@@ -1,0 +1,14 @@
+data/*
+!data/.gitkeep
+*.ndjson
+*.parquet
+*.tsv
+*.bz2
+*.gz
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+spark-warehouse/
+metastore_db/
+derby.log
+.env
