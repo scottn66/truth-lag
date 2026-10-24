@@ -1,0 +1,56 @@
+# Prompt given to the build agent "mongo"
+
+Tool: Claude Code Workflow (model claude-opus-5-5), run 2026-10-24. Source: ec-hw2/genai/workflows/build.js (this text is generated from it, word for word).
+
+```text
+You are building one part of the Truth Lag EC HW2 project (SJSU DATA 226, Group 9: a NoSQL mini project that answers "which English Wikipedia edits get reverted, how fast, and who reverts whom" in MongoDB and Neo4j, compared with SQL). Today is 2026-10-24 (UTC). The repo is /Users/scottnelson/Desktop/226/truth-lag on git branch ec-hw2. Work ONLY inside this repo.
+
+Read first (all short): ec-hw2/SPEC.md (the assignment), ec-hw2/config.py (every path, window and rule: import it, never re-type a rule), ec-hw2/DATA_MODEL.md (every table and collection with its columns: follow it exactly), ec-hw2/STYLE.md (writing and code rules), ec-hw2/ingest/history_columns.py (types for the dump columns). The approved plan is /Users/scottnelson/.claude/plans/https-github-com-scottn66-truth-lag-this-mutable-whistle.md (read the parts about your work).
+
+Environment: Python 3.12 venv at .venv. Run '.venv/bin/python ...' from the repo root. Installed: pandas 2.3, pyarrow, pymongo, neo4j (driver 6), matplotlib, tabulate, pytest, jupyter, nbconvert, ipykernel, python-dotenv. MongoDB 8.0 (mongodb://localhost:27017) and Neo4j 2026.10.1 with GDS + APOC (bolt://localhost:7687, Browser http://localhost:7474) run in Docker via Colima (containers truthlag-mongo-1 and truthlag-neo4j-1). Credentials are in ec-hw2/.env and config.py loads them: never print them. Data is in data/ (git-ignored): data/history (VPS-filtered dump as Parquet, ALL columns are strings), data/raw (copy of the live capture). The live capture runs on a VPS; the copy in data/raw was synced at the start of this build.
+
+Hard rules:
+- Touch only the files listed for your part. If you need a change in a shared file (config.py, DATA_MODEL.md, STYLE.md, ec-hw2/requirements.txt, ec-hw2/docker-compose.yml, ingest/history_columns.py), do NOT edit it: describe the change in shared_change_requests and work around it locally if you can.
+- No git commands that change anything (no add, commit, checkout, stash, reset). No package installs (no pip or uv install). Never run "docker compose down -v" and never remove containers or volumes.
+- Never ssh to the VPS, never run rsync, never open Wikimedia EventStreams connections, and never call Wikimedia web APIs. (Only the literature part may use the web, for papers.)
+- Never use the "timeout" command (it is not on macOS). Run long jobs in the background with output to a log under data/logs/ and check the log.
+- Never delete or rewrite anything under data/raw or data/history.
+- Write output files safely: write <name>.tmp, then os.replace to the final name, then write a _SUCCESS_<step>.json next to it with row counts.
+- Every script starts with a docstring: purpose, inputs, outputs, and the exact run command. Use plain short English in comments and docs. All times are timezone-aware UTC. A script in a sub-folder of ec-hw2 imports config with sys.path.insert(0, str(Path(__file__).resolve().parents[N])) (N = depth to ec-hw2) and then "import config".
+- Put your tests in ec-hw2/tests/test_<part>.py with tiny synthetic fixtures that use the same column names and types as the real files. Run them with '.venv/bin/python -m pytest ec-hw2/tests/test_<part>.py -q'. Create ec-hw2/tests/__init__.py only if it does not exist.
+- Human editors must appear only as pseudonyms in any committed result, figure or sample (bots keep their real names). Page titles are fine.
+- At the end, run your code on the real data, check that the numbers make sense, and report honestly: what works, what does not, and every number you saw. Do not claim something works unless you ran it.
+
+Return the structured result: part, files you created, commands that ran OK, key numbers (name/value), issues (anything wrong, surprising or unfinished), shared_change_requests, and notes_for_docs (facts the teammates should know, in plain English).
+
+YOUR PART: MongoDB (checked later by the Data+MongoDB role).
+Inputs (made by other parts, they exist now; check the _SUCCESS_*.json files and stop with a clear message if one is missing): data/tables/history_revisions.parquet, history_revert_links.parquet, live_revisions.parquet, live_revert_links.parquet, live_revert_links_all.parquet, late_reverts.parquet, data/parsed/page_change.parquet and tag_events.parquet.
+Create: ec-hw2/ingest/build_documents.py, ec-hw2/load_mongo.py, ec-hw2/speed_layer.py, the query files ec-hw2/queries/mongo/q1_revert_rate_by_hour.json, q2_top_contested_pages.json, q3_time_to_revert.json, q4_bot_vs_human.json, q5_truth_lag_preview.json and compare_mutual_reverts.json (the "top contested pages" comparison query is q2), ec-hw2/queries/run_mongo.py, ec-hw2/queries/run_all.py (calls run_mongo, then queries/run_cypher.py and queries/run_sql.py only if those files exist; other parts write them), ec-hw2/tests/test_mongo.py, and the outputs results/mongo_*.csv and results/mongo_*.md.
+Follow DATA_MODEL.md section 4 exactly for documents and collections, and section 7 for the shared definitions.
+- build_documents.py: Parquet -> documents (dicts; datetimes as timezone-aware datetime). comment is cut to 120 characters. Live documents have live{} and history documents have history{}. It writes nothing to disk except results/sample_documents.json: ONE history and ONE live document, with human editor names replaced by pseudonyms (for the report picture).
+- load_mongo.py: --target local|atlas|sharded (URIs from config); --confirm-overwrite is required for atlas.
+  - local: drop and reload revisions, revert_links, tag_events (mw-reverted additions only) and late_reverts. Create the indexes: the spec's {"page.id": 1, "ts": 1}, {"user.id": 1}, {"history.reverted": 1}, plus {cohort: 1, ts: 1} and revert_links {reverted_rev_id: 1}. Use insert_many in batches of 5,000 (ordered=False).
+  - atlas: history documents WITHOUT comment, history revert_links and the chart collections only. Before loading, estimate the size (average BSON size of a sample times the count, plus an index estimate) and refuse if it is over config.ATLAS_BUDGET_MB. Print the database stats after loading. Do not run the atlas target now (there is no ATLAS_URI yet); just make it ready and test the size estimate.
+  - sharded: only make the connection work; the scale-out part copies the data.
+- speed_layer.py builds page_hour from data/parsed/page_change.parquet (ns 0, edit/create, the whole capture). The key is (page_id, UTC hour of meta_dt). edits_seen = edit events published in that hour; revert_events_seen = events with a revert in that hour; reverted_revs_seen = covered revisions (from live_revert_links_all) counted in the hour of the reverting event's meta_dt.
+  - The batch mode must give the same counts on every re-run. Load a staging collection page_change_min (only the needed fields), run an aggregation with $group and $merge into page_hour (whenMatched 'replace'), then drop the staging collection. This shows MongoDB doing the speed-layer job.
+  - The --follow mode tails the newest LOCAL raw files (never EventStreams) and applies $inc to page_hour_live. It stops on Ctrl-C and never counts a meta.id twice (keep a set).
+  - Print the top 10 page-hours by edits_seen.
+- Query files: write each pipeline as MongoDB Extended JSON (bson.json_util) in its own .json file: {"collection": ..., "description": "plain English, including how to paste the pipeline into Atlas Data Explorer > Aggregations or Compass", "pipeline": [...]}. Each pipeline starts with $match on cohort.
+  - Q1 (spec 3.1) revert rate by hour of day x user kind. Use both cohorts. Reverted = history.reverted for history; for live, use a $lookup to revert_links with within_followup. Group by cohort, hour_utc and user.kind; output edits, reverted and revert_rate. run_mongo.py also writes chart_q1_hour_kind with $merge.
+  - Q2 (spec 3.2) top 20 contested pages: the history cohort with the exact DATA_MODEL section 7 definition. edits_p counts non-bot edits. revert_actions_p = distinct reverting_rev_id from revert_links with within_followup and by_other. Also reverted_editors_p. Keep pages with edits >= 10 and editors >= 2. The score is a float. Order by score desc, revert_actions desc, edits desc, page_id asc, and limit to 20. Add the contested flag and the page title.
+  - Q3 (spec 3.3) time-to-revert distribution: $bucket on revert_links.T_s (within_followup) by cohort, with boundaries config.LAG_GRID_S and default config.LAG_DEFAULT_BUCKET. run_mongo.py asserts the default bucket is empty. Output n and share per bucket. Also write chart_q3_time_to_revert.
+  - Q4 (spec 3.4) bot vs human share of reverts: a $facet over history revert_links with within_followup and by_other. One facet gives reverts MADE by reverter_kind (share); one gives reverts RECEIVED by author_kind (share). Add the revert rate of bot edits vs human edits from revisions.
+  - Q5 (spec 3.5) truth-lag preview. Start from revisions (both cohorts). Use an equality $lookup to revert_links on reverted_rev_id (plus a cohort match). Also $lookup page_hour for the page's edits in the hour before the edit; that is live only, and for history use history page_edits_prev_1h and say so in a note.
+    - Compute T, and for live also known-by = T + K.
+    - Output, for each cohort and user_kind: the share of eventual reverts (within 4 days, the common horizon) already known at each wait in config.WAIT_POINTS_S.
+    - For live, also output revert-risk deciles (in run_mongo.py, with $bucketAuto or precomputed decile cut points). For each decile give n, the revert rate within 4 d, the median T, and the residual P(w < T <= 4 d | T > w) for each w in config.DECISION_WAITS_S, with a Wilson 95% CI (the CI may be computed in Python after the pipeline).
+    - Also write chart_q5_known_by and chart_q5_risk_deciles. Drop groups with n < config.RISK_MIN_GROUP_N.
+  - compare_mutual_reverts (spec 5): history revert_links with within_followup and by_other. $group to (reverter_key, author_key, page_id) counts, then a self-$lookup to find the reverse direction on the same page. Output unordered pairs (a < b) per page with both counts, ordered by page_id, a, b.
+- run_mongo.py runs all 6 pipelines on local (or --target atlas) and times each one (median of 7 warm runs after 1 warm-up). It writes results/mongo_<name>.csv and .md (the first rows as text tables, using tabulate), writes the chart collections, asserts the Q3 default bucket is empty, and prints a summary. Replace human editor names with pseudonyms in any result that shows editors (the same alias rule as the graph: 'editor_' + the first hex digits of sha1(editor_key), long enough to be unique).
+- Check your results against Python:
+  - The Q5 share known within 4 d computed from the Parquet tables must equal the Mongo result (print both).
+  - Q2 must match a pandas computation from the Parquet tables (same 20 page_ids, scores rounded to 6).
+- Tests (test_mongo.py) may use the local MongoDB with database truthlag_test, dropped at the end. Cover the document builder shape, the Q2 tie order on a tiny fixture, the Q3 bucket edges and the mutual-revert pairing.
+- At the end, load local for real and run run_mongo.py.
+```
