@@ -1,0 +1,17 @@
+# MongoDB query timings
+
+Target: atlas. MongoDB 8.0.34. Each query ran 7 warm times after 1 warm-up; median_ms is the median of those runs. The risk deciles ran once. Checks: Q1 = pandas (every cohort x hour x user kind): OK; Q2 = pandas (same 20 page_ids, scores rounded to 6): OK; Q3 default bucket 'over_20d' is empty: OK; Q3 bucket counts = pandas (history, history_4d): OK; Q5 known-by shares = pandas (every cohort, kind and wait): OK; mutual pairs = pandas (page, editor pair and counts; no order): OK; no editor key or human name in the result files: OK.
+
+Rows: 7.
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 10:10 UTC (data-v1). Full table: `mongo_atlas_summary.csv`.
+
+| query                  | collection   |   result_rows |   median_ms |   min_ms |   max_ms |   runs |
+|------------------------|--------------|---------------|-------------|----------|----------|--------|
+| q1_revert_rate_by_hour | revisions    |            75 |      1418.9 |   1400.3 |   1445.2 |      7 |
+| q2_top_contested_pages | revert_links |            20 |       488.7 |    472.8 |    549.7 |      7 |
+| q3_time_to_revert      | revert_links |            19 |       178   |    172.3 |    189.9 |      7 |
+| q4_bot_vs_human        | revert_links |             8 |      1306.1 |   1286.6 |   1352   |      7 |
+| q5_truth_lag_preview   | revisions    |            36 |     59088.3 |  58872.4 |  59567.8 |      7 |
+| compare_mutual_reverts | revert_links |           462 |      1520.8 |   1481.8 |   1531.9 |      7 |
+| q5_risk_deciles        | revisions    |             0 |        46.7 |     46.7 |     46.7 |      1 |
+

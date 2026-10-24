@@ -1,0 +1,9 @@
+part,kind,revert_actions,reverted_revisions,share,edits,reverted,reverted_by_other,revert_rate,revert_rate_by_other
+made_by_reverter_kind,registered,11886,16105,0.8888058027368578,,,,,
+made_by_reverter_kind,temporary,815,1024,0.06094369251476856,,,,,
+made_by_reverter_kind,bot,672,739,0.05025050474837359,,,,,
+received_by_author_kind,temporary,7861,9946,0.5566375643608686,,,,,
+received_by_author_kind,registered,5563,7749,0.43368032236400267,,,,,
+received_by_author_kind,bot,171,173,0.009682113275128721,,,,,
+edit_revert_rate,bot,,,,33483,271,173,0.00809365946898426,0.005166801063226115
+edit_revert_rate,human,,,,261533,19429,17695,0.07428890426829501,0.0676587658154038

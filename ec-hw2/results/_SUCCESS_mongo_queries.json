@@ -1,0 +1,56 @@
+{
+  "step": "mongo_queries",
+  "data_version": "data-v1",
+  "created_at": "2026-10-24T09:56:42+00:00",
+  "rows": {
+    "mongo_q1_revert_rate_by_hour.csv": 147,
+    "mongo_q2_top_contested_pages.csv": 20,
+    "mongo_q3_time_to_revert.csv": 27,
+    "mongo_q4_bot_vs_human.csv": 8,
+    "mongo_q5_truth_lag_preview.csv": 72,
+    "mongo_q5_truth_lag_preview_activity.csv": 15,
+    "mongo_compare_mutual_reverts.csv": 462,
+    "mongo_q5_risk_deciles.csv": 11
+  },
+  "target": "local",
+  "checks": [
+    {
+      "name": "Q1 = pandas (every cohort x hour x user kind)",
+      "ok": true
+    },
+    {
+      "name": "Q2 = pandas (same 20 page_ids, scores rounded to 6)",
+      "ok": true
+    },
+    {
+      "name": "Q3 default bucket 'over_20d' is empty",
+      "ok": true
+    },
+    {
+      "name": "Q3 bucket counts = pandas (history, live, history_4d)",
+      "ok": true
+    },
+    {
+      "name": "Q5 known-by shares = pandas (every cohort, kind and wait)",
+      "ok": true
+    },
+    {
+      "name": "mutual pairs = pandas (full ordered list)",
+      "ok": true
+    },
+    {
+      "name": "no editor key or human name in the result files",
+      "ok": true
+    },
+    {
+      "name": "Q5 risk deciles = pandas (n, reverts, page creations, exact median T)",
+      "ok": true
+    }
+  ],
+  "charts": {
+    "chart_q1_hour_kind": 147,
+    "chart_q3_time_to_revert": 27,
+    "chart_q5_known_by": 72,
+    "chart_q5_risk_deciles": 11
+  }
+}
