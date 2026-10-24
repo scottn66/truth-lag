@@ -1,0 +1,27 @@
+%% EC HW2 architecture: where the data comes from and where it goes.
+%% Render: .venv/bin/python ec-hw2/report/make_figures.py --only architecture
+%% The links go from subgraph to subgraph, so each row keeps its left-to-right order.
+flowchart TB
+    subgraph VPS["1. VPS vps-coin: always on, we only read it"]
+        direction LR
+        ES["Wikimedia EventStreams<br/>page_change.v1, revert-risk, tags"] --> CAP["capture.py<br/>truthlag-capture-a and -b"] --> RAWV["raw .ndjson.gz<br/>one folder per meta.dt hour"]
+        DUMP["MediaWiki History dump<br/>2026-09, 557 MB .bz2"] --> FILT["filter_history.py<br/>ran once"] --> HISTV["Parquet: Sep 8-10 cohort<br/>+ slim September file"]
+    end
+    subgraph ING["2. Scott's Mac: parse"]
+        direction LR
+        RAW["data/raw/"] --> PARSE["ingest/ parse scripts<br/>parse_stream, label_live,<br/>late_reverts, parse_history"]
+        HIST["data/history/"] --> PARSE
+        PARSE --> TAB["Parquet tables<br/>data/tables/<br/>history + live cohorts"]
+    end
+    subgraph DB["3. Scott's Mac: databases (Docker in Colima) and queries"]
+        direction LR
+        MONGO[("MongoDB 8.0<br/>revisions, revert_links,<br/>page_hour")] -->|export_graph.py| CSV["CSV files<br/>data/neo4j/import/"] -->|"load_neo4j.py<br/>LOAD CSV"| NEO[("Neo4j 2026.10 + GDS<br/>Editor, Page,<br/>EDITED, REVERTED")]
+        SQL[("SQLite<br/>truthlag.sqlite<br/>(load_sql.py)")]
+        MONGO -.->|history cohort only| ATLAS[("MongoDB Atlas<br/>free tier M0")]
+        RES["queries/, compare.py<br/>results/, notebooks/"]
+        MONGO --> RES
+        NEO --> RES
+        SQL --> RES
+    end
+    VPS ==>|"rsync -az --partial (never --delete)"| ING
+    ING ==>|"load_mongo.py and load_sql.py"| DB
