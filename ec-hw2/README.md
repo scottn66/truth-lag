@@ -6,7 +6,7 @@
 > MongoDB holds one document per edit. Neo4j holds a graph of who reverts whom.
 > Then we ask the same questions in SQL and compare the three databases.
 
-**Status on 2026-10-24:** the branch `ec-hw2` is not on GitHub yet, and the data-v1 release is not published yet. Both are planned for 2026-10-24. Until then, Ways 1-3 (section 4) and section 5 do not work. Scott deletes this line after the push.
+**Status on 2026-10-24:** the branch `ec-hw2` is on GitHub, with the draft pull request [#1](https://github.com/scottn66/truth-lag/pull/1). The data-v1 release is not published yet, so Ways 2-3 (section 4) need it first. Way 1 (reading on GitHub) works now.
 
 - New words: [GLOSSARY.md](GLOSSARY.md) (with Chinese, 繁體 and 简体).
 - Tasks, schedule and daily log: [PROGRESS.md](PROGRESS.md).
