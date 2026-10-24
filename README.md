@@ -1,3 +1,8 @@
+> **EC HW2 (NoSQL mini project, due Thu 2026-10-29 4:29 PM PT): open [`ec-hw2/README.md`](ec-hw2/README.md).**
+> Everything else in this repo is for the final project.
+>
+> Do not run the Quickstart collector until after 2026-10-29: the VPS capture needs the EventStreams connection slots.
+
 # Truth Lag
 
 SJSU DATA 226, Group 9: Scott, Tingyu, Wanru, Zhenni.

@@ -1,0 +1,14 @@
+[Unit]
+Description=TruthLag Wikimedia SSE capture (b)
+After=network-online.target
+Wants=network-online.target
+[Service]
+# Runs as root: only user on this VPS. Writes only under /opt/truthlag.
+WorkingDirectory=/opt/truthlag
+ExecStart=/opt/truthlag/venv/bin/python /opt/truthlag/capture.py b mediawiki.revision-tags-change 2026-10-17T00:00:00Z
+Restart=always
+RestartSec=10
+MemoryMax=500M
+Nice=5
+[Install]
+WantedBy=multi-user.target
