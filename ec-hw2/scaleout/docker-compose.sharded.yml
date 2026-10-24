@@ -1,0 +1,69 @@
+# Sharded MongoDB demo for EC HW2 (scale-out). This is a SEPARATE compose project.
+#
+# What it starts (all mongo:8.0, the same version as the main project and Atlas):
+#   cfg     the config server: replica set cfgrs, port 27019
+#   shard1  shard 1: replica set shard1rs, port 27018 (inside Docker only)
+#   shard2  shard 2: replica set shard2rs, port 27018 (inside Docker only)
+#   mongos  the router: port 27017 inside, published as 127.0.0.1:27020
+# Each replica set has 1 member. That is enough to show how data and queries are
+# split; a real cluster has 3 members per replica set.
+#
+# Memory: 3 x 600 MB + 256 MB = about 2 GB at most. Colima has 6 GB, so stop Neo4j
+# first. The main MongoDB (port 27017) can keep running.
+#
+# Run (from the repo root), in this order. SHARDING.md explains every step.
+#   docker stop truthlag-neo4j-1
+#   docker compose -f ec-hw2/scaleout/docker-compose.sharded.yml up -d
+#   bash ec-hw2/scaleout/init_sharded.sh
+#   .venv/bin/python ec-hw2/scaleout/demo_sharding.py
+#   docker start truthlag-neo4j-1
+#   docker compose -f ec-hw2/scaleout/docker-compose.sharded.yml stop
+#
+# The volumes are named truthlag-sharded_cfg_data, truthlag-sharded_shard1_data and
+# truthlag-sharded_shard2_data. They are not the main project's volumes.
+# Never run "down -v".
+name: truthlag-sharded
+
+services:
+  cfg:
+    image: mongo:8.0
+    command: ["mongod", "--configsvr", "--replSet", "cfgrs", "--port", "27019",
+              "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: [cfg_data:/data/configdb]   # a config server keeps its data in /data/configdb
+    # The image declares two data folders. The unused one is a tmpfs, so Docker does
+    # not create an extra volume without a name.
+    tmpfs: [/data/db]
+    mem_limit: 600m
+    restart: "no"                        # a demo: it should not start again by itself
+
+  shard1:
+    image: mongo:8.0
+    command: ["mongod", "--shardsvr", "--replSet", "shard1rs", "--port", "27018",
+              "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: [shard1_data:/data/db]
+    tmpfs: [/data/configdb]
+    mem_limit: 600m
+    restart: "no"
+
+  shard2:
+    image: mongo:8.0
+    command: ["mongod", "--shardsvr", "--replSet", "shard2rs", "--port", "27018",
+              "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: [shard2_data:/data/db]
+    tmpfs: [/data/configdb]
+    mem_limit: 600m
+    restart: "no"
+
+  mongos:
+    image: mongo:8.0
+    command: ["mongos", "--configdb", "cfgrs/cfg:27019", "--port", "27017", "--bind_ip_all"]
+    ports: ["127.0.0.1:27020:27017"]     # config.SHARDED_URI = mongodb://localhost:27020
+    depends_on: [cfg, shard1, shard2]
+    tmpfs: [/data/db, /data/configdb]    # mongos stores nothing on disk
+    mem_limit: 256m
+    restart: "no"
+
+volumes:
+  cfg_data:
+  shard1_data:
+  shard2_data:
