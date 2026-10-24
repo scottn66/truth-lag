@@ -1,0 +1,71 @@
+{
+  "step": "sql_queries",
+  "data_version": "data-v1",
+  "created_at": "2026-10-24T09:56:54+00:00",
+  "sqlite_version": "3.53.1",
+  "runs": 7,
+  "rows": {
+    "sql_compare_top_contested.csv": 20,
+    "sql_compare_mutual_reverts.csv": 462
+  },
+  "median_ms": {
+    "sql_compare_top_contested.csv": 24.0,
+    "sql_compare_mutual_reverts.csv": 17.6
+  },
+  "results": [
+    {
+      "query": "compare_top_contested",
+      "file": "sql_compare_top_contested.csv",
+      "result_rows": 20,
+      "median_ms": 24.0,
+      "min_ms": 23.9,
+      "max_ms": 24.6,
+      "runs": 7
+    },
+    {
+      "query": "compare_mutual_reverts",
+      "file": "sql_compare_mutual_reverts.csv",
+      "result_rows": 462,
+      "median_ms": 17.6,
+      "min_ms": 17.6,
+      "max_ms": 18.2,
+      "runs": 7
+    }
+  ],
+  "checks": [
+    {
+      "name": "SQL top contested = pandas (page_id, score to 6; counts)",
+      "ok": true
+    },
+    {
+      "name": "SQL top contested = Mongo Q2 (mongo_q2_top_contested_pages.csv)",
+      "ok": true,
+      "same_page_and_score": true,
+      "same_counts": true
+    },
+    {
+      "name": "SQL top contested = Cypher (cypher_compare_top_contested.csv)",
+      "ok": true,
+      "same_page_and_score": true,
+      "same_counts": true
+    },
+    {
+      "name": "SQL mutual reverts = pandas (full ordered list of keys)",
+      "ok": true,
+      "rows": 462
+    },
+    {
+      "name": "SQL mutual reverts = Mongo (mongo_compare_mutual_reverts.csv, full ordered list)",
+      "ok": true,
+      "rows": 462,
+      "first_difference_row": null
+    },
+    {
+      "name": "SQL mutual reverts = Cypher Q1 (cypher_q1_mutual_reverts.csv, full ordered list)",
+      "ok": true,
+      "rows": 462,
+      "first_difference_row": null
+    }
+  ],
+  "seconds": 1.1
+}
