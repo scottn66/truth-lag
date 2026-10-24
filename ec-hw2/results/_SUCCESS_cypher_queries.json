@@ -1,0 +1,103 @@
+{
+  "step": "cypher_queries",
+  "data_version": "data-v1",
+  "created_at": "2026-10-24T09:56:52+00:00",
+  "neo4j_version": "2026.10.1",
+  "runs": 7,
+  "rows": {
+    "cypher_q1_mutual_reverts.csv": 462,
+    "cypher_q1_mutual_reverts_total.csv": 1,
+    "cypher_q2_central_reverters.csv": 20,
+    "cypher_q2_central_reverters_humans.csv": 20,
+    "cypher_q2_central_reverters_by_degree.csv": 20,
+    "cypher_q3_conflict_communities_louvain_stats.csv": 1,
+    "cypher_q3_conflict_communities_community_sizes.csv": 1,
+    "cypher_q3_conflict_communities.csv": 10,
+    "cypher_q3_conflict_communities_wcc_sizes.csv": 6,
+    "cypher_q3_conflict_communities_wcc_largest.csv": 5,
+    "cypher_q4_pages_most_warring_editors.csv": 20,
+    "cypher_q4_pages_most_warring_editors_by_any_revert.csv": 20,
+    "cypher_q5_two_hop_contested.csv": 20,
+    "cypher_compare_top_contested.csv": 20
+  },
+  "median_ms": {
+    "cypher_q1_mutual_reverts.csv": 53.0,
+    "cypher_q1_mutual_reverts_total.csv": 38.7,
+    "cypher_q2_central_reverters.csv": 193.3,
+    "cypher_q2_central_reverters_humans.csv": 185.6,
+    "cypher_q2_central_reverters_by_degree.csv": 17.2,
+    "cypher_q3_conflict_communities_louvain_stats.csv": 412.7,
+    "cypher_q3_conflict_communities_community_sizes.csv": 19.2,
+    "cypher_q3_conflict_communities.csv": 106.9,
+    "cypher_q3_conflict_communities_wcc_sizes.csv": 8.7,
+    "cypher_q3_conflict_communities_wcc_largest.csv": 39.6,
+    "cypher_q4_pages_most_warring_editors.csv": 26.2,
+    "cypher_q4_pages_most_warring_editors_by_any_revert.csv": 23.1,
+    "cypher_q5_two_hop_contested.csv": 17.9,
+    "cypher_compare_top_contested.csv": 112.9
+  },
+  "checks": [
+    {
+      "name": "PageRank converged ('cypher_q2_reverse', {relationshipWeightProperty: 'count', concurrency: 4, maxIterations: 200, tolerance: 1e-7})",
+      "ok": true,
+      "iterations": 111
+    },
+    {
+      "name": "compare_top_contested = Mongo Q2 (same 20 page_ids, scores rounded to 6)",
+      "ok": true,
+      "same_counts": true
+    },
+    {
+      "name": "Cypher Q1 total = number of Cypher Q1 rows",
+      "ok": true
+    },
+    {
+      "name": "Cypher Q1 = Mongo compare_mutual_reverts (full ordered list)",
+      "ok": true,
+      "rows": 462
+    },
+    {
+      "name": "Louvain wrote communityId on every Editor",
+      "ok": true
+    },
+    {
+      "name": "WCC component sizes add up to all Editor nodes",
+      "ok": true
+    },
+    {
+      "name": "community_sizes: same total as louvain_stats, and 2+ editors + 1 editor = total",
+      "ok": true,
+      "communities": 28615,
+      "communities_2plus": 1191
+    },
+    {
+      "name": "Editor.reverts_made = sum of outgoing REVERTED.count",
+      "ok": true,
+      "bad": 0
+    },
+    {
+      "name": "Editor.reverts_received = sum of incoming REVERTED.count",
+      "ok": true,
+      "bad": 0
+    },
+    {
+      "name": "Page.revert_actions = distinct reverting_rev_id on its EDITED relationships",
+      "ok": true,
+      "bad": 0
+    },
+    {
+      "name": "values have real types (Page.score FLOAT, EDITED.ts ZONED DATETIME, REVERTED.count INTEGER)",
+      "ok": true,
+      "bad": 0
+    },
+    {
+      "name": "every human Editor.alias = the shared pseudonym (ingest/build_documents.py)",
+      "ok": true,
+      "editors_checked": 37511,
+      "different": 0
+    }
+  ],
+  "failed_files": [],
+  "figure": "results/figures/neo4j_edit_war_example.png",
+  "seconds": 9.3
+}
