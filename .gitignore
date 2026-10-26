@@ -12,3 +12,9 @@ spark-warehouse/
 metastore_db/
 derby.log
 .env
+# EC HW2
+*.sqlite
+*.tmp
+ec-hw2/.env
+ec-hw2/.env.*
+!ec-hw2/.env.example

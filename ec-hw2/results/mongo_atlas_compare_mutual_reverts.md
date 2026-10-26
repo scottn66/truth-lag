@@ -1,0 +1,41 @@
+# Mutual reverts per page (comparison query, MongoDB)
+
+Mutual reverts (spec 5, the comparison query; DATA_MODEL.md section 7): editor a reverted b AND b reverted a on the SAME page. Input: history revert_links with within_followup and by_other (both keys not null). $group makes the triples (reverter_key, author_key, page_id) with the distinct reverting revisions; a self-$lookup on revert_links (same page, roles swapped) finds the reverse direction. One row per page and unordered pair (a < b by key): page_id, a, b, a_reverted_b and b_reverted_a (distinct revert actions in each direction). Ordered by page_id, a, b. The output shows editor keys: results/ files replace human keys with pseudonyms.
+
+Rows: 462. Median time: 1,520.8 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 10:10 UTC (data-v1). Full table: `mongo_atlas_compare_mutual_reverts.csv`.
+
+|   page_id | page_title                            | editor_a          | editor_b          |   a_reverted_b |   b_reverted_a |
+|-----------|---------------------------------------|-------------------|-------------------|----------------|----------------|
+|      1921 | Al-Qaeda                              | editor_0d0cfcfbf9 | editor_9eb8ef10a7 |              1 |              1 |
+|      6443 | Ceuta                                 | editor_36d2f02780 | editor_3b58b3c064 |              1 |              2 |
+|      8691 | Divination                            | editor_2a2c1d5e4e | editor_37519a19ee |              2 |              1 |
+|     11642 | General_Dynamics_F-16_Fighting_Falcon | editor_6ce3a652ad | editor_87b8cee2d3 |              1 |              1 |
+|     12861 | Governor_of_New_York                  | editor_47e86b5cd9 | editor_487db86817 |              1 |              1 |
+|     14653 | Iran                                  | editor_c76338f65c | editor_cc48647e40 |              1 |              1 |
+|     15800 | June_26                               | editor_7628bfe60d | editor_7ca4a5a591 |              1 |              1 |
+|     21216 | Nevada                                | editor_3e752ffcba | editor_dd4c69c7ef |              1 |              1 |
+|     21711 | Neon_Genesis_Evangelion               | editor_a11552f42d | editor_ed3b936f81 |              1 |              1 |
+|     25412 | Rock_and_roll                         | editor_6990c735a3 | editor_71e32ee367 |              1 |              1 |
+|     26769 | South_America                         | editor_07a4f411ef | editor_8811ab609d |              1 |              1 |
+|     28588 | Coat_of_arms_of_South_Africa          | editor_4deed9c19b | editor_740863da11 |              1 |              1 |
+|     28849 | Shiva                                 | editor_56450988a7 | editor_bdb60908b2 |              1 |              1 |
+|     31924 | University_of_California,_Davis       | editor_a2afead7f9 | editor_bbbf6dbde4 |              2 |              1 |
+|     33299 | William_Henry_Harrison                | editor_1b2c1e3586 | editor_b61b267917 |              1 |              1 |
+|     37653 | CBS                                   | editor_5c0348929b | editor_96ab052746 |              2 |              1 |
+|     46252 | Fox_Broadcasting_Company              | editor_149df512e8 | editor_f3ddbfb21b |              2 |              1 |
+|     46764 | Artiodactyla                          | editor_d5a2b9dbd5 | editor_e84ed8f72e |              1 |              1 |
+|     50884 | Chelicerata                           | editor_aec5a64ebf | editor_d77156726d |              1 |              1 |
+|     52382 | Watergate_scandal                     | editor_26780f3de3 | editor_bfe10b76eb |              1 |              1 |
+|     52382 | Watergate_scandal                     | editor_2fdc778846 | editor_c8c6ac1305 |              1 |              1 |
+|     52382 | Watergate_scandal                     | editor_2fdc778846 | editor_f70885dc34 |              2 |              2 |
+|     52382 | Watergate_scandal                     | editor_3710546463 | editor_dd4c69c7ef |              2 |              3 |
+|     52382 | Watergate_scandal                     | editor_3710546463 | ClueBot NG        |              1 |              1 |
+|     52382 | Watergate_scandal                     | editor_88ce220359 | editor_dd4c69c7ef |              2 |              2 |
+|     52382 | Watergate_scandal                     | editor_bfe10b76eb | editor_c8c6ac1305 |              1 |              1 |
+|     53307 | Lepidoptera                           | editor_7df58ece29 | editor_aec5a64ebf |              2 |              1 |
+|     60585 | Social_Democratic_Party_of_Germany    | editor_8f36f41c8c | editor_ad6cd81354 |              1 |              1 |
+|     66069 | Harald_V                              | editor_47caafd596 | editor_edd7e230da |              1 |              1 |
+|     66069 | Harald_V                              | editor_78e3c56467 | editor_8f621ec0db |              1 |              1 |
+
+(first 30 of 462 rows)

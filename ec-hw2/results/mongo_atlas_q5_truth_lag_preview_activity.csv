@@ -1,0 +1,6 @@
+cohort,source,prev_hour_edits,prev_hour_edits_from,n_edits,n_reverted_4d,revert_rate_4d
+history,prev_1h,0,0,202410,11390,0.05627192332394645
+history,prev_1h,1,1,42155,2519,0.059755663622346106
+history,prev_1h,2-4,2,32697,2627,0.08034376242468728
+history,prev_1h,5-9,5,11888,767,0.06451884253028264
+history,prev_1h,10+,10,5866,343,0.05847255369928401

@@ -1,0 +1,105 @@
+{
+  "step": "comparison",
+  "data_version": "data-v1",
+  "timing_label": "draft",
+  "created_at": "2026-10-24T09:57:08+00:00",
+  "runs": 7,
+  "rounds": 3,
+  "rows": {
+    "comparison.csv": 6,
+    "comparison_extra.csv": 1
+  },
+  "result_rows": {
+    "top contested pages / MongoDB": 20,
+    "top contested pages / Neo4j": 20,
+    "top contested pages / SQLite": 20,
+    "mutual reverts / MongoDB": 462,
+    "mutual reverts / Neo4j": 462,
+    "mutual reverts / SQLite": 462
+  },
+  "median_ms": {
+    "top contested pages / MongoDB": 76.7,
+    "top contested pages / Neo4j": 114.2,
+    "top contested pages / SQLite": 25.2,
+    "mutual reverts / MongoDB": 133.1,
+    "mutual reverts / Neo4j": 39.3,
+    "mutual reverts / SQLite": 16.1
+  },
+  "range_ms": {
+    "top contested pages / MongoDB": [
+      72.5,
+      100.5
+    ],
+    "top contested pages / Neo4j": [
+      107.9,
+      142.0
+    ],
+    "top contested pages / SQLite": [
+      24.7,
+      30.8
+    ],
+    "mutual reverts / MongoDB": [
+      128.4,
+      158.0
+    ],
+    "mutual reverts / Neo4j": [
+      30.7,
+      45.2
+    ],
+    "mutual reverts / SQLite": [
+      15.9,
+      16.7
+    ]
+  },
+  "faster_than": {
+    "top contested pages / MongoDB": "Neo4j",
+    "top contested pages / Neo4j": "",
+    "top contested pages / SQLite": "MongoDB; Neo4j",
+    "mutual reverts / MongoDB": "",
+    "mutual reverts / Neo4j": "MongoDB",
+    "mutual reverts / SQLite": "MongoDB; Neo4j"
+  },
+  "extra": {
+    "engine": "SQLite, pre-aggregated input",
+    "median_ms": 1.4,
+    "min_ms": 1.4,
+    "max_ms": 1.6,
+    "setup_ms": 12.5,
+    "same_result": "yes (same rows as the SQLite raw-link query)"
+  },
+  "mongo_index_check": {
+    "index": "cohort_1_page_id_1",
+    "pipelines": {
+      "top contested pages": {
+        "stage": "IXSCAN",
+        "index": "cohort_1_page_id_1",
+        "docs_examined": 19858,
+        "with_index_ms": 75.9,
+        "collection_scan_ms": 70.5
+      },
+      "mutual reverts": {
+        "stage": "IXSCAN",
+        "index": "cohort_1_page_id_1",
+        "docs_examined": 19858,
+        "with_index_ms": 127.5,
+        "collection_scan_ms": 129.9
+      }
+    }
+  },
+  "top_columns_equal": true,
+  "pain_scored_by": [
+    "draft by Claude Code; Comparison+viz owner to re-score"
+  ],
+  "all_identical": true,
+  "load_average_start": [
+    3.45458984375,
+    3.54833984375,
+    3.138671875
+  ],
+  "load_average_end": [
+    3.4580078125,
+    3.54638671875,
+    3.142578125
+  ],
+  "idle_load_threshold": 2.0
+}

@@ -1,0 +1,75 @@
+{
+  "step": "sharding",
+  "data_version": "data-v1",
+  "created_at": "2026-10-24T08:11:06+00:00",
+  "rows": {
+    "documents_copied": 295016,
+    "documents_shard1rs": 147462,
+    "documents_shard2rs": 147554,
+    "queries_explained": 5
+  },
+  "output": "ec-hw2/results/sharding.md",
+  "limit": null,
+  "chunks": {
+    "shard2rs": 1,
+    "shard1rs": 1
+  },
+  "routing": {
+    "history of one page": "SINGLE_SHARD",
+    "all edits of one editor": "SHARD_MERGE",
+    "a range of page ids": "SHARD_MERGE",
+    "revert rate by hour of day": "both shards, merged by mongos",
+    "the 20 pages with the most revisions": "both shards, merged by mongos"
+  },
+  "checks": [
+    {
+      "name": "every copied document is in the sharded collection",
+      "ok": true
+    },
+    {
+      "name": "the shards own all documents ($shardedDataDistribution)",
+      "ok": true
+    },
+    {
+      "name": "no orphaned documents (no chunk moved during the load)",
+      "ok": true
+    },
+    {
+      "name": "even spread: each shard owns 45%-55% of the documents",
+      "ok": true
+    },
+    {
+      "name": "routing of 'history of one page' is SINGLE_SHARD",
+      "ok": true
+    },
+    {
+      "name": "routing of 'all edits of one editor' is SHARD_MERGE",
+      "ok": true
+    },
+    {
+      "name": "routing of 'a range of page ids' is SHARD_MERGE",
+      "ok": true
+    },
+    {
+      "name": "routing of 'revert rate by hour of day' is both shards",
+      "ok": true
+    },
+    {
+      "name": "routing of 'the 20 pages with the most revisions' is both shards",
+      "ok": true
+    },
+    {
+      "name": "every page is on one shard only (partial rows of the top-pages query = distinct pages)",
+      "ok": true
+    },
+    {
+      "name": "page history: same number of revisions as the local database",
+      "ok": true
+    },
+    {
+      "name": "revert rate by hour: the same 24 rows as the local database",
+      "ok": true
+    }
+  ],
+  "seconds": 5.4
+}

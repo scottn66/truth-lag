@@ -1,0 +1,96 @@
+{
+  "note": "One real document of each cohort from the MongoDB collection 'revisions'. Human editors are shown as pseudonyms (editor_ + the first 10 hex digits of HMAC-SHA256(secret key, editor key)) and their user id is hidden (null). Bots keep their real names. Times are UTC.",
+  "history": {
+    "_id": "enwiki:1373795093",
+    "wiki_db": "enwiki",
+    "rev_id": 1373795093,
+    "parent_id": 1373794884,
+    "cohort": "history",
+    "page": {
+      "id": 28116865,
+      "title": "Adam_Liaw",
+      "ns": 0
+    },
+    "user": {
+      "id": null,
+      "name": "editor_ec984595df",
+      "kind": "registered",
+      "key": "editor_ec984595df",
+      "is_bot": false,
+      "is_anon": false,
+      "is_temp": false,
+      "edit_count": 2
+    },
+    "ts": {
+      "$date": "2026-09-08T00:12:14Z"
+    },
+    "hour_utc": 0,
+    "size": 20863,
+    "size_delta": 29,
+    "comment": "added extra information on how he changed throughout his journey",
+    "tags": [
+      "visualeditor"
+    ],
+    "mw_reverted_tag": true,
+    "is_revert": false,
+    "revert_method": null,
+    "history": {
+      "snapshot": "2026-09",
+      "reverted": true,
+      "reverted_any": true,
+      "secs_to_revert": 125,
+      "reverting_rev_id": 1373795417,
+      "reverter": {
+        "key": "u:13286072",
+        "name": "ClueBot NG",
+        "kind": "bot"
+      },
+      "reverted_by_other": true,
+      "followup_s": 1992373,
+      "page_edits_prev_1h": 1
+    }
+  },
+  "live": {
+    "_id": "enwiki:1381091233",
+    "wiki_db": "enwiki",
+    "rev_id": 1381091233,
+    "parent_id": 1381086738,
+    "cohort": "live",
+    "page": {
+      "id": 44546553,
+      "title": "Ancient_Cappadocian_language",
+      "ns": 0
+    },
+    "user": {
+      "id": null,
+      "name": "editor_b73890917c",
+      "kind": "registered",
+      "key": "editor_b73890917c",
+      "is_bot": false,
+      "is_anon": false,
+      "is_temp": false,
+      "edit_count": 43713
+    },
+    "ts": {
+      "$date": "2026-10-20T00:00:05Z"
+    },
+    "hour_utc": 0,
+    "size": 29145,
+    "size_delta": -27,
+    "comment": "Removed page protection template (unprotected)",
+    "tags": [
+      "mobile edit",
+      "mobile web edit"
+    ],
+    "mw_reverted_tag": false,
+    "is_revert": false,
+    "revert_method": null,
+    "live": {
+      "seen_ts": {
+        "$date": "2026-10-20T00:00:08.023Z"
+      },
+      "revert_risk": 0.4776158630847931,
+      "page_edits_prev_1h": 1
+    }
+  }
+}
