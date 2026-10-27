@@ -10,8 +10,8 @@ a_reverted_b, b_reverted_a (distinct revert actions in each direction).
 Output columns (result total): mutual_pairs, pages, editors, pairs_with_bot.
 Editors are shown by alias (a pseudonym for humans; bots keep their name).
 
-Rows: 462. Median time: 53.0 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/q1_mutual_reverts.cypher`. Full table: `cypher_q1_mutual_reverts.csv`.
+Rows: 462. Median time: 261.2 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/q1_mutual_reverts.cypher`. Full table: `cypher_q1_mutual_reverts.csv`.
 
 |   page_id | page_title                            | editor_a          | editor_b          |   a_reverted_b |   b_reverted_a |
 |-----------|---------------------------------------|-------------------|-------------------|----------------|----------------|

@@ -15,8 +15,8 @@ Output columns: page_id, a, b, a_reverted_b, b_reverted_a (distinct revert actio
   keys with pseudonyms.
 ```
 
-Rows: 462. Median time: 17.6 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_sql.py` on 2026-10-24 09:56 UTC (data-v1, SQLite 3.53.1). Query: `queries/sql/compare_mutual_reverts.sql`. Full table: `sql_compare_mutual_reverts.csv`.
+Rows: 462. Median time: 19.5 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_sql.py` on 2026-10-27 21:28 UTC (data-v2, SQLite 3.53.1). Query: `queries/sql/compare_mutual_reverts.sql`. Full table: `sql_compare_mutual_reverts.csv`.
 
 |   page_id | page_title                            | editor_a          | editor_b          |   a_reverted_b |   b_reverted_a |
 |-----------|---------------------------------------|-------------------|-------------------|----------------|----------------|

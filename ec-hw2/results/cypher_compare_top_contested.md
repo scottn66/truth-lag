@@ -24,8 +24,8 @@ have no EDITED relationship; Mongo Q2 counts them as human edits. None of their
 Output columns: page_id, page_title, edits, revert_actions, reverted_editors, score,
 contested.
 
-Rows: 20. Median time: 112.9 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/compare_top_contested.cypher`. Full table: `cypher_compare_top_contested.csv`.
+Rows: 20. Median time: 119.4 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/compare_top_contested.cypher`. Full table: `cypher_compare_top_contested.csv`.
 
 |   rank |   page_id | page_title                               |   edits |   revert_actions |   reverted_editors |    score | contested   |
 |--------|-----------|------------------------------------------|---------|------------------|--------------------|----------|-------------|

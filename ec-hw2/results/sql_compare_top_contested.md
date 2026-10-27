@@ -26,8 +26,8 @@ Output columns: page_id, page_title, edits, revert_actions, reverted_editors, sc
   contested (1 = true).
 ```
 
-Rows: 20. Median time: 24.0 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_sql.py` on 2026-10-24 09:56 UTC (data-v1, SQLite 3.53.1). Query: `queries/sql/compare_top_contested.sql`. Full table: `sql_compare_top_contested.csv`.
+Rows: 20. Median time: 27.6 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_sql.py` on 2026-10-27 21:28 UTC (data-v2, SQLite 3.53.1). Query: `queries/sql/compare_top_contested.sql`. Full table: `sql_compare_top_contested.csv`.
 
 |   rank |   page_id | page_title                               |   edits |   revert_actions |   reverted_editors |    score | contested   |
 |--------|-----------|------------------------------------------|---------|------------------|--------------------|----------|-------------|

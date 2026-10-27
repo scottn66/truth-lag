@@ -14,8 +14,8 @@ Output columns: editor_a, editor_b, shared_contested_pages, a_reverted_b,
 b_reverted_a, example_pages (up to 3 page titles, by page id).
 Top 20 by shared_contested_pages, then a.key, b.key. Editors are shown by alias.
 
-Rows: 20. Median time: 17.9 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/q5_two_hop_contested.cypher`. Full table: `cypher_q5_two_hop_contested.csv`.
+Rows: 20. Median time: 21.8 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/q5_two_hop_contested.cypher`. Full table: `cypher_q5_two_hop_contested.csv`.
 
 | editor_a          | editor_b          |   shared_contested_pages |   a_reverted_b |   b_reverted_a | example_pages                                                              |
 |-------------------|-------------------|--------------------------|----------------|----------------|----------------------------------------------------------------------------|

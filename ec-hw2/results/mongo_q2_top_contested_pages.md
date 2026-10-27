@@ -2,8 +2,8 @@
 
 Mongo Q2 (spec 3.2), also the 'top contested pages' comparison query: the top 20 contested pages of the history cohort, with the shared definition of DATA_MODEL.md section 7. revert_actions = distinct reverting_rev_id among revert_links with within_followup and by_other on the page; reverted_editors = distinct author_key among those links; edits = non-bot history revisions on the page (from revisions, with $lookup on page.id). Pages need edits >= 10 and reverted_editors >= 2. score = revert_actions / edits (a float). Order: score desc, revert_actions desc, edits desc, page_id asc. contested = revert_actions >= 2 and score >= 0.2. It starts from revert_links, because only pages with reverts can qualify, and the $lookup then uses the {page.id, ts} index.
 
-Rows: 20. Median time: 78.2 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 09:56 UTC (data-v1). Full table: `mongo_q2_top_contested_pages.csv`.
+Rows: 20. Median time: 76.9 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-27 21:27 UTC (data-v2). Full table: `mongo_q2_top_contested_pages.csv`.
 
 |   rank |   page_id | page_title                               |   edits |   revert_actions |   reverted_editors |    score | contested   |
 |--------|-----------|------------------------------------------|---------|------------------|--------------------|----------|-------------|

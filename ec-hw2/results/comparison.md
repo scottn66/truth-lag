@@ -1,38 +1,38 @@
 # Three-engine comparison: MongoDB, Neo4j and SQLite
 
-**Timing label: draft.** Load average (1 / 5 / 15 min): 3.45 / 3.55 / 3.14 at the start and 3.46 / 3.55 / 3.14 at the end. Other jobs may have been running. `--final` runs only when the 1-minute load average is at most 2.0. The equality checks and the query sizes do not depend on the timing.
+**Timing label: draft.** Load average (1 / 5 / 15 min): 4.65 / 4.37 / 4.05 at the start and 4.73 / 4.40 / 4.06 at the end. Other jobs may have been running. `--final` runs only when the 1-minute load average is at most 2.0. The equality checks and the query sizes do not depend on the timing.
 
-Made by `ec-hw2/comparison/compare.py` on 2026-10-24 09:56 UTC (data-v1). Full tables: `comparison.csv` (the 6 compared rows) and `comparison_extra.csv` (the extra row). Both questions use the history cohort and the shared definitions in `DATA_MODEL.md` section 7.
+Made by `ec-hw2/comparison/compare.py` on 2026-10-27 21:28 UTC (data-v2). Full tables: `comparison.csv` (the 6 compared rows) and `comparison_extra.csv` (the extra row). Both questions use the history cohort and the shared definitions in `DATA_MODEL.md` section 7.
 
 ## Results
 
 | question | engine | lines of code | code characters | median ms | min-max ms | same result? | modeling note |
 |---|---|---:|---:|---:|---:|---|---|
-| top contested pages | MongoDB | 62 | 1,040 | 76.7 | 72.5-100.5 | yes | 12 stages: group the links per page and keep pages with 2+ reverted editors; then a $lookup into revisions counts the human edits of the 1,357 kept pages only. |
-| top contested pages | Neo4j | 18 | 768 | 114.2 | 107.9-142.0 | yes | Two MATCH steps: the first filters all 295,013 EDITED relationships on the revert flags (there is no separate revert-link table), the second counts the edits of the 1,357 kept pages only. |
-| top contested pages | SQLite | 38 | 1,224 | 25.2 | 24.7-30.8 | yes | GROUP BY with HAVING, then one correlated COUNT per kept page (the 1,357 kept pages); the score is 1.0 * a / b to avoid whole-number division. |
-| mutual reverts | MongoDB | 52 | 884 | 133.1 | 128.4-158.0 | yes | The reverse direction needs a self-$lookup with let and $expr, run once per a < b triple (4,229 times). |
-| mutual reverts | Neo4j | 6 | 275 | 39.3 | 30.7-45.2 | yes | The pattern (a)-[:REVERTED]->(b)-[:REVERTED]->(a) is one line, but it needs page_id on all 13,269 REVERTED relationships. |
-| mutual reverts | SQLite | 13 | 412 | 16.1 | 15.9-16.7 | yes | A CTE of (reverter, author, page) triples is joined to itself with the roles swapped. |
-| mutual reverts | SQLite, pre-aggregated input (extra row, not compared) | 5 | 188 | 1.4 | 1.4-1.6 | yes (same rows as the SQLite raw-link query) | The same self-join as the SQLite query, on the pre-aggregated TEMP table. |
+| top contested pages | MongoDB | 62 | 1,040 | 83.6 | 75.0-114.1 | yes | 12 stages: group the links per page and keep pages with 2+ reverted editors; then a $lookup into revisions counts the human edits of the 1,357 kept pages only. |
+| top contested pages | Neo4j | 18 | 768 | 137.7 | 120.7-251.2 | yes | Two MATCH steps: the first filters all 295,013 EDITED relationships on the revert flags (there is no separate revert-link table), the second counts the edits of the 1,357 kept pages only. |
+| top contested pages | SQLite | 38 | 1,224 | 37.6 | 30.1-54.1 | yes | GROUP BY with HAVING, then one correlated COUNT per kept page (the 1,357 kept pages); the score is 1.0 * a / b to avoid whole-number division. |
+| mutual reverts | MongoDB | 52 | 884 | 144.1 | 137.6-148.5 | yes | The reverse direction needs a self-$lookup with let and $expr, run once per a < b triple (4,229 times). |
+| mutual reverts | Neo4j | 6 | 275 | 44.6 | 38.2-57.4 | yes | The pattern (a)-[:REVERTED]->(b)-[:REVERTED]->(a) is one line, but it needs page_id on all 13,269 REVERTED relationships. |
+| mutual reverts | SQLite | 13 | 412 | 26.1 | 17.6-29.0 | yes | A CTE of (reverter, author, page) triples is joined to itself with the roles swapped. |
+| mutual reverts | SQLite, pre-aggregated input (extra row, not compared) | 5 | 188 | 1.9 | 1.5-3.1 | yes (same rows as the SQLite raw-link query) | The same self-join as the SQLite query, on the pre-aggregated TEMP table. |
 
 **Speed.** We call an engine faster only when its min-max range does not overlap the other engine's range.
 
-- top contested pages: MongoDB is faster than Neo4j (72.5-100.5 ms vs 107.9-142.0 ms; the ranges do not overlap).
-- top contested pages: SQLite is faster than MongoDB (24.7-30.8 ms vs 72.5-100.5 ms; the ranges do not overlap).
-- top contested pages: SQLite is faster than Neo4j (24.7-30.8 ms vs 107.9-142.0 ms; the ranges do not overlap).
-- mutual reverts: Neo4j is faster than MongoDB (30.7-45.2 ms vs 128.4-158.0 ms; the ranges do not overlap).
-- mutual reverts: SQLite is faster than MongoDB (15.9-16.7 ms vs 128.4-158.0 ms; the ranges do not overlap).
-- mutual reverts: SQLite is faster than Neo4j (15.9-16.7 ms vs 30.7-45.2 ms; the ranges do not overlap).
-- mutual reverts, extra row: SQLite, pre-aggregated input is faster than Neo4j (1.4-1.6 ms vs 30.7-45.2 ms; the ranges do not overlap).
+- top contested pages: MongoDB is faster than Neo4j (75.0-114.1 ms vs 120.7-251.2 ms; the ranges do not overlap).
+- top contested pages: SQLite is faster than MongoDB (30.1-54.1 ms vs 75.0-114.1 ms; the ranges do not overlap).
+- top contested pages: SQLite is faster than Neo4j (30.1-54.1 ms vs 120.7-251.2 ms; the ranges do not overlap).
+- mutual reverts: Neo4j is faster than MongoDB (38.2-57.4 ms vs 137.6-148.5 ms; the ranges do not overlap).
+- mutual reverts: SQLite is faster than MongoDB (17.6-29.0 ms vs 137.6-148.5 ms; the ranges do not overlap).
+- mutual reverts: SQLite is faster than Neo4j (17.6-29.0 ms vs 38.2-57.4 ms; the ranges do not overlap).
+- mutual reverts, extra row: SQLite, pre-aggregated input is faster than Neo4j (1.5-3.1 ms vs 38.2-57.4 ms; the ranges do not overlap).
 
 ## What each timed query reads
 
 - **Neo4j, mutual reverts:** Reads the REVERTED relationships that export_graph.py pre-aggregated (one per reverter, reverted editor and page, with count); that grouping is NOT inside the timed query. In MongoDB, the export_graph.py step that builds these relationships took 0.09 s (from `_SUCCESS_export_graph.json`). MongoDB and SQLite do this grouping inside the timed query, so the Neo4j time is not like for like.
-- **Extra row:** `queries/sql/compare_mutual_reverts_preaggregated.sql` gives SQLite the same head start. It builds the grouped triples once as a TEMP table in memory (12.5 ms, not timed; 15 lines of setup code), then times only the self-join. Its result is compared with the SQLite raw-link result: yes (same rows as the SQLite raw-link query).
-- **MongoDB:** revert_links holds 37,117 documents (19,858 history, 17,259 live) and revisions holds 574,482 documents (295,016 history). Both pipelines start with $match cohort = 'history', so the live documents are filtered out inside the timed query.
-  - top contested pages: query plan of the first $match: IXSCAN on index cohort_1_page_id_1, 19,858 documents examined; median 75.9 ms with this default plan and 70.5 ms with a forced collection scan (hint {$natural: 1}, 7 runs each, helper runs).
-  - mutual reverts: query plan of the first $match: IXSCAN on index cohort_1_page_id_1, 19,858 documents examined; median 127.5 ms with this default plan and 129.9 ms with a forced collection scan (hint {$natural: 1}, 7 runs each, helper runs).
+- **Extra row:** `queries/sql/compare_mutual_reverts_preaggregated.sql` gives SQLite the same head start. It builds the grouped triples once as a TEMP table in memory (27.4 ms, not timed; 15 lines of setup code), then times only the self-join. Its result is compared with the SQLite raw-link result: yes (same rows as the SQLite raw-link query).
+- **MongoDB:** revert_links holds 38,216 documents (19,858 history, 18,358 live) and revisions holds 574,482 documents (295,016 history). Both pipelines start with $match cohort = 'history', so the live documents are filtered out inside the timed query.
+  - top contested pages: query plan of the first $match: IXSCAN on index cohort_1_page_id_1, 19,858 documents examined; median 76.2 ms with this default plan and 72.9 ms with a forced collection scan (hint {$natural: 1}, 7 runs each, helper runs).
+  - mutual reverts: query plan of the first $match: IXSCAN on index cohort_1_page_id_1, 19,858 documents examined; median 130.9 ms with this default plan and 128.9 ms with a forced collection scan (hint {$natural: 1}, 7 runs each, helper runs).
 - **SQLite and Neo4j** hold the history cohort only.
 
 ## Modeling pain (1 = easy, 5 = hard)
@@ -58,12 +58,12 @@ Facts with numbers only. The Comparison+viz owner turns them into findings in th
 - Mutual reverts: the outputs are identical in the 3 engines: 462 pairs on 397 pages, with 631 distinct editors; 25 pairs include a bot.
 - 18 of the top 20 contested pages have at least one mutual pair; together they hold 51 of the 462 pairs.
 - Query size (code characters without spaces / lines of code): top contested pages: MongoDB 1,040 characters / 62 lines, Neo4j 768 characters / 18 lines, SQLite 1,224 characters / 38 lines; mutual reverts: MongoDB 884 characters / 52 lines, Neo4j 275 characters / 6 lines, SQLite 412 characters / 13 lines. Line counts depend on the layout: 40 of the 114 MongoDB lines hold only brackets or commas.
-- Median time in ms with the min-max range (draft, 1 warm-up, then 3 rounds of 7 timed runs (21 runs per query)): top contested pages: MongoDB 76.7 (72.5-100.5), Neo4j 114.2 (107.9-142.0), SQLite 25.2 (24.7-30.8); mutual reverts: MongoDB 133.1 (128.4-158.0), Neo4j 39.3 (30.7-45.2), SQLite 16.1 (15.9-16.7).
-- Speed, top contested pages: MongoDB is faster than Neo4j (72.5-100.5 ms vs 107.9-142.0 ms; the ranges do not overlap). SQLite is faster than MongoDB (24.7-30.8 ms vs 72.5-100.5 ms; the ranges do not overlap). SQLite is faster than Neo4j (24.7-30.8 ms vs 107.9-142.0 ms; the ranges do not overlap).
-- Speed, mutual reverts: Neo4j is faster than MongoDB (30.7-45.2 ms vs 128.4-158.0 ms; the ranges do not overlap). SQLite is faster than MongoDB (15.9-16.7 ms vs 128.4-158.0 ms; the ranges do not overlap). SQLite is faster than Neo4j (15.9-16.7 ms vs 30.7-45.2 ms; the ranges do not overlap).
-- Mutual reverts on pre-aggregated input (extra row): SQLite takes 1.4 ms (1.4-1.6) when it reads triples grouped beforehand, against 16.1 ms (15.9-16.7) on the raw revert links; Neo4j, which reads the REVERTED relationships grouped by export_graph.py, takes 39.3 ms (30.7-45.2). Building the TEMP table took 12.5 ms (not timed).
-- Input sizes: SQLite revert_links has 19,858 rows (17,868 pass within_followup and by_other), which make 13,269 (reverter, author, page) triples; 4,229 of them have a < b, so the MongoDB self-$lookup runs 4,229 times. MongoDB revert_links has 37,117 documents (19,858 history). Neo4j has 13,269 REVERTED relationships and 295,013 EDITED relationships.
-- MongoDB first $match (cohort = 'history'): top contested pages: IXSCAN cohort_1_page_id_1, 19,858 documents examined, median 75.9 ms with the default plan (the index exists) vs 70.5 ms with a forced collection scan; mutual reverts: IXSCAN cohort_1_page_id_1, 19,858 documents examined, median 127.5 ms with the default plan (the index exists) vs 129.9 ms with a forced collection scan.
+- Median time in ms with the min-max range (draft, 1 warm-up, then 3 rounds of 7 timed runs (21 runs per query)): top contested pages: MongoDB 83.6 (75.0-114.1), Neo4j 137.7 (120.7-251.2), SQLite 37.6 (30.1-54.1); mutual reverts: MongoDB 144.1 (137.6-148.5), Neo4j 44.6 (38.2-57.4), SQLite 26.1 (17.6-29.0).
+- Speed, top contested pages: MongoDB is faster than Neo4j (75.0-114.1 ms vs 120.7-251.2 ms; the ranges do not overlap). SQLite is faster than MongoDB (30.1-54.1 ms vs 75.0-114.1 ms; the ranges do not overlap). SQLite is faster than Neo4j (30.1-54.1 ms vs 120.7-251.2 ms; the ranges do not overlap).
+- Speed, mutual reverts: Neo4j is faster than MongoDB (38.2-57.4 ms vs 137.6-148.5 ms; the ranges do not overlap). SQLite is faster than MongoDB (17.6-29.0 ms vs 137.6-148.5 ms; the ranges do not overlap). SQLite is faster than Neo4j (17.6-29.0 ms vs 38.2-57.4 ms; the ranges do not overlap).
+- Mutual reverts on pre-aggregated input (extra row): SQLite takes 1.9 ms (1.5-3.1) when it reads triples grouped beforehand, against 26.1 ms (17.6-29.0) on the raw revert links; Neo4j, which reads the REVERTED relationships grouped by export_graph.py, takes 44.6 ms (38.2-57.4). Building the TEMP table took 27.4 ms (not timed).
+- Input sizes: SQLite revert_links has 19,858 rows (17,868 pass within_followup and by_other), which make 13,269 (reverter, author, page) triples; 4,229 of them have a < b, so the MongoDB self-$lookup runs 4,229 times. MongoDB revert_links has 38,216 documents (19,858 history). Neo4j has 13,269 REVERTED relationships and 295,013 EDITED relationships.
+- MongoDB first $match (cohort = 'history'): top contested pages: IXSCAN cohort_1_page_id_1, 19,858 documents examined, median 76.2 ms with the default plan (the index exists) vs 72.9 ms with a forced collection scan; mutual reverts: IXSCAN cohort_1_page_id_1, 19,858 documents examined, median 130.9 ms with the default plan (the index exists) vs 128.9 ms with a forced collection scan.
 - 3 history revisions have no editor key (pages 87880, 20197943, 84167596). SQLite and MongoDB count them as human edits; Neo4j has no EDITED relationship for them. None of these pages is in the top 20.
 
 ## How we measured
@@ -90,8 +90,8 @@ Facts with numbers only. The Comparison+viz owner turns them into findings in th
 | Neo4j memory | heap 1.46GiB, page cache 1.00GiB |
 | SQLite version | 3.53.1 (in the Python process on the host) |
 | Python and drivers | Python 3.12.13, pymongo 4.19.0, neo4j driver 6.4.1 |
-| load average (1 / 5 / 15 min), start | 3.45 / 3.55 / 3.14 |
-| load average (1 / 5 / 15 min), end | 3.46 / 3.55 / 3.14 |
+| load average (1 / 5 / 15 min), start | 4.65 / 4.37 / 4.05 |
+| load average (1 / 5 / 15 min), end | 4.73 / 4.40 / 4.06 |
 | --final load threshold (1 min) | 2.0 |
 
 ## Query files

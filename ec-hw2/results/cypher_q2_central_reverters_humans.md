@@ -28,8 +28,8 @@ Output columns (result by_degree = top 20 by reverts_made): editor, kind, out_de
 editors_reverted, reverts_made, reverts_received.
 The projection is dropped at the end. Editors are shown by alias.
 
-Rows: 20. Median time: 185.6 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/q2_central_reverters.cypher`. Full table: `cypher_q2_central_reverters_humans.csv`.
+Rows: 20. Median time: 174.7 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/q2_central_reverters.cypher`. Full table: `cypher_q2_central_reverters_humans.csv`.
 
 | editor            | kind       |   out_degree |   editors_reverted |   reverts_made |   reverts_received |   pagerank |
 |-------------------|------------|--------------|--------------------|----------------|--------------------|------------|
