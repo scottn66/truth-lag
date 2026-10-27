@@ -172,3 +172,10 @@ Below are the high and medium findings, one line each. "Changed" is what the fix
 | 30 | medium | [3] and [5] measured hour of day in local time, but were cited for Mongo Q1 (UTC hours) with no warning. | verify:citations | A caveat in both rows. |
 
 The 33 low findings are in the same file. The fix prompts asked to fix them where the fix is small; the commits show which ones were fixed.
+
+## Run log (added 2026-10-27, PT)
+These are records of pipeline runs, not prompts. Scott asked for them to be logged here on 2026-10-27. The runs were checked against the `_SUCCESS_*.json` files, `data/logs/` and `FACTS.md`.
+
+1. **`ec-hw2/ingest/parse_history.py`** ran on 2026-10-24 at 2:46 AM PT and took 7.5 s. It wrote 295,016 revisions and 19,858 revert links to `data/tables/`: `history_revisions.parquet`, `history_revert_links.parquet`, `history_summary.json` and `_SUCCESS_history.json`. The history cohort is final. The `data-v1` tags inside these files are only labels.
+2. **`ingest/vps/filter_history.py`** ran on the VPS. It produced the two cut-down Parquet files: the Sep 8–10 namespace-0 file (300,564 rows, 78 columns) and the slim September file (5.27M rows, 12 columns). They reached the Mac on 2026-10-23 at 9:57 PM PT, together with `filter_stats.json`. These are final too.
+3. **`ec-hw2/refresh_live.sh`** ran on 2026-10-27, started by Grok Bot (226 · Big Data Warehouse) at Scott's request. All 11 steps finished without errors. `DATA_VERSION` changed to `data-v2`. There are 1.23M live edits and 4,350 late-revert documents, and every live edit now has at least 4 days of follow-up. The Neo4j mutual-reverts query went from 53 ms to 261 ms, possibly because of a cold cache. `compare.py --final` and `release_data.sh` have not been run yet, and the changes are not committed.

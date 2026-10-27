@@ -38,8 +38,8 @@ Output columns (result wcc_largest = the 5 largest components): rank, editors, b
 pages, reverts, top_reverters.
 The projection is dropped at the end. Editors are shown by alias.
 
-Rows: 1. Time: 412.7 ms (1 run).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/q3_conflict_communities.cypher`. Full table: `cypher_q3_conflict_communities_louvain_stats.csv`.
+Rows: 1. Time: 536.9 ms (1 run).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/q3_conflict_communities.cypher`. Full table: `cypher_q3_conflict_communities_louvain_stats.csv`.
 
 |   communities |   modularity |   levels |   editors_written |
 |---------------|--------------|----------|-------------------|

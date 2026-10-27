@@ -38,8 +38,8 @@ Output columns (result wcc_largest = the 5 largest components): rank, editors, b
 pages, reverts, top_reverters.
 The projection is dropped at the end. Editors are shown by alias.
 
-Rows: 10. Median time: 106.9 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/q3_conflict_communities.cypher`. Full table: `cypher_q3_conflict_communities.csv`.
+Rows: 10. Median time: 115.8 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/q3_conflict_communities.cypher`. Full table: `cypher_q3_conflict_communities.csv`.
 
 |   rank |   community |   editors |   bots |   pages |   reverts |   reverted_edges |   star_share | top_page                             |   top_page_reverts |   top_page_share | top_reverters                                             |
 |--------|-------------|-----------|--------|---------|-----------|------------------|--------------|--------------------------------------|--------------------|------------------|-----------------------------------------------------------|

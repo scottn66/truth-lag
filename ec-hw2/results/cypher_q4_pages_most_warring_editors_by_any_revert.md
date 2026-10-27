@@ -14,8 +14,8 @@ page_title, warring_editors, mutual_pairs, editors_in_any_revert, revert_actions
 Output columns (result by_any_revert = top 20 by editors_in_any_revert, then
 page_id): the same columns.
 
-Rows: 20. Median time: 23.1 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_cypher.py` on 2026-10-24 09:56 UTC (data-v1). Query: `queries/cypher/q4_pages_most_warring_editors.cypher`. Full table: `cypher_q4_pages_most_warring_editors_by_any_revert.csv`.
+Rows: 20. Median time: 27.5 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_cypher.py` on 2026-10-27 21:27 UTC (data-v2). Query: `queries/cypher/q4_pages_most_warring_editors.cypher`. Full table: `cypher_q4_pages_most_warring_editors_by_any_revert.csv`.
 
 |   page_id | page_title                                             |   warring_editors |   mutual_pairs |   editors_in_any_revert |   revert_actions |   edits |
 |-----------|--------------------------------------------------------|-------------------|----------------|-------------------------|------------------|---------|

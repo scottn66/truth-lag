@@ -2,8 +2,8 @@
 
 Mongo Q3 (spec 3.3): the distribution of the time to revert T_s (seconds from the reverted revision to the reverting revision), for revert_links with within_followup. Three series (field cohort): 'history' = history reverts within 20 days; 'live' = live reverts within 4 days; 'history_4d' = the history reverts with T_s <= 345600 s (4 days), with the shares computed again on that smaller total. Compare 'live' with 'history_4d' (the same 4-day horizon), not with 'history'. The live T is also cut by the capture until 2026-10-27T00:05:00+00:00 (provisional). One $bucket per series inside a $facet, with the lag grid of config.py as boundaries [lower, upper). The default bucket 'over_20d' must stay empty (run_mongo.py asserts this). Output: cohort (series), bucket label, bucket_lower_s, bucket_upper_s, n, share of the series, cumulative share. Empty buckets are not listed.
 
-Rows: 19. Median time: 178.0 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 10:10 UTC (data-v1). Full table: `mongo_atlas_q3_time_to_revert.csv`.
+Rows: 19. Median time: 179.8 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-27 21:43 UTC (data-v2). Full table: `mongo_atlas_q3_time_to_revert.csv`.
 
 | cohort     | bucket    |   bucket_lower_s |   bucket_upper_s |    n |     share |   cum_share |   bucket_order | bucket_sorted   |
 |------------|-----------|------------------|------------------|------|-----------|-------------|----------------|-----------------|

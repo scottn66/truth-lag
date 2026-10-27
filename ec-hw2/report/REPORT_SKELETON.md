@@ -11,7 +11,7 @@
 >
 > Section headings below are the spec section 7 headings, word for word and in order. Owners are roles; write names in the "Who did what" table at the end.
 
-*Built by `ec-hw2/report/build_skeleton.py` on 2026-10-24 10:30 UTC from `report/FACTS.md` (data-v1). Live cohort: **PROVISIONAL** until 2026-10-27 00:05 UTC.*
+*Built by `ec-hw2/report/build_skeleton.py` on 2026-10-27 21:28 UTC from `report/FACTS.md` (data-v2). Live cohort: **FINAL** until 2026-10-27 00:05 UTC.*
 
 ## Abstract
 
@@ -19,17 +19,17 @@
 
 **Facts box**
 
-| key                               | value   | unit                                | status      |
-|-----------------------------------|---------|-------------------------------------|-------------|
-| `history_revisions`               | 295,016 | revisions                           | FINAL       |
-| `live_revisions`                  | 279,466 | revisions                           | PROVISIONAL |
-| `history_revert_rate_non_bot_pct` | 7.43    | % (reverted within 20 days)         | FINAL       |
-| `history_median_T_h`              | 1.02    | h (history reverts within 20 days)  | FINAL       |
-| `history_T_within_1h_pct`         | 49.86   | % of history reverts within 20 days | FINAL       |
-| `history_T_within_1d_pct`         | 79.68   | % of history reverts within 20 days | FINAL       |
-| `cypher_q1_mutual_pairs`          | 462     | pairs                               | FINAL       |
-| `mongo_q5_history_known_1h_pct`   | 55.66   | % of 4-day reverts                  | FINAL       |
-| `cmp_all_identical`               | yes     |                                     | FINAL       |
+| key                               | value   | unit                                | status   |
+|-----------------------------------|---------|-------------------------------------|----------|
+| `history_revisions`               | 295,016 | revisions                           | FINAL    |
+| `live_revisions`                  | 279,466 | revisions                           | FINAL    |
+| `history_revert_rate_non_bot_pct` | 7.43    | % (reverted within 20 days)         | FINAL    |
+| `history_median_T_h`              | 1.02    | h (history reverts within 20 days)  | FINAL    |
+| `history_T_within_1h_pct`         | 49.86   | % of history reverts within 20 days | FINAL    |
+| `history_T_within_1d_pct`         | 79.68   | % of history reverts within 20 days | FINAL    |
+| `cypher_q1_mutual_pairs`          | 462     | pairs                               | FINAL    |
+| `mongo_q5_history_known_1h_pct`   | 55.66   | % of 4-day reverts                  | FINAL    |
+| `cmp_all_identical`               | yes     |                                     | FINAL    |
 
 **Figures:** none.
 
@@ -146,24 +146,24 @@ Limits of this comparison (from `report/references.md`): [1] and [6] measure sur
 
 **Facts box**
 
-| key                               | value                | unit                      | status      |
-|-----------------------------------|----------------------|---------------------------|-------------|
-| `history_file_rows`               | 300,564              | rows                      | FINAL       |
-| `history_dropped_namespace_not_0` | 4,265                | rows                      | FINAL       |
-| `history_dropped_null_same_sha1`  | 568                  | rows                      | FINAL       |
-| `history_dropped_null_comment`    | 715                  | rows                      | FINAL       |
-| `history_revisions`               | 295,016              | revisions                 | FINAL       |
-| `wikistats_content_edits`         | 298,802              | edits                     | FINAL       |
-| `history_file_vs_wikistats_pct`   | +0.59                | %                         | FINAL       |
-| `live_page_change_events`         | 639,330              | events                    | PROVISIONAL |
-| `live_dropped_namespace_not_0`    | 205,504              | events                    | PROVISIONAL |
-| `live_dropped_outside_window`     | 133,972              | events                    | PROVISIONAL |
-| `live_dropped_not_edit`           | 20,388               | events                    | PROVISIONAL |
-| `live_revisions`                  | 279,466              | revisions                 | PROVISIONAL |
-| `capture_page_change_first_utc`   | 2026-10-19T23:00:00Z | UTC                       | FINAL       |
-| `capture_tags_first_utc`          | 2026-10-17T01:30:18Z | UTC                       | FINAL       |
-| `live_newest_meta_dt`             | 2026-10-24T07:59:59Z | UTC (newest parsed event) | PROVISIONAL |
-| `live_final_after`                | 2026-10-27T00:05:00Z | UTC                       | FINAL       |
+| key                               | value                | unit                      | status   |
+|-----------------------------------|----------------------|---------------------------|----------|
+| `history_file_rows`               | 300,564              | rows                      | FINAL    |
+| `history_dropped_namespace_not_0` | 4,265                | rows                      | FINAL    |
+| `history_dropped_null_same_sha1`  | 568                  | rows                      | FINAL    |
+| `history_dropped_null_comment`    | 715                  | rows                      | FINAL    |
+| `history_revisions`               | 295,016              | revisions                 | FINAL    |
+| `wikistats_content_edits`         | 298,802              | edits                     | FINAL    |
+| `history_file_vs_wikistats_pct`   | +0.59                | %                         | FINAL    |
+| `live_page_change_events`         | 1,231,427            | events                    | FINAL    |
+| `live_dropped_namespace_not_0`    | 379,956              | events                    | FINAL    |
+| `live_dropped_outside_window`     | 538,090              | events                    | FINAL    |
+| `live_dropped_not_edit`           | 33,915               | events                    | FINAL    |
+| `live_revisions`                  | 279,466              | revisions                 | FINAL    |
+| `capture_page_change_first_utc`   | 2026-10-19T23:00:00Z | UTC                       | FINAL    |
+| `capture_tags_first_utc`          | 2026-10-17T01:30:18Z | UTC                       | FINAL    |
+| `live_newest_meta_dt`             | 2026-10-27T20:59:59Z | UTC (newest parsed event) | FINAL    |
+| `live_final_after`                | 2026-10-27T00:05:00Z | UTC                       | FINAL    |
 
 **Figures:**
 
@@ -237,26 +237,26 @@ Limits of this comparison (from `report/references.md`): [1] and [6] measure sur
 
 **Facts box**
 
-| key                               | value                                                                                                                                                                                         | unit                                                                      | status      |
-|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|-------------|
-| `mongo_revisions_docs`            | 574,482                                                                                                                                                                                       | documents                                                                 | PROVISIONAL |
-| `mongo_revert_links_docs`         | 37,117                                                                                                                                                                                        | documents                                                                 | PROVISIONAL |
-| `mongo_page_hour_docs`            | 299,476                                                                                                                                                                                       | documents                                                                 | PROVISIONAL |
-| `mongo_indexes`                   | 7                                                                                                                                                                                             | indexes                                                                   | FINAL       |
-| `mongo_index_list`                | revisions.page.id_1_ts_1; revisions.user.id_1; revisions.history.reverted_1; revisions.cohort_1_ts_1; revert_links.reverted_rev_id_1; revert_links.page_id_1; revert_links.cohort_1_page_id_1 |                                                                           | FINAL       |
-| `mongo_ms_q1_revert_rate_by_hour` | 5,229.9                                                                                                                                                                                       | ms (median of 7)                                                          | PROVISIONAL |
-| `mongo_ms_q2_top_contested_pages` | 78.2                                                                                                                                                                                          | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | FINAL       |
-| `mongo_ms_q3_time_to_revert`      | 50.3                                                                                                                                                                                          | ms (median of 7)                                                          | FINAL       |
-| `mongo_ms_q4_bot_vs_human`        | 269.5                                                                                                                                                                                         | ms (median of 7)                                                          | FINAL       |
-| `mongo_ms_q5_truth_lag_preview`   | 15,147.8                                                                                                                                                                                      | ms (median of 7)                                                          | PROVISIONAL |
-| `atlas_estimate_mb`               | 229.7                                                                                                                                                                                         | MB (budget 400, limit 512)                                                | FINAL       |
-| `shard_key`                       | {"page.id": "hashed"}                                                                                                                                                                         |                                                                           | FINAL       |
-| `shard_shard1rs_pct`              | 49.98                                                                                                                                                                                         | % of documents                                                            | FINAL       |
-| `shard_shard2rs_pct`              | 50.02                                                                                                                                                                                         | % of documents                                                            | FINAL       |
-| `shard_route_one_page`            | SINGLE_SHARD                                                                                                                                                                                  |                                                                           | FINAL       |
-| `shard_route_one_editor`          | SHARD_MERGE                                                                                                                                                                                   |                                                                           | FINAL       |
-| `shard_biggest_page_title`        | List_of_2018_albums                                                                                                                                                                           |                                                                           | FINAL       |
-| `shard_biggest_page_revisions`    | 261                                                                                                                                                                                           | revisions                                                                 | FINAL       |
+| key                               | value                                                                                                                                                                                         | unit                                                                      | status   |
+|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
+| `mongo_revisions_docs`            | 574,482                                                                                                                                                                                       | documents                                                                 | FINAL    |
+| `mongo_revert_links_docs`         | 38,216                                                                                                                                                                                        | documents                                                                 | FINAL    |
+| `mongo_page_hour_docs`            | 605,017                                                                                                                                                                                       | documents                                                                 | FINAL    |
+| `mongo_indexes`                   | 7                                                                                                                                                                                             | indexes                                                                   | FINAL    |
+| `mongo_index_list`                | revisions.page.id_1_ts_1; revisions.user.id_1; revisions.history.reverted_1; revisions.cohort_1_ts_1; revert_links.reverted_rev_id_1; revert_links.page_id_1; revert_links.cohort_1_page_id_1 |                                                                           | FINAL    |
+| `mongo_ms_q1_revert_rate_by_hour` | 5,362.2                                                                                                                                                                                       | ms (median of 7)                                                          | FINAL    |
+| `mongo_ms_q2_top_contested_pages` | 76.9                                                                                                                                                                                          | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | FINAL    |
+| `mongo_ms_q3_time_to_revert`      | 50.5                                                                                                                                                                                          | ms (median of 7)                                                          | FINAL    |
+| `mongo_ms_q4_bot_vs_human`        | 270.8                                                                                                                                                                                         | ms (median of 7)                                                          | FINAL    |
+| `mongo_ms_q5_truth_lag_preview`   | 15,541.7                                                                                                                                                                                      | ms (median of 7)                                                          | FINAL    |
+| `atlas_estimate_mb`               | 229.7                                                                                                                                                                                         | MB (budget 400, limit 512)                                                | FINAL    |
+| `shard_key`                       | {"page.id": "hashed"}                                                                                                                                                                         |                                                                           | FINAL    |
+| `shard_shard1rs_pct`              | 49.98                                                                                                                                                                                         | % of documents                                                            | FINAL    |
+| `shard_shard2rs_pct`              | 50.02                                                                                                                                                                                         | % of documents                                                            | FINAL    |
+| `shard_route_one_page`            | SINGLE_SHARD                                                                                                                                                                                  |                                                                           | FINAL    |
+| `shard_route_one_editor`          | SHARD_MERGE                                                                                                                                                                                   |                                                                           | FINAL    |
+| `shard_biggest_page_title`        | List_of_2018_albums                                                                                                                                                                           |                                                                           | FINAL    |
+| `shard_biggest_page_revisions`    | 261                                                                                                                                                                                           | revisions                                                                 | FINAL    |
 
 **Figures:**
 
@@ -353,7 +353,7 @@ Limits of this comparison (from `report/references.md`): [1] and [6] measure sur
 
 **Mongo Q1: revert rate by hour of day and user kind**
 
-Collection `revisions`. File `queries/mongo/q1_revert_rate_by_hour.json`. Median time 5,229.9 ms (median of 7), local MongoDB.
+Collection `revisions`. File `queries/mongo/q1_revert_rate_by_hour.json`. Median time 5,362.2 ms (median of 7), local MongoDB.
 
 ```json
 [
@@ -434,7 +434,7 @@ Result: the first rows (of 147 rows in `results/mongo_q1_revert_rate_by_hour.csv
 
 **Mongo Q2: top 20 contested pages (history cohort)**
 
-Collection `revert_links`. File `queries/mongo/q2_top_contested_pages.json`. Median time 78.2 ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*), local MongoDB.
+Collection `revert_links`. File `queries/mongo/q2_top_contested_pages.json`. Median time 76.9 ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*), local MongoDB.
 
 ```json
 [
@@ -520,7 +520,7 @@ Result: the first rows (of 20 rows in `results/mongo_q2_top_contested_pages.csv`
 
 **Mongo Q4: bot vs human share of reverts (history cohort)**
 
-Collection `revert_links`. File `queries/mongo/q4_bot_vs_human.json`. Median time 269.5 ms (median of 7), local MongoDB.
+Collection `revert_links`. File `queries/mongo/q4_bot_vs_human.json`. Median time 270.8 ms (median of 7), local MongoDB.
 
 ```json
 [
@@ -666,11 +666,11 @@ Result: the first rows (of 8 rows in `results/mongo_q4_bot_vs_human.csv`):
 | `cypher_q4_top_page_title`                | PB&J_Otter |                                                                                        | FINAL    |
 | `cypher_q4_top_page_warring_editors`      | 10         | editors                                                                                | FINAL    |
 | `cypher_q5_top_pair_shared_pages`         | 4          | contested pages                                                                        | FINAL    |
-| `cypher_ms_q1_mutual_reverts`             | 53.0       | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*)              | FINAL    |
-| `cypher_ms_q2_central_reverters`          | 193.3      | ms (median of 7)                                                                       | FINAL    |
-| `cypher_ms_q3_conflict_communities`       | 106.9      | ms (median of 7)                                                                       | FINAL    |
-| `cypher_ms_q4_pages_most_warring_editors` | 26.2       | ms (median of 7)                                                                       | FINAL    |
-| `cypher_ms_q5_two_hop_contested`          | 17.9       | ms (median of 7)                                                                       | FINAL    |
+| `cypher_ms_q1_mutual_reverts`             | 261.2      | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*)              | FINAL    |
+| `cypher_ms_q2_central_reverters`          | 206.1      | ms (median of 7)                                                                       | FINAL    |
+| `cypher_ms_q3_conflict_communities`       | 115.8      | ms (median of 7)                                                                       | FINAL    |
+| `cypher_ms_q4_pages_most_warring_editors` | 32.0       | ms (median of 7)                                                                       | FINAL    |
+| `cypher_ms_q5_two_hop_contested`          | 21.8       | ms (median of 7)                                                                       | FINAL    |
 
 **Figures:**
 
@@ -702,7 +702,7 @@ Result: the first rows (of 8 rows in `results/mongo_q4_bot_vs_human.csv`):
 
 **Cypher Q1 (spec 4.1): mutual-revert pairs on the same page (edit wars)**
 
-File `queries/cypher/q1_mutual_reverts.cypher` (2 statements). Median time of the main result 53.0 ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*), local Neo4j.
+File `queries/cypher/q1_mutual_reverts.cypher` (2 statements). Median time of the main result 261.2 ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*), local Neo4j.
 
 ```cypher
 MATCH (a:Editor)-[r1:REVERTED]->(b:Editor)-[r2:REVERTED]->(a)
@@ -736,7 +736,7 @@ Result: the first rows (of 462 rows in `results/cypher_q1_mutual_reverts.csv`):
 
 **Cypher Q2 (spec 4.2): the most central reverters (degree and PageRank, with GDS)**
 
-File `queries/cypher/q2_central_reverters.cypher` (6 statements). Median time of the main result 193.3 ms (median of 7), local Neo4j.
+File `queries/cypher/q2_central_reverters.cypher` (6 statements). Median time of the main result 206.1 ms (median of 7), local Neo4j.
 
 ```cypher
 CALL gds.graph.drop('cypher_q2_reverse', false) YIELD graphName
@@ -808,7 +808,7 @@ Result: the first rows (of 20 rows in `results/cypher_q2_central_reverters.csv`)
 
 **Cypher Q3 (spec 4.3): communities of conflict (Louvain and WCC, with GDS)**
 
-File `queries/cypher/q3_conflict_communities.cypher` (8 statements). Median time of the main result 106.9 ms (median of 7), local Neo4j.
+File `queries/cypher/q3_conflict_communities.cypher` (8 statements). Median time of the main result 115.8 ms (median of 7), local Neo4j.
 
 ```cypher
 CALL gds.graph.drop('cypher_q3_undirected', false) YIELD graphName
@@ -939,7 +939,7 @@ Result: the first rows (of 10 rows in `results/cypher_q3_conflict_communities.cs
 
 **Cypher Q4 (spec 4.4): the pages with the most distinct warring editors**
 
-File `queries/cypher/q4_pages_most_warring_editors.cypher` (2 statements). Median time of the main result 26.2 ms (median of 7), local Neo4j.
+File `queries/cypher/q4_pages_most_warring_editors.cypher` (2 statements). Median time of the main result 32.0 ms (median of 7), local Neo4j.
 
 ```cypher
 MATCH (a:Editor)-[r1:REVERTED]->(b:Editor)-[r2:REVERTED]->(a)
@@ -993,7 +993,7 @@ Result: the first rows (of 20 rows in `results/cypher_q4_pages_most_warring_edit
 
 **Cypher Q5 (spec 4.5): 2-hop, editors linked through shared contested pages**
 
-File `queries/cypher/q5_two_hop_contested.cypher` (1 statements). Median time of the main result 17.9 ms (median of 7), local Neo4j.
+File `queries/cypher/q5_two_hop_contested.cypher` (1 statements). Median time of the main result 21.8 ms (median of 7), local Neo4j.
 
 ```cypher
 MATCH (p:Page {contested: true})
@@ -1046,24 +1046,24 @@ Result: the first rows (of 20 rows in `results/cypher_q5_two_hop_contested.csv`)
 
 **Facts box**
 
-| key                                              | value                                                                                                      | unit                                                         | status      |
-|--------------------------------------------------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|-------------|
-| `history_revert_rate_non_bot_pct`                | 7.43                                                                                                       | % (reverted within 20 days)                                  | FINAL       |
-| `history_revert_rate_temporary_pct`              | 27.32                                                                                                      | % (reverted within 20 days)                                  | FINAL       |
-| `history_revert_rate_registered_pct`             | 4.03                                                                                                       | % (reverted within 20 days)                                  | FINAL       |
-| `history_revert_rate_bot_pct`                    | 0.81                                                                                                       | % (reverted within 20 days)                                  | FINAL       |
-| `mongo_q1_history_temporary_vs_registered_ratio` | 6.8                                                                                                        | times                                                        | FINAL       |
-| `history_median_T_h`                             | 1.02                                                                                                       | h (history reverts within 20 days)                           | FINAL       |
-| `history_median_T_temporary_h`                   | 0.33                                                                                                       | h (history reverts within 20 days)                           | FINAL       |
-| `history_median_T_registered_h`                  | 3.03                                                                                                       | h (history reverts within 20 days)                           | FINAL       |
-| `history_T_within_1h_pct`                        | 49.86                                                                                                      | % of history reverts within 20 days                          | FINAL       |
-| `history_T_within_1d_pct`                        | 79.68                                                                                                      | % of history reverts within 20 days                          | FINAL       |
-| `history_T_over_7d_pct`                          | 6.32                                                                                                       | % of history reverts within 20 days                          | FINAL       |
-| `mongo_q4_made_by_bot_pct`                       | 5.03                                                                                                       | % of revert actions                                          | FINAL       |
-| `mongo_q4_received_by_temporary_pct`             | 55.66                                                                                                      | % of reverted revisions                                      | FINAL       |
-| `mongo_q2_top5_titles`                           | Personality_and_image_of_Elizabeth_II; Watergate_scandal; PB&J_Otter; Jim_Queen; Pororo_the_Little_Penguin |                                                              | FINAL       |
-| `live_revert_rate_human_pct`                     | 6.92                                                                                                       | % (reverted within 4 days)                                   | PROVISIONAL |
-| `live_median_T_h`                                | 0.30                                                                                                       | h (live reverts within 4 days; the follow-up is still short) | PROVISIONAL |
+| key                                              | value                                                                                                      | unit                                                         | status   |
+|--------------------------------------------------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|----------|
+| `history_revert_rate_non_bot_pct`                | 7.43                                                                                                       | % (reverted within 20 days)                                  | FINAL    |
+| `history_revert_rate_temporary_pct`              | 27.32                                                                                                      | % (reverted within 20 days)                                  | FINAL    |
+| `history_revert_rate_registered_pct`             | 4.03                                                                                                       | % (reverted within 20 days)                                  | FINAL    |
+| `history_revert_rate_bot_pct`                    | 0.81                                                                                                       | % (reverted within 20 days)                                  | FINAL    |
+| `mongo_q1_history_temporary_vs_registered_ratio` | 6.8                                                                                                        | times                                                        | FINAL    |
+| `history_median_T_h`                             | 1.02                                                                                                       | h (history reverts within 20 days)                           | FINAL    |
+| `history_median_T_temporary_h`                   | 0.33                                                                                                       | h (history reverts within 20 days)                           | FINAL    |
+| `history_median_T_registered_h`                  | 3.03                                                                                                       | h (history reverts within 20 days)                           | FINAL    |
+| `history_T_within_1h_pct`                        | 49.86                                                                                                      | % of history reverts within 20 days                          | FINAL    |
+| `history_T_within_1d_pct`                        | 79.68                                                                                                      | % of history reverts within 20 days                          | FINAL    |
+| `history_T_over_7d_pct`                          | 6.32                                                                                                       | % of history reverts within 20 days                          | FINAL    |
+| `mongo_q4_made_by_bot_pct`                       | 5.03                                                                                                       | % of revert actions                                          | FINAL    |
+| `mongo_q4_received_by_temporary_pct`             | 55.66                                                                                                      | % of reverted revisions                                      | FINAL    |
+| `mongo_q2_top5_titles`                           | Personality_and_image_of_Elizabeth_II; Watergate_scandal; PB&J_Otter; Jim_Queen; Pororo_the_Little_Penguin |                                                              | FINAL    |
+| `live_revert_rate_human_pct`                     | 7.14                                                                                                       | % (reverted within 4 days)                                   | FINAL    |
+| `live_median_T_h`                                | 0.37                                                                                                       | h (live reverts within 4 days; the follow-up is still short) | FINAL    |
 
 **Guiding questions**
 1. Who gets reverted most (user kind), and is it the same in both cohorts?
@@ -1103,25 +1103,25 @@ Result: the first rows (of 20 rows in `results/cypher_q5_two_hop_contested.csv`)
 
 **Facts box**
 
-| key                                      | value       | unit                                              | status      |
-|------------------------------------------|-------------|---------------------------------------------------|-------------|
-| `mongo_q5_history_known_1min_pct`        | 19.87       | % of 4-day reverts                                | FINAL       |
-| `mongo_q5_history_known_1h_pct`          | 55.66       | % of 4-day reverts                                | FINAL       |
-| `mongo_q5_history_known_1d_pct`          | 88.96       | % of 4-day reverts                                | FINAL       |
-| `mongo_q5_live_known_1h_pct`             | 59.83       | % of 4-day reverts                                | PROVISIONAL |
-| `risk_top_decile_score_min`              | 0.83        | revert-risk score                                 | PROVISIONAL |
-| `risk_top_decile_revert_rate_pct`        | 31.66       | % reverted within 4 days                          | PROVISIONAL |
-| `risk_top_decile_visible_1h_pct`         | 69.24       | % of 4-day reverts                                | PROVISIONAL |
-| `risk_top_decile_visible_1h_ci`          | 68.25-70.21 | % (Wilson 95%)                                    | PROVISIONAL |
-| `risk_top_decile_later_1h_pct`           | 12.48       | % of edits still clean at the wait                | PROVISIONAL |
-| `risk_top_decile_later_1d_pct`           | 2.13        | % of edits still clean at the wait                | PROVISIONAL |
-| `risk_bottom_decile_revert_rate_pct`     | 0.07        | % reverted within 4 days                          | PROVISIONAL |
-| `risk_top2_deciles_share_of_reverts_pct` | 73.07       | % of 4-day reverts (scored edits)                 | PROVISIONAL |
-| `late_reverts_rows`                      | 3,205       | September revisions, all namespaces (lower bound) | PROVISIONAL |
-| `late_reverts_exact`                     | 1,928       | revisions, all namespaces (lower bound)           | PROVISIONAL |
-| `late_reverts_inexact_undo`              | 94          | revisions, all namespaces (lower bound)           | PROVISIONAL |
-| `late_reverts_method_unknown`            | 1,183       | revisions, all namespaces (lower bound)           | PROVISIONAL |
-| `live_followup_max_d`                    | 4.33        | days                                              | PROVISIONAL |
+| key                                      | value       | unit                                              | status   |
+|------------------------------------------|-------------|---------------------------------------------------|----------|
+| `mongo_q5_history_known_1min_pct`        | 19.87       | % of 4-day reverts                                | FINAL    |
+| `mongo_q5_history_known_1h_pct`          | 55.66       | % of 4-day reverts                                | FINAL    |
+| `mongo_q5_history_known_1d_pct`          | 88.96       | % of 4-day reverts                                | FINAL    |
+| `mongo_q5_live_known_1h_pct`             | 57.95       | % of 4-day reverts                                | FINAL    |
+| `risk_top_decile_score_min`              | 0.83        | revert-risk score                                 | FINAL    |
+| `risk_top_decile_revert_rate_pct`        | 32.18       | % reverted within 4 days                          | FINAL    |
+| `risk_top_decile_visible_1h_pct`         | 68.13       | % of 4-day reverts                                | FINAL    |
+| `risk_top_decile_visible_1h_ci`          | 67.14-69.11 | % (Wilson 95%)                                    | FINAL    |
+| `risk_top_decile_later_1h_pct`           | 13.13       | % of edits still clean at the wait                | FINAL    |
+| `risk_top_decile_later_1d_pct`           | 2.86        | % of edits still clean at the wait                | FINAL    |
+| `risk_bottom_decile_revert_rate_pct`     | 0.07        | % reverted within 4 days                          | FINAL    |
+| `risk_top2_deciles_share_of_reverts_pct` | 72.41       | % of 4-day reverts (scored edits)                 | FINAL    |
+| `late_reverts_rows`                      | 4,350       | September revisions, all namespaces (lower bound) | FINAL    |
+| `late_reverts_exact`                     | 2,970       | revisions, all namespaces (lower bound)           | FINAL    |
+| `late_reverts_inexact_undo`              | 198         | revisions, all namespaces (lower bound)           | FINAL    |
+| `late_reverts_method_unknown`            | 1,182       | revisions, all namespaces (lower bound)           | FINAL    |
+| `live_followup_max_d`                    | 7.87        | days                                              | FINAL    |
 
 **Figures:**
 
@@ -1145,17 +1145,17 @@ Result: the first rows (of 20 rows in `results/cypher_q5_two_hop_contested.csv`)
 
 | risk group   | risk score   | edits (n)   | reverts in 4 d (n)   | revert rate   | visible after 1 h [95% CI]   | visible after 1 d [95% CI]   | reverted later if clean at 1 h [95% CI]   | reverted later if clean at 1 d [95% CI]   |
 |--------------|--------------|-------------|----------------------|---------------|------------------------------|------------------------------|-------------------------------------------|-------------------------------------------|
-| decile 1     | 0.00-0.06    | 26,902      | 19                   | 0.07%         | 63.2% (41.0-80.9)            | 100.0% (83.2-100.0)          | 0.03% (0.01-0.05)                         | 0.00% (0.00-0.01)                         |
-| decile 2     | 0.06-0.12    | 26,902      | 103                  | 0.38%         | 61.2% (51.5-70.0)            | 89.3% (81.9-93.9)            | 0.15% (0.11-0.20)                         | 0.04% (0.02-0.07)                         |
-| decile 3     | 0.12-0.18    | 26,902      | 248                  | 0.92%         | 42.7% (36.7-49.0)            | 88.3% (83.7-91.7)            | 0.53% (0.45-0.62)                         | 0.11% (0.08-0.16)                         |
-| decile 4     | 0.18-0.25    | 26,902      | 354                  | 1.32%         | 50.0% (44.8-55.2)            | 89.3% (85.6-92.1)            | 0.66% (0.57-0.77)                         | 0.14% (0.10-0.20)                         |
-| decile 5     | 0.25-0.32    | 26,902      | 500                  | 1.86%         | 42.6% (38.3-47.0)            | 85.0% (81.6-87.9)            | 1.08% (0.96-1.21)                         | 0.28% (0.23-0.35)                         |
-| decile 6     | 0.32-0.40    | 26,902      | 692                  | 2.57%         | 43.8% (40.1-47.5)            | 82.5% (79.5-85.2)            | 1.46% (1.33-1.61)                         | 0.46% (0.38-0.55)                         |
-| decile 7     | 0.40-0.49    | 26,902      | 1,027                | 3.82%         | 43.8% (40.8-46.9)            | 84.4% (82.1-86.5)            | 2.18% (2.01-2.36)                         | 0.61% (0.53-0.72)                         |
-| decile 8     | 0.49-0.63    | 26,902      | 1,662                | 6.18%         | 46.3% (43.9-48.7)            | 88.7% (87.1-90.1)            | 3.41% (3.20-3.64)                         | 0.74% (0.64-0.85)                         |
-| decile 9     | 0.63-0.83    | 26,902      | 3,978                | 14.79%        | 56.8% (55.3-58.3)            | 92.9% (92.1-93.7)            | 6.97% (6.66-7.30)                         | 1.22% (1.08-1.36)                         |
-| decile 10    | 0.83-1.00    | 26,898      | 8,517                | 31.66%        | 69.2% (68.2-70.2)            | 95.3% (94.8-95.7)            | 12.48% (12.04-12.93)                      | 2.13% (1.93-2.35)                         |
-| no score     | none         | 10,450      | 159                  | 1.52%         | 49.1% (41.4-56.8)            | 88.7% (82.8-92.7)            | 0.78% (0.63-0.97)                         | 0.17% (0.11-0.28)                         |
+| decile 1     | 0.00-0.06    | 26,902      | 20                   | 0.07%         | 60.0% (38.7-78.1)            | 95.0% (76.4-99.1)            | 0.03% (0.02-0.06)                         | 0.00% (0.00-0.02)                         |
+| decile 2     | 0.06-0.12    | 26,902      | 108                  | 0.40%         | 58.3% (48.9-67.2)            | 85.2% (77.3-90.7)            | 0.17% (0.13-0.22)                         | 0.06% (0.04-0.10)                         |
+| decile 3     | 0.12-0.18    | 26,902      | 258                  | 0.96%         | 41.1% (35.3-47.2)            | 84.9% (80.0-88.7)            | 0.57% (0.48-0.66)                         | 0.15% (0.11-0.20)                         |
+| decile 4     | 0.18-0.25    | 26,902      | 372                  | 1.38%         | 47.6% (42.6-52.7)            | 84.9% (81.0-88.2)            | 0.73% (0.63-0.84)                         | 0.21% (0.16-0.27)                         |
+| decile 5     | 0.25-0.32    | 26,902      | 530                  | 1.97%         | 40.2% (36.1-44.4)            | 80.2% (76.6-83.4)            | 1.19% (1.06-1.32)                         | 0.40% (0.33-0.48)                         |
+| decile 6     | 0.32-0.40    | 26,902      | 736                  | 2.74%         | 41.2% (37.7-44.8)            | 77.6% (74.4-80.4)            | 1.63% (1.48-1.79)                         | 0.63% (0.54-0.73)                         |
+| decile 7     | 0.40-0.49    | 26,902      | 1,100                | 4.09%         | 40.9% (38.0-43.8)            | 78.8% (76.3-81.1)            | 2.46% (2.28-2.65)                         | 0.89% (0.79-1.02)                         |
+| decile 8     | 0.49-0.63    | 26,902      | 1,745                | 6.49%         | 44.1% (41.8-46.5)            | 84.5% (82.7-86.1)            | 3.73% (3.51-3.97)                         | 1.07% (0.95-1.20)                         |
+| decile 9     | 0.63-0.83    | 26,902      | 4,124                | 15.33%        | 54.8% (53.3-56.3)            | 89.6% (88.7-90.5)            | 7.56% (7.24-7.90)                         | 1.84% (1.68-2.03)                         |
+| decile 10    | 0.83-1.00    | 26,898      | 8,655                | 32.18%        | 68.1% (67.1-69.1)            | 93.8% (93.3-94.3)            | 13.13% (12.68-13.60)                      | 2.86% (2.64-3.11)                         |
+| no score     | none         | 10,450      | 170                  | 1.63%         | 45.9% (38.6-53.4)            | 82.9% (76.6-87.9)            | 0.89% (0.72-1.09)                         | 0.28% (0.20-0.40)                         |
 
 The revert-risk score is Wikimedia's `revertrisk-language-agnostic` model: cite `report/references.md` W17. The "no score" group holds page creations plus edits whose score event was not captured.
 
@@ -1180,12 +1180,12 @@ The revert-risk score is Wikimedia's `revertrisk-language-agnostic` model: cite 
 | `cmp_loc_mutual_mongodb`  | 52      | lines (non-blank, non-comment)                                     | FINAL       |
 | `cmp_loc_mutual_neo4j`    | 6       | lines (non-blank, non-comment)                                     | FINAL       |
 | `cmp_loc_mutual_sqlite`   | 13      | lines (non-blank, non-comment)                                     | FINAL       |
-| `cmp_ms_top_mongodb`      | 76.7    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_top_neo4j`        | 114.2   | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_top_sqlite`       | 25.2    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_mutual_mongodb`   | 133.1   | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_mutual_neo4j`     | 39.3    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_mutual_sqlite`    | 16.1    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_top_mongodb`      | 83.6    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_top_neo4j`        | 137.7   | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_top_sqlite`       | 37.6    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_mutual_mongodb`   | 144.1   | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_mutual_neo4j`     | 44.6    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_mutual_sqlite`    | 26.1    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
 | `cmp_pain_top_mongodb`    | 3       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
 | `cmp_pain_top_neo4j`      | 3       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
 | `cmp_pain_top_sqlite`     | 2       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
@@ -1226,18 +1226,18 @@ The `cmp_pain_*` scores are **drafts by Claude Code** (`comparison/pain.csv`). T
 
 **Facts box**
 
-| key                                    | value   | unit                                           | status      |
-|----------------------------------------|---------|------------------------------------------------|-------------|
-| `capture_page_change_files_cut_short`  | 11      | of 144 files                                   | PROVISIONAL |
-| `capture_tags_files_cut_short`         | 27      | of 201 files                                   | PROVISIONAL |
-| `capture_revert_risk_gaps`             | 2       | gaps over 120 s                                | PROVISIONAL |
-| `capture_revert_risk_gap_s_total`      | 546     | s                                              | PROVISIONAL |
-| `history_dropped_null_comment`         | 715     | rows                                           | FINAL       |
-| `live_revert_events`                   | 29,112  | revert events (all namespaces)                 | PROVISIONAL |
-| `live_revert_events_newest_not_parent` | 1,254   | revert events                                  | PROVISIONAL |
-| `history_tag_share_T_7d_20d_pct`       | 79.37   | % with mw-reverted tag                         | FINAL       |
-| `live_tag_confirmed_range_gt_15_pct`   | 0.00    | % of reverted revisions (complete ranges only) | PROVISIONAL |
-| `live_followup_max_d`                  | 4.33    | days                                           | PROVISIONAL |
+| key                                    | value   | unit                                           | status   |
+|----------------------------------------|---------|------------------------------------------------|----------|
+| `capture_page_change_files_cut_short`  | 27      | of 232 files                                   | FINAL    |
+| `capture_tags_files_cut_short`         | 50      | of 286 files                                   | FINAL    |
+| `capture_revert_risk_gaps`             | 3       | gaps over 120 s                                | FINAL    |
+| `capture_revert_risk_gap_s_total`      | 850     | s                                              | FINAL    |
+| `history_dropped_null_comment`         | 715     | rows                                           | FINAL    |
+| `live_revert_events`                   | 52,112  | revert events (all namespaces)                 | FINAL    |
+| `live_revert_events_newest_not_parent` | 2,209   | revert events                                  | FINAL    |
+| `history_tag_share_T_7d_20d_pct`       | 79.37   | % with mw-reverted tag                         | FINAL    |
+| `live_tag_confirmed_range_gt_15_pct`   | 0.00    | % of reverted revisions (complete ranges only) | FINAL    |
+| `live_followup_max_d`                  | 7.87    | days                                           | FINAL    |
 
 **Figures:**
 
@@ -1363,7 +1363,7 @@ The errors that the AI review found, and the fixes, are listed in `ec-hw2/genai/
 
 **Mongo Q3: time to revert ($bucket on the lag grid)**
 
-Collection `revert_links`. File `queries/mongo/q3_time_to_revert.json`. Median time 50.3 ms (median of 7), local MongoDB.
+Collection `revert_links`. File `queries/mongo/q3_time_to_revert.json`. Median time 50.5 ms (median of 7), local MongoDB.
 
 ```json
 [
@@ -1683,18 +1683,18 @@ Result: the first rows (of 27 rows in `results/mongo_q3_time_to_revert.csv`):
 | history_4d | 6-24 h    | 21600            | 86400            | 2797 | 0.1585  | 0.8896      | 6              | 06 6-24 h       |
 | history_4d | 1-2 d     | 86400            | 172800           | 1028 | 0.05826 | 0.9478      | 7              | 07 1-2 d        |
 | history_4d | 2-4 d     | 172800           | 345600           | 921  | 0.05219 | 1           | 8              | 08 2-4 d        |
-| live       | <1 min    | 0                | 60               | 4148 | 0.2403  | 0.2403      | 1              | 01 <1 min       |
-| live       | 1-5 min   | 60               | 300              | 2830 | 0.164   | 0.4043      | 2              | 02 1-5 min      |
-| live       | 5-15 min  | 300              | 900              | 1428 | 0.08274 | 0.4871      | 3              | 03 5-15 min     |
-| live       | 15-60 min | 900              | 3600             | 1923 | 0.1114  | 0.5985      | 4              | 04 15-60 min    |
-| live       | 1-6 h     | 3600             | 21600            | 3076 | 0.1782  | 0.7767      | 5              | 05 1-6 h        |
-| live       | 6-24 h    | 21600            | 86400            | 2532 | 0.1467  | 0.9234      | 6              | 06 6-24 h       |
-| live       | 1-2 d     | 86400            | 172800           | 716  | 0.04149 | 0.9649      | 7              | 07 1-2 d        |
-| live       | 2-4 d     | 172800           | 345600           | 606  | 0.03511 | 1           | 8              | 08 2-4 d        |
+| live       | <1 min    | 0                | 60               | 4148 | 0.2328  | 0.2328      | 1              | 01 <1 min       |
+| live       | 1-5 min   | 60               | 300              | 2830 | 0.1588  | 0.3916      | 2              | 02 1-5 min      |
+| live       | 5-15 min  | 300              | 900              | 1428 | 0.08014 | 0.4718      | 3              | 03 5-15 min     |
+| live       | 15-60 min | 900              | 3600             | 1923 | 0.1079  | 0.5797      | 4              | 04 15-60 min    |
+| live       | 1-6 h     | 3600             | 21600            | 3076 | 0.1726  | 0.7523      | 5              | 05 1-6 h        |
+| live       | 6-24 h    | 21600            | 86400            | 2532 | 0.1421  | 0.8944      | 6              | 06 6-24 h       |
+| live       | 1-2 d     | 86400            | 172800           | 763  | 0.04282 | 0.9373      | 7              | 07 1-2 d        |
+| live       | 2-4 d     | 172800           | 345600           | 1118 | 0.06275 | 1           | 8              | 08 2-4 d        |
 
 **Mongo Q5: truth-lag preview (share of eventual reverts known after a wait)**
 
-Collection `revisions`. File `queries/mongo/q5_truth_lag_preview.json`. Median time 15,147.8 ms (median of 7), local MongoDB.
+Collection `revisions`. File `queries/mongo/q5_truth_lag_preview.json`. Median time 15,541.7 ms (median of 7), local MongoDB.
 
 ```json
 [
@@ -1917,6 +1917,6 @@ Result: the first rows where user_kind=all; wait=1 min,1 h,1 d (of 72 rows in `r
 | history  | all         | 1 min  | 60       | 295016    | 17646           | 0.05981          | 3506    | 0.1987        | 02 1 min      |
 | history  | all         | 1 h    | 3600     | 295016    | 17646           | 0.05981          | 9822    | 0.5566        | 05 1 h        |
 | history  | all         | 1 d    | 86400    | 295016    | 17646           | 0.05981          | 15697   | 0.8896        | 07 1 d        |
-| live     | all         | 1 min  | 60       | 279466    | 17259           | 0.06176          | 3986    | 0.231         | 02 1 min      |
-| live     | all         | 1 h    | 3600     | 279466    | 17259           | 0.06176          | 10326   | 0.5983        | 05 1 h        |
-| live     | all         | 1 d    | 86400    | 279466    | 17259           | 0.06176          | 15936   | 0.9233        | 07 1 d        |
+| live     | all         | 1 min  | 60       | 279466    | 17818           | 0.06376          | 3986    | 0.2237        | 02 1 min      |
+| live     | all         | 1 h    | 3600     | 279466    | 17818           | 0.06376          | 10326   | 0.5795        | 05 1 h        |
+| live     | all         | 1 d    | 86400    | 279466    | 17818           | 0.06376          | 15936   | 0.8944        | 07 1 d        |

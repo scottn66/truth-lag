@@ -34,7 +34,7 @@ NEO4J_IMPORT_DIR = DATA_DIR / "neo4j" / "import"    # CSV files that Neo4j reads
 RESULTS_DIR = HW2_DIR / "results"                   # small query outputs, committed to git
 FIGURES_DIR = HW2_DIR / "results" / "figures"
 
-DATA_VERSION = "data-v1"   # data-v2 after the live cutoff (Mon 2026-10-26 5:05 PM PT = 2026-10-27 00:05 UTC)
+DATA_VERSION = "data-v2"   # data-v2 after the live cutoff (Mon 2026-10-26 5:05 PM PT = 2026-10-27 00:05 UTC)
 DATA_VERSION_FILE = TABLES_DIR / "DATA_VERSION"   # written by release_data.sh
 
 # --------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 
 Mongo Q4 (spec 3.4): bot vs human share of reverts in the history cohort, with one $facet. Input: revert_links with within_followup and by_other (self-reverts removed). made_by_reverter_kind: revert actions (distinct reverting_rev_id) made by each reverter kind, and their share. received_by_author_kind: reverted revisions by author kind, and their share. edit_revert_rate: from revisions (an uncorrelated $lookup), the revert rate of bot edits vs human edits (human = not a bot, so it includes the few 'unknown' editors); reverted = history.reverted (within 20 days, any reverter) and reverted_by_other. The result is one document with three arrays.
 
-Rows: 8. Median time: 1,306.1 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 10:10 UTC (data-v1). Full table: `mongo_atlas_q4_bot_vs_human.csv`.
+Rows: 8. Median time: 1,347.7 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-27 21:43 UTC (data-v2). Full table: `mongo_atlas_q4_bot_vs_human.csv`.
 
 | part                    | kind       | revert_actions   | reverted_revisions   | share                | edits   | reverted   | reverted_by_other   | revert_rate         | revert_rate_by_other   |
 |-------------------------|------------|------------------|----------------------|----------------------|---------|------------|---------------------|---------------------|------------------------|

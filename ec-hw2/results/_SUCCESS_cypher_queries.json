@@ -1,7 +1,7 @@
 {
   "step": "cypher_queries",
-  "data_version": "data-v1",
-  "created_at": "2026-10-24T09:56:52+00:00",
+  "data_version": "data-v2",
+  "created_at": "2026-10-27T21:27:59+00:00",
   "neo4j_version": "2026.10.1",
   "runs": 7,
   "rows": {
@@ -21,20 +21,20 @@
     "cypher_compare_top_contested.csv": 20
   },
   "median_ms": {
-    "cypher_q1_mutual_reverts.csv": 53.0,
-    "cypher_q1_mutual_reverts_total.csv": 38.7,
-    "cypher_q2_central_reverters.csv": 193.3,
-    "cypher_q2_central_reverters_humans.csv": 185.6,
-    "cypher_q2_central_reverters_by_degree.csv": 17.2,
-    "cypher_q3_conflict_communities_louvain_stats.csv": 412.7,
-    "cypher_q3_conflict_communities_community_sizes.csv": 19.2,
-    "cypher_q3_conflict_communities.csv": 106.9,
-    "cypher_q3_conflict_communities_wcc_sizes.csv": 8.7,
-    "cypher_q3_conflict_communities_wcc_largest.csv": 39.6,
-    "cypher_q4_pages_most_warring_editors.csv": 26.2,
-    "cypher_q4_pages_most_warring_editors_by_any_revert.csv": 23.1,
-    "cypher_q5_two_hop_contested.csv": 17.9,
-    "cypher_compare_top_contested.csv": 112.9
+    "cypher_q1_mutual_reverts.csv": 261.2,
+    "cypher_q1_mutual_reverts_total.csv": 169.1,
+    "cypher_q2_central_reverters.csv": 206.1,
+    "cypher_q2_central_reverters_humans.csv": 174.7,
+    "cypher_q2_central_reverters_by_degree.csv": 21.9,
+    "cypher_q3_conflict_communities_louvain_stats.csv": 536.9,
+    "cypher_q3_conflict_communities_community_sizes.csv": 34.5,
+    "cypher_q3_conflict_communities.csv": 115.8,
+    "cypher_q3_conflict_communities_wcc_sizes.csv": 13.7,
+    "cypher_q3_conflict_communities_wcc_largest.csv": 58.6,
+    "cypher_q4_pages_most_warring_editors.csv": 32.0,
+    "cypher_q4_pages_most_warring_editors_by_any_revert.csv": 27.5,
+    "cypher_q5_two_hop_contested.csv": 21.8,
+    "cypher_compare_top_contested.csv": 119.4
   },
   "checks": [
     {
@@ -99,5 +99,5 @@
   ],
   "failed_files": [],
   "figure": "results/figures/neo4j_edit_war_example.png",
-  "seconds": 9.3
+  "seconds": 16.1
 }

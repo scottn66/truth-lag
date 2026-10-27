@@ -2,8 +2,8 @@
 
 Mutual reverts (spec 5, the comparison query; DATA_MODEL.md section 7): editor a reverted b AND b reverted a on the SAME page. Input: history revert_links with within_followup and by_other (both keys not null). $group makes the triples (reverter_key, author_key, page_id) with the distinct reverting revisions; a self-$lookup on revert_links (same page, roles swapped) finds the reverse direction. One row per page and unordered pair (a < b by key): page_id, a, b, a_reverted_b and b_reverted_a (distinct revert actions in each direction). Ordered by page_id, a, b. The output shows editor keys: results/ files replace human keys with pseudonyms.
 
-Rows: 462. Median time: 1,520.8 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 10:10 UTC (data-v1). Full table: `mongo_atlas_compare_mutual_reverts.csv`.
+Rows: 462. Median time: 1,465.2 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-27 21:43 UTC (data-v2). Full table: `mongo_atlas_compare_mutual_reverts.csv`.
 
 |   page_id | page_title                            | editor_a          | editor_b          |   a_reverted_b |   b_reverted_a |
 |-----------|---------------------------------------|-------------------|-------------------|----------------|----------------|

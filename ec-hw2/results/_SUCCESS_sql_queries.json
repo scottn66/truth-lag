@@ -1,7 +1,7 @@
 {
   "step": "sql_queries",
-  "data_version": "data-v1",
-  "created_at": "2026-10-24T09:56:54+00:00",
+  "data_version": "data-v2",
+  "created_at": "2026-10-27T21:28:00+00:00",
   "sqlite_version": "3.53.1",
   "runs": 7,
   "rows": {
@@ -9,26 +9,26 @@
     "sql_compare_mutual_reverts.csv": 462
   },
   "median_ms": {
-    "sql_compare_top_contested.csv": 24.0,
-    "sql_compare_mutual_reverts.csv": 17.6
+    "sql_compare_top_contested.csv": 27.6,
+    "sql_compare_mutual_reverts.csv": 19.5
   },
   "results": [
     {
       "query": "compare_top_contested",
       "file": "sql_compare_top_contested.csv",
       "result_rows": 20,
-      "median_ms": 24.0,
-      "min_ms": 23.9,
-      "max_ms": 24.6,
+      "median_ms": 27.6,
+      "min_ms": 26.2,
+      "max_ms": 36.2,
       "runs": 7
     },
     {
       "query": "compare_mutual_reverts",
       "file": "sql_compare_mutual_reverts.csv",
       "result_rows": 462,
-      "median_ms": 17.6,
-      "min_ms": 17.6,
-      "max_ms": 18.2,
+      "median_ms": 19.5,
+      "min_ms": 18.6,
+      "max_ms": 22.4,
       "runs": 7
     }
   ],
@@ -67,5 +67,5 @@
       "first_difference_row": null
     }
   ],
-  "seconds": 1.1
+  "seconds": 1.3
 }

@@ -1,9 +1,9 @@
 # FACTS: the key numbers of EC HW2
 
-Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not edit by hand: run the script again.
+Made by `ec-hw2/report/build_facts.py` on 2026-10-27 21:28 UTC (data-v2). Do not edit by hand: run the script again.
 
 - Use these numbers in the report. Each notebook checks its numbers against this table in its last cell.
-- **FINAL**: the number will not change. **PROVISIONAL**: it depends on the live cohort, whose stream labels are final after 2026-10-27T00:05:00Z (Mon 2026-10-26 5:05 PM PT); or it is a comparison timing that `results/comparison.csv` labels draft; or it is a modeling-pain score that is still a draft by Claude Code (`comparison/pain.csv`). Live cohort now: **PROVISIONAL** (newest parsed event: 2026-10-24T07:59:59Z).
+- **FINAL**: the number will not change. **PROVISIONAL**: it depends on the live cohort, whose stream labels are final after 2026-10-27T00:05:00Z (Mon 2026-10-26 5:05 PM PT); or it is a comparison timing that `results/comparison.csv` labels draft; or it is a modeling-pain score that is still a draft by Claude Code (`comparison/pain.csv`). Live cohort now: **FINAL** (newest parsed event: 2026-10-27T20:59:59Z).
 - Horizons: history keys count reverts within 20 days, unless the key ends in `_4d` (within 4 days). Live keys count reverts within 4 days, and the live follow-up is still short. Compare the live cohort only with the `_4d` history keys.
 - Comparison timings come only from `results/comparison.csv` (`cmp_ms_*`: median, min and max). The `mongo_ms_*` and `cypher_ms_*` times of the same queries are single-engine runs: do not compare them.
 - Percent values are in percent (7.43 means 7.43%). Times are UTC. Human editors appear only as pseudonyms.
@@ -45,10 +45,10 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not
 | history_T_p90_d | 4.21 | days (history reverts within 20 days) | data/tables/history_summary.json | FINAL |
 | history_self_revert_pct | 9.29 | % of history reverts within 20 days | data/tables/history_summary.json | FINAL |
 | history_reverted_4d | 17,646 | revisions (reverted within 4 days) | data/tables/history_revert_links.parquet | FINAL |
-| history_median_T_4d_s | 1,942 | s (history reverts within 4 days (the live horizon)) | data/tables/history_revert_links.parquet | FINAL |
-| history_median_T_4d_h | 0.54 | h (history reverts within 4 days (the live horizon)) | data/tables/history_revert_links.parquet | FINAL |
-| history_T_within_1h_4d_pct | 55.66 | % of history reverts within 4 days (the live horizon) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
-| history_T_within_1d_4d_pct | 88.96 | % of history reverts within 4 days (the live horizon) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| history_median_T_4d_s | 1,942 | s (history reverts within 4 days, the live horizon) | data/tables/history_revert_links.parquet | FINAL |
+| history_median_T_4d_h | 0.54 | h (history reverts within 4 days, the live horizon) | data/tables/history_revert_links.parquet | FINAL |
+| history_T_within_1h_4d_pct | 55.66 | % of history reverts within 4 days, the live horizon | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| history_T_within_1d_4d_pct | 88.96 | % of history reverts within 4 days, the live horizon | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
 | history_revert_links | 19,858 | rows | data/tables/history_summary.json | FINAL |
 | history_links_by_other_20d | 17,868 | rows | data/tables/history_summary.json | FINAL |
 | history_tag_agreement_pct | 99.52 | % of revisions | data/tables/history_summary.json | FINAL |
@@ -58,61 +58,61 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not
 | history_tag_share_T_7d_20d_pct | 79.37 | % with mw-reverted tag | data/tables/history_summary.json | FINAL |
 | history_tag_share_T_gt_20d_pct | 58.23 | % with mw-reverted tag | data/tables/history_summary.json | FINAL |
 | history_tag_share_T_not_reverted_pct | 0.16 | % with mw-reverted tag | data/tables/history_summary.json | FINAL |
-| live_page_change_events | 639,330 | events | data/tables/live_summary.json | PROVISIONAL |
-| live_revisions | 279,466 | revisions | data/tables/_SUCCESS_live.json | PROVISIONAL |
-| live_dropped_namespace_not_0 | 205,504 | events | data/tables/live_summary.json | PROVISIONAL |
-| live_dropped_outside_window | 133,972 | events | data/tables/live_summary.json | PROVISIONAL |
-| live_dropped_not_edit | 20,388 | events | data/tables/live_summary.json | PROVISIONAL |
-| live_reverted_4d | 17,259 | revisions (reverted within 4 days) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_rate_pct | 6.18 | % (reverted within 4 days) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_rate_human_pct | 6.92 | % (reverted within 4 days) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_rate_temporary_pct | 26.43 | % (reverted within 4 days) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_rate_registered_pct | 3.57 | % (reverted within 4 days) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_rate_bot_pct | 0.38 | % (reverted within 4 days) | data/tables/live_summary.json | PROVISIONAL |
-| live_median_T_s | 1,088 | s (live reverts within 4 days; the follow-up is still short) | data/tables/live_summary.json | PROVISIONAL |
-| live_median_T_h | 0.30 | h (live reverts within 4 days; the follow-up is still short) | data/tables/live_summary.json | PROVISIONAL |
-| live_T_within_1h_pct | 59.85 | % of live reverts within 4 days; the follow-up is still short | ec-hw2/results/mongo_q3_time_to_revert.csv | PROVISIONAL |
-| live_T_within_1d_pct | 92.34 | % of live reverts within 4 days; the follow-up is still short | ec-hw2/results/mongo_q3_time_to_revert.csv | PROVISIONAL |
-| live_K_median_s | 3.48 | s | data/tables/live_summary.json | PROVISIONAL |
-| live_K_p90_s | 8.61 | s | data/tables/live_summary.json | PROVISIONAL |
-| live_K_p99_s | 17.84 | s | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_risk_coverage_pct | 98.15 | % of edits | data/tables/live_summary.json | PROVISIONAL |
-| live_tag_confirmed_range_le_15_pct | 99.41 | % of reverted revisions (complete ranges only) | data/tables/live_summary.json | PROVISIONAL |
-| live_tag_confirmed_range_le_15_n | 16,317 | reverted revisions (complete ranges only) | data/tables/live_summary.json | PROVISIONAL |
-| live_tag_confirmed_range_gt_15_pct | 0.00 | % of reverted revisions (complete ranges only) | data/tables/live_summary.json | PROVISIONAL |
-| live_tag_confirmed_range_gt_15_n | 263 | reverted revisions (complete ranges only) | data/tables/live_summary.json | PROVISIONAL |
-| live_tag_confirmed_range_incomplete_pct | 66.42 | % of reverted revisions whose revert range starts before the capture (size unknown) | data/tables/live_summary.json | PROVISIONAL |
-| live_tag_confirmed_range_incomplete_n | 679 | reverted revisions (range starts before the capture; range_size is a lower bound) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_events | 29,112 | revert events (all namespaces) | data/tables/live_summary.json | PROVISIONAL |
-| live_revert_events_newest_not_parent | 1,254 | revert events | data/tables/live_summary.json | PROVISIONAL |
-| live_newest_meta_dt | 2026-10-24T07:59:59Z | UTC (newest parsed event) | data/tables/_SUCCESS_live.json | PROVISIONAL |
+| live_page_change_events | 1,231,427 | events | data/tables/live_summary.json | FINAL |
+| live_revisions | 279,466 | revisions | data/tables/_SUCCESS_live.json | FINAL |
+| live_dropped_namespace_not_0 | 379,956 | events | data/tables/live_summary.json | FINAL |
+| live_dropped_outside_window | 538,090 | events | data/tables/live_summary.json | FINAL |
+| live_dropped_not_edit | 33,915 | events | data/tables/live_summary.json | FINAL |
+| live_reverted_4d | 17,818 | revisions (reverted within 4 days) | data/tables/live_summary.json | FINAL |
+| live_revert_rate_pct | 6.38 | % (reverted within 4 days) | data/tables/live_summary.json | FINAL |
+| live_revert_rate_human_pct | 7.14 | % (reverted within 4 days) | data/tables/live_summary.json | FINAL |
+| live_revert_rate_temporary_pct | 26.91 | % (reverted within 4 days) | data/tables/live_summary.json | FINAL |
+| live_revert_rate_registered_pct | 3.74 | % (reverted within 4 days) | data/tables/live_summary.json | FINAL |
+| live_revert_rate_bot_pct | 0.44 | % (reverted within 4 days) | data/tables/live_summary.json | FINAL |
+| live_median_T_s | 1,344 | s (live reverts within 4 days; the follow-up is still short) | data/tables/live_summary.json | FINAL |
+| live_median_T_h | 0.37 | h (live reverts within 4 days; the follow-up is still short) | data/tables/live_summary.json | FINAL |
+| live_T_within_1h_pct | 57.97 | % of live reverts within 4 days; the follow-up is still short | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| live_T_within_1d_pct | 89.44 | % of live reverts within 4 days; the follow-up is still short | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| live_K_median_s | 3.44 | s | data/tables/live_summary.json | FINAL |
+| live_K_p90_s | 8.57 | s | data/tables/live_summary.json | FINAL |
+| live_K_p99_s | 17.78 | s | data/tables/live_summary.json | FINAL |
+| live_revert_risk_coverage_pct | 98.15 | % of edits | data/tables/live_summary.json | FINAL |
+| live_tag_confirmed_range_le_15_pct | 99.42 | % of reverted revisions (complete ranges only) | data/tables/live_summary.json | FINAL |
+| live_tag_confirmed_range_le_15_n | 16,761 | reverted revisions (complete ranges only) | data/tables/live_summary.json | FINAL |
+| live_tag_confirmed_range_gt_15_pct | 0.00 | % of reverted revisions (complete ranges only) | data/tables/live_summary.json | FINAL |
+| live_tag_confirmed_range_gt_15_n | 284 | reverted revisions (complete ranges only) | data/tables/live_summary.json | FINAL |
+| live_tag_confirmed_range_incomplete_pct | 67.27 | % of reverted revisions whose revert range starts before the capture (size unknown) | data/tables/live_summary.json | FINAL |
+| live_tag_confirmed_range_incomplete_n | 773 | reverted revisions (range starts before the capture; range_size is a lower bound) | data/tables/live_summary.json | FINAL |
+| live_revert_events | 52,112 | revert events (all namespaces) | data/tables/live_summary.json | FINAL |
+| live_revert_events_newest_not_parent | 2,209 | revert events | data/tables/live_summary.json | FINAL |
+| live_newest_meta_dt | 2026-10-27T20:59:59Z | UTC (newest parsed event) | data/tables/_SUCCESS_live.json | FINAL |
 | live_final_after | 2026-10-27T00:05:00Z | UTC | ec-hw2/config.py | FINAL |
-| live_followup_max_d | 4.33 | days | data/tables/live_revisions.parquet | PROVISIONAL |
-| live_followup_min_d | 1.33 | days | data/tables/live_revisions.parquet | PROVISIONAL |
-| live_followup_ge_4d_pct | 11.35 | % of live edits followed for 4 days or more | data/tables/live_revisions.parquet | PROVISIONAL |
+| live_followup_max_d | 7.87 | days | data/tables/live_revisions.parquet | FINAL |
+| live_followup_min_d | 4.88 | days | data/tables/live_revisions.parquet | FINAL |
+| live_followup_ge_4d_pct | 100.00 | % of live edits followed for 4 days or more | data/tables/live_revisions.parquet | FINAL |
 | capture_page_change_first_utc | 2026-10-19T23:00:00Z | UTC | data/parsed/_SUCCESS_parsed.json | FINAL |
-| capture_page_change_last_utc | 2026-10-24T07:59:59Z | UTC (newest parsed event) | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_page_change_events | 639,330 | events | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_page_change_gaps | 0 | gaps over 120 s | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_page_change_files_cut_short | 11 | of 144 files | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_page_change_gap_s_total | 0 | s | data/parsed/capture_gaps.csv | PROVISIONAL |
+| capture_page_change_last_utc | 2026-10-27T20:59:59Z | UTC (newest parsed event) | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_page_change_events | 1,231,427 | events | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_page_change_gaps | 0 | gaps over 120 s | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_page_change_files_cut_short | 27 | of 232 files | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_page_change_gap_s_total | 0 | s | data/parsed/capture_gaps.csv | FINAL |
 | capture_revert_risk_first_utc | 2026-10-19T23:00:00Z | UTC | data/parsed/_SUCCESS_parsed.json | FINAL |
-| capture_revert_risk_last_utc | 2026-10-24T07:59:59Z | UTC (newest parsed event) | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_revert_risk_events | 399,115 | events | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_revert_risk_gaps | 2 | gaps over 120 s | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_revert_risk_files_cut_short | 10 | of 142 files | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_revert_risk_gap_s_total | 546 | s | data/parsed/capture_gaps.csv | PROVISIONAL |
+| capture_revert_risk_last_utc | 2026-10-27T20:59:58Z | UTC (newest parsed event) | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_revert_risk_events | 789,634 | events | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_revert_risk_gaps | 3 | gaps over 120 s | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_revert_risk_files_cut_short | 28 | of 230 files | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_revert_risk_gap_s_total | 850 | s | data/parsed/capture_gaps.csv | FINAL |
 | capture_tags_first_utc | 2026-10-17T01:30:18Z | UTC | data/parsed/_SUCCESS_parsed.json | FINAL |
-| capture_tags_last_utc | 2026-10-24T07:59:59Z | UTC (newest parsed event) | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_tags_events | 1,059,190 | events | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_tags_gaps | 0 | gaps over 120 s | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_tags_files_cut_short | 27 | of 201 files | data/parsed/_SUCCESS_parsed.json | PROVISIONAL |
-| capture_tags_gap_s_total | 0 | s | data/parsed/capture_gaps.csv | PROVISIONAL |
-| mongo_revisions_docs | 574,482 | documents | data/tables/_SUCCESS_mongo_local.json | PROVISIONAL |
-| mongo_revert_links_docs | 37,117 | documents | data/tables/_SUCCESS_mongo_local.json | PROVISIONAL |
-| mongo_tag_events_docs | 67,326 | documents | data/tables/_SUCCESS_mongo_local.json | PROVISIONAL |
-| mongo_late_reverts_docs | 3,205 | documents | data/tables/_SUCCESS_mongo_local.json | PROVISIONAL |
-| mongo_page_hour_docs | 299,476 | documents | data/tables/_SUCCESS_page_hour.json | PROVISIONAL |
+| capture_tags_last_utc | 2026-10-27T20:59:59Z | UTC (newest parsed event) | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_tags_events | 1,603,253 | events | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_tags_gaps | 0 | gaps over 120 s | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_tags_files_cut_short | 50 | of 286 files | data/parsed/_SUCCESS_parsed.json | FINAL |
+| capture_tags_gap_s_total | 0 | s | data/parsed/capture_gaps.csv | FINAL |
+| mongo_revisions_docs | 574,482 | documents | data/tables/_SUCCESS_mongo_local.json | FINAL |
+| mongo_revert_links_docs | 38,216 | documents | data/tables/_SUCCESS_mongo_local.json | FINAL |
+| mongo_tag_events_docs | 99,606 | documents | data/tables/_SUCCESS_mongo_local.json | FINAL |
+| mongo_late_reverts_docs | 4,350 | documents | data/tables/_SUCCESS_mongo_local.json | FINAL |
+| mongo_page_hour_docs | 605,017 | documents | data/tables/_SUCCESS_page_hour.json | FINAL |
 | mongo_indexes | 7 | indexes | data/tables/_SUCCESS_mongo_local.json | FINAL |
 | mongo_index_list | revisions.page.id_1_ts_1; revisions.user.id_1; revisions.history.reverted_1; revisions.cohort_1_ts_1; revert_links.reverted_rev_id_1; revert_links.page_id_1; revert_links.cohort_1_page_id_1 |  | data/tables/_SUCCESS_mongo_local.json | FINAL |
 | mongo_q1_history_temporary_hourly_min_pct | 22.24 | % | ec-hw2/results/mongo_q1_revert_rate_by_hour.csv | FINAL |
@@ -131,10 +131,10 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not
 | mongo_q2_contested_in_top20 | 20 | pages | ec-hw2/results/mongo_q2_top_contested_pages.csv | FINAL |
 | mongo_q3_history_lt_1min_pct | 17.61 | % of history reverts within 20 days | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
 | mongo_q3_history_buckets | 11 | non-empty buckets (history reverts within 20 days) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
-| mongo_q3_history_4d_lt_1min_pct | 19.66 | % of history reverts within 4 days (compare with live) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
-| mongo_q3_history_4d_buckets | 8 | non-empty buckets (history reverts within 4 days (compare with live)) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
-| mongo_q3_live_lt_1min_pct | 24.03 | % of live reverts within 4 days; the follow-up is still short | ec-hw2/results/mongo_q3_time_to_revert.csv | PROVISIONAL |
-| mongo_q3_live_buckets | 8 | non-empty buckets (live reverts within 4 days; the follow-up is still short) | ec-hw2/results/mongo_q3_time_to_revert.csv | PROVISIONAL |
+| mongo_q3_history_4d_lt_1min_pct | 19.66 | % of history reverts within 4 days; compare with live | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| mongo_q3_history_4d_buckets | 8 | non-empty buckets (history reverts within 4 days; compare with live) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| mongo_q3_live_lt_1min_pct | 23.28 | % of live reverts within 4 days; the follow-up is still short | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
+| mongo_q3_live_buckets | 8 | non-empty buckets (live reverts within 4 days; the follow-up is still short) | ec-hw2/results/mongo_q3_time_to_revert.csv | FINAL |
 | mongo_q4_revert_actions_total | 13,373 | revert actions | ec-hw2/results/mongo_q4_bot_vs_human.csv | FINAL |
 | mongo_q4_reverted_revisions_total | 17,868 | revisions | ec-hw2/results/mongo_q4_bot_vs_human.csv | FINAL |
 | mongo_q4_made_by_bot_pct | 5.03 | % of revert actions | ec-hw2/results/mongo_q4_bot_vs_human.csv | FINAL |
@@ -155,20 +155,20 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not
 | mongo_q5_history_known_1d_pct | 88.96 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
 | mongo_q5_history_known_1h_temporary_pct | 62.43 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
 | mongo_q5_history_known_1h_registered_pct | 47.51 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
-| mongo_q5_live_reverts_4d | 17,259 | revisions | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_q5_live_revert_rate_4d_pct | 6.18 | % | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_q5_live_known_1min_pct | 23.10 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_q5_live_known_1h_pct | 59.83 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_q5_live_known_1d_pct | 92.33 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_q5_live_known_1h_temporary_pct | 66.24 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_q5_live_known_1h_registered_pct | 52.10 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | PROVISIONAL |
-| mongo_ms_q1_revert_rate_by_hour | 5,229.9 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | PROVISIONAL |
-| mongo_ms_q2_top_contested_pages | 78.2 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/mongo_summary.csv | FINAL |
-| mongo_ms_q3_time_to_revert | 50.3 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | FINAL |
-| mongo_ms_q4_bot_vs_human | 269.5 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | FINAL |
-| mongo_ms_q5_truth_lag_preview | 15,147.8 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | PROVISIONAL |
-| mongo_ms_compare_mutual_reverts | 129.3 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/mongo_summary.csv | FINAL |
-| mongo_ms_q5_risk_deciles | 7,780.9 | ms (median of 1) | ec-hw2/results/mongo_summary.csv | PROVISIONAL |
+| mongo_q5_live_reverts_4d | 17,818 | revisions | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_q5_live_revert_rate_4d_pct | 6.38 | % | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_q5_live_known_1min_pct | 22.37 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_q5_live_known_1h_pct | 57.95 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_q5_live_known_1d_pct | 89.44 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_q5_live_known_1h_temporary_pct | 65.06 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_q5_live_known_1h_registered_pct | 49.69 | % of 4-day reverts | ec-hw2/results/mongo_q5_truth_lag_preview.csv | FINAL |
+| mongo_ms_q1_revert_rate_by_hour | 5,362.2 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | FINAL |
+| mongo_ms_q2_top_contested_pages | 76.9 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/mongo_summary.csv | FINAL |
+| mongo_ms_q3_time_to_revert | 50.5 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | FINAL |
+| mongo_ms_q4_bot_vs_human | 270.8 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | FINAL |
+| mongo_ms_q5_truth_lag_preview | 15,541.7 | ms (median of 7) | ec-hw2/results/mongo_summary.csv | FINAL |
+| mongo_ms_compare_mutual_reverts | 128.5 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/mongo_summary.csv | FINAL |
+| mongo_ms_q5_risk_deciles | 7,908.1 | ms (median of 1) | ec-hw2/results/mongo_summary.csv | FINAL |
 | atlas_estimate_mb | 229.7 | MB (budget 400, limit 512) | ec-hw2/load_mongo.py --target atlas --estimate-only | FINAL |
 | neo4j_editor_count | 37,546 | nodes | data/neo4j/_SUCCESS_load_neo4j_local.json | FINAL |
 | neo4j_page_count | 165,415 | nodes | data/neo4j/_SUCCESS_load_neo4j_local.json | FINAL |
@@ -213,76 +213,76 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not
 | cypher_q4_top_page_warring_editors | 10 | editors | ec-hw2/results/cypher_q4_pages_most_warring_editors.csv | FINAL |
 | cypher_q4_top_page_mutual_pairs | 9 | pairs | ec-hw2/results/cypher_q4_pages_most_warring_editors.csv | FINAL |
 | cypher_q5_top_pair_shared_pages | 4 | contested pages | ec-hw2/results/cypher_q5_two_hop_contested.csv | FINAL |
-| cypher_ms_q1_mutual_reverts | 53.0 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/cypher_summary.csv | FINAL |
-| cypher_ms_q2_central_reverters | 193.3 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
-| cypher_ms_q3_conflict_communities | 106.9 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
-| cypher_ms_q4_pages_most_warring_editors | 26.2 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
-| cypher_ms_q5_two_hop_contested | 17.9 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
-| cypher_ms_compare_top_contested | 112.9 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/cypher_summary.csv | FINAL |
+| cypher_ms_q1_mutual_reverts | 261.2 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/cypher_summary.csv | FINAL |
+| cypher_ms_q2_central_reverters | 206.1 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
+| cypher_ms_q3_conflict_communities | 115.8 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
+| cypher_ms_q4_pages_most_warring_editors | 32.0 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
+| cypher_ms_q5_two_hop_contested | 21.8 | ms (median of 7) | ec-hw2/results/cypher_summary.csv | FINAL |
+| cypher_ms_compare_top_contested | 119.4 | ms (median of 7; single-engine run, not for the comparison: use cmp_ms_*) | ec-hw2/results/cypher_summary.csv | FINAL |
 | cmp_loc_top_mongodb | 62 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_top_mongodb | 1,040 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_top_mongodb | 22 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_top_mongodb | 76.7 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_top_mongodb | 72.5 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_top_mongodb | 100.5 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_top_mongodb | 83.6 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_min_top_mongodb | 75.0 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_max_top_mongodb | 114.1 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_faster_than_top_mongodb | Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_pain_top_mongodb | 3 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_top_mongodb | 20 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_top_neo4j | 18 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_top_neo4j | 768 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_top_neo4j | 0 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_top_neo4j | 114.2 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_top_neo4j | 107.9 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_top_neo4j | 142.0 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_top_neo4j | 137.7 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_min_top_neo4j | 120.7 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_max_top_neo4j | 251.2 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_faster_than_top_neo4j | none | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_pain_top_neo4j | 3 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_top_neo4j | 20 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_top_sqlite | 38 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_top_sqlite | 1,224 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_top_sqlite | 4 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_top_sqlite | 25.2 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_top_sqlite | 24.7 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_top_sqlite | 30.8 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_top_sqlite | 37.6 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_min_top_sqlite | 30.1 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_max_top_sqlite | 54.1 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_faster_than_top_sqlite | MongoDB; Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_pain_top_sqlite | 2 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_top_sqlite | 20 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_mutual_mongodb | 52 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_mutual_mongodb | 884 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_mutual_mongodb | 18 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_mutual_mongodb | 133.1 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_mutual_mongodb | 128.4 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_mutual_mongodb | 158.0 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_mutual_mongodb | 144.1 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_min_mutual_mongodb | 137.6 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_max_mutual_mongodb | 148.5 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_faster_than_mutual_mongodb | none | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_pain_mutual_mongodb | 4 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_mutual_mongodb | 462 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_mutual_neo4j | 6 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_mutual_neo4j | 275 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_mutual_neo4j | 0 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_mutual_neo4j | 39.3 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_mutual_neo4j | 30.7 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_mutual_neo4j | 45.2 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_mutual_neo4j | 44.6 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_min_mutual_neo4j | 38.2 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_max_mutual_neo4j | 57.4 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_faster_than_mutual_neo4j | MongoDB | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_pain_mutual_neo4j | 2 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_mutual_neo4j | 462 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_mutual_sqlite | 13 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_mutual_sqlite | 412 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_mutual_sqlite | 1 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_mutual_sqlite | 16.1 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_mutual_sqlite | 15.9 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_mutual_sqlite | 16.7 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_mutual_sqlite | 26.1 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_min_mutual_sqlite | 17.6 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_max_mutual_sqlite | 29.0 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_faster_than_mutual_sqlite | MongoDB; Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
 | cmp_pain_mutual_sqlite | 2 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_mutual_sqlite | 462 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_scored_by | draft by Claude Code; Comparison+viz owner to re-score | who scored the modeling pain | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_runs_per_query | 21 | timed runs per query | ec-hw2/results/comparison.csv | FINAL |
 | cmp_rounds | 3 | rounds (the engines take turns) | ec-hw2/results/comparison.csv | FINAL |
-| cmp_load_average_start | 3.45 | 1-minute load average when the timing started (idle below 2.0) | ec-hw2/results/_SUCCESS_comparison.json | PROVISIONAL |
+| cmp_load_average_start | 4.65 | 1-minute load average when the timing started (idle below 2.0) | ec-hw2/results/_SUCCESS_comparison.json | PROVISIONAL |
 | cmp_all_identical | yes |  | ec-hw2/results/_SUCCESS_comparison.json | FINAL |
 | cmp_timing_label | draft | draft timings are PROVISIONAL | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_mutual_sqlite_preagg | 1.4 | ms (draft, median of 21; extra row, not compared) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
-| cmp_ms_min_mutual_sqlite_preagg | 1.4 | ms (fastest run; extra row) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
-| cmp_ms_max_mutual_sqlite_preagg | 1.6 | ms (slowest run; extra row) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
-| cmp_setup_ms_mutual_sqlite_preagg | 12.5 | ms to build the TEMP table of grouped triples (not timed in the median) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
+| cmp_ms_mutual_sqlite_preagg | 1.9 | ms (draft, median of 21; extra row, not compared) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
+| cmp_ms_min_mutual_sqlite_preagg | 1.5 | ms (fastest run; extra row) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
+| cmp_ms_max_mutual_sqlite_preagg | 3.1 | ms (slowest run; extra row) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
+| cmp_setup_ms_mutual_sqlite_preagg | 27.4 | ms to build the TEMP table of grouped triples (not timed in the median) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
 | cmp_loc_mutual_sqlite_preagg | 5 | lines (the timed query only) | ec-hw2/results/comparison_extra.csv | FINAL |
 | shard_key | {"page.id": "hashed"} |  | ec-hw2/scaleout/SHARDING.md | FINAL |
 | shard_documents | 295,016 | documents | ec-hw2/results/_SUCCESS_sharding.json | FINAL |
@@ -295,46 +295,46 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-24 10:19 UTC (data-v1). Do not
 | shard_checks_ok | 12 of 12 | checks | ec-hw2/results/_SUCCESS_sharding.json | FINAL |
 | shard_biggest_page_title | List_of_2018_albums |  | data/tables/history_revisions.parquet | FINAL |
 | shard_biggest_page_revisions | 261 | revisions | data/tables/history_revisions.parquet | FINAL |
-| late_reverts_rows | 3,205 | September revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_rows_ns0 | 2,662 | September revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_exact | 1,928 | revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_exact_ns0 | 1,645 | revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_in_history_cohort_exact | 85 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_inexact_undo | 94 | revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_inexact_undo_ns0 | 91 | revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_in_history_cohort_inexact_undo | 6 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_method_unknown | 1,183 | revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_method_unknown_ns0 | 926 | revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_in_history_cohort_method_unknown | 80 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_in_history_cohort | 171 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_pages | 1,817 | pages, all namespaces | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_pages_ns0 | 1,513 | pages, namespace 0 only, like the history cohort | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_reverting_actions | 1,055 | revert actions, all namespaces | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_reverting_actions_ns0 | 896 | revert actions, namespace 0 only, like the history cohort | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_median_age_exact_d | 31.9 | days (all namespaces) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| late_reverts_restored_later | 136 | revisions (all namespaces) | data/tables/late_reverts_summary.json | PROVISIONAL |
-| risk_top_decile_score_min | 0.83 | revert-risk score | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_edits | 26,898 | edits | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_revert_rate_pct | 31.66 | % reverted within 4 days | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_bottom_decile_revert_rate_pct | 0.07 | % reverted within 4 days | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_visible_1h_pct | 69.24 | % of 4-day reverts | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_visible_1h_ci | 68.25-70.21 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_later_1h_pct | 12.48 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_later_1h_ci | 12.04-12.93 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_bottom_decile_later_1h_pct | 0.026 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_visible_1d_pct | 95.30 | % of 4-day reverts | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_visible_1d_ci | 94.83-95.73 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_later_1d_pct | 2.13 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top_decile_later_1d_ci | 1.93-2.35 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_bottom_decile_later_1d_pct | 0.000 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_top2_deciles_share_of_reverts_pct | 73.07 | % of 4-day reverts (scored edits) | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_no_score_edits | 10,450 | edits with no revert-risk score | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_no_score_revert_rate_pct | 1.52 | % reverted within 4 days (page creations and edits without a captured score, mixed) | ec-hw2/results/mongo_q5_risk_deciles.csv | PROVISIONAL |
-| risk_no_score_page_creations | 5,392 | page creations (no page creation has a score) | data/tables/live_revisions.parquet + live_revert_links.parquet | PROVISIONAL |
-| risk_no_score_page_creations_reverted | 0 | page creations reverted within 4 days | data/tables/live_revisions.parquet + live_revert_links.parquet | PROVISIONAL |
-| risk_no_score_not_captured | 5,058 | edits whose score event was not captured | data/tables/live_revisions.parquet + live_revert_links.parquet | PROVISIONAL |
-| risk_no_score_not_captured_reverted | 159 | of those edits, reverted within 4 days | data/tables/live_revisions.parquet + live_revert_links.parquet | PROVISIONAL |
-| risk_no_score_not_captured_revert_rate_pct | 3.14 | % reverted within 4 days (edits whose score event was not captured) | data/tables/live_revisions.parquet + live_revert_links.parquet | PROVISIONAL |
+| late_reverts_rows | 4,350 | September revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_rows_ns0 | 3,591 | September revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_exact | 2,970 | revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_exact_ns0 | 2,472 | revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_in_history_cohort_exact | 121 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_inexact_undo | 198 | revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_inexact_undo_ns0 | 194 | revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_in_history_cohort_inexact_undo | 16 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_method_unknown | 1,182 | revisions, all namespaces (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_method_unknown_ns0 | 925 | revisions, namespace 0 only, like the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_in_history_cohort_method_unknown | 80 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_in_history_cohort | 217 | revisions in the history cohort (lower bound) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_pages | 2,437 | pages, all namespaces | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_pages_ns0 | 2,022 | pages, namespace 0 only, like the history cohort | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_reverting_actions | 1,684 | revert actions, all namespaces | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_reverting_actions_ns0 | 1,414 | revert actions, namespace 0 only, like the history cohort | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_median_age_exact_d | 33.1 | days (all namespaces) | data/tables/late_reverts_summary.json | FINAL |
+| late_reverts_restored_later | 206 | revisions (all namespaces) | data/tables/late_reverts_summary.json | FINAL |
+| risk_top_decile_score_min | 0.83 | revert-risk score | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_edits | 26,898 | edits | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_revert_rate_pct | 32.18 | % reverted within 4 days | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_bottom_decile_revert_rate_pct | 0.07 | % reverted within 4 days | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_visible_1h_pct | 68.13 | % of 4-day reverts | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_visible_1h_ci | 67.14-69.11 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_later_1h_pct | 13.13 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_later_1h_ci | 12.68-13.60 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_bottom_decile_later_1h_pct | 0.030 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_visible_1d_pct | 93.78 | % of 4-day reverts | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_visible_1d_ci | 93.26-94.27 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_later_1d_pct | 2.86 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top_decile_later_1d_ci | 2.64-3.11 | % (Wilson 95%) | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_bottom_decile_later_1d_pct | 0.004 | % of edits still clean at the wait | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_top2_deciles_share_of_reverts_pct | 72.41 | % of 4-day reverts (scored edits) | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_no_score_edits | 10,450 | edits with no revert-risk score | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_no_score_revert_rate_pct | 1.63 | % reverted within 4 days (page creations and edits without a captured score, mixed) | ec-hw2/results/mongo_q5_risk_deciles.csv | FINAL |
+| risk_no_score_page_creations | 5,392 | page creations (no page creation has a score) | data/tables/live_revisions.parquet + live_revert_links.parquet | FINAL |
+| risk_no_score_page_creations_reverted | 0 | page creations reverted within 4 days | data/tables/live_revisions.parquet + live_revert_links.parquet | FINAL |
+| risk_no_score_not_captured | 5,058 | edits whose score event was not captured | data/tables/live_revisions.parquet + live_revert_links.parquet | FINAL |
+| risk_no_score_not_captured_reverted | 170 | of those edits, reverted within 4 days | data/tables/live_revisions.parquet + live_revert_links.parquet | FINAL |
+| risk_no_score_not_captured_revert_rate_pct | 3.36 | % reverted within 4 days (edits whose score event was not captured) | data/tables/live_revisions.parquet + live_revert_links.parquet | FINAL |
 | example_slow_page_title | World_Figure_Skating_Championships |  | data/tables/history_revisions.parquet | FINAL |
 | example_slow_page_id | 229356 |  | data/tables/history_revisions.parquet | FINAL |
 | example_slow_edits | 12 | revisions (history cohort) | data/tables/history_revisions.parquet | FINAL |

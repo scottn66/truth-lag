@@ -2,8 +2,8 @@
 
 Mongo Q1 (spec 3.1): the revert rate by hour of day (UTC, hour of the edit) and user kind (bot, temporary = logged out, registered, unknown), for both cohorts. History cohort: reverted = history.reverted (reverted within 20 days, self-reverts included). Live cohort: reverted = a revert_links document (found with $lookup) with within_followup (within 4 days). The live half is added with $unionWith, so the $lookup runs only for live documents. Output: cohort, hour_utc, user_kind, edits, reverted, revert_rate.
 
-Rows: 75. Median time: 1,418.9 ms (7 warm runs after 1 warm-up).
-Made by `ec-hw2/queries/run_mongo.py` on 2026-10-24 10:10 UTC (data-v1). Full table: `mongo_atlas_q1_revert_rate_by_hour.csv`.
+Rows: 75. Median time: 1,414.3 ms (7 warm runs after 1 warm-up).
+Made by `ec-hw2/queries/run_mongo.py` on 2026-10-27 21:43 UTC (data-v2). Full table: `mongo_atlas_q1_revert_rate_by_hour.csv`.
 
 | cohort   |   hour_utc | user_kind   |   edits |   reverted |   revert_rate |
 |----------|------------|-------------|---------|------------|---------------|
