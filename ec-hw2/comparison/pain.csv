@@ -1,7 +1,7 @@
 question,engine,score,reason,scored_by
-top contested pages,MongoDB,3,"Two collections: a $lookup sub-pipeline counts the human edits, and each distinct count needs $addToSet and then $size.","draft by Claude Code; Comparison+viz owner to re-score"
-top contested pages,Neo4j,3,"The revert facts are on the EDITED relationships only because the export copied them there; the query needs two MATCH steps and a CASE inside count().","draft by Claude Code; Comparison+viz owner to re-score"
-top contested pages,SQLite,2,"Plain GROUP BY with HAVING and a correlated COUNT, but a plain join made SQLite scan all revisions, and the float division (1.0 * a / b) needs care.","draft by Claude Code; Comparison+viz owner to re-score"
-mutual reverts,MongoDB,4,"The longest query: a self-$lookup with let variables, and its inner $match repeats the outer filter.","draft by Claude Code; Comparison+viz owner to re-score"
-mutual reverts,Neo4j,2,"The query is short, but the loader first had to build one REVERTED relationship per editor pair and page.","draft by Claude Code; Comparison+viz owner to re-score"
-mutual reverts,SQLite,2,"Short, but the swapped join condition (r.a = f.b AND r.b = f.a) is easy to get wrong.","draft by Claude Code; Comparison+viz owner to re-score"
+top contested pages,MongoDB,3,"Two collections: a $lookup sub-pipeline counts the human edits, and each distinct count needs $addToSet and then $size.","Tingyu Lee (re-scored from Claude Code draft)"
+top contested pages,Neo4j,3,"The revert facts are on the EDITED relationships only because the export copied them there; the query needs two MATCH steps and a CASE inside count().","Tingyu Lee (re-scored from Claude Code draft)"
+top contested pages,SQLite,3,"Several intermediate steps and subqueries (GROUP BY with HAVING and a correlated COUNT); a plain join made SQLite scan all revisions, and the float division needs care.","Tingyu Lee (re-scored from Claude Code draft)"
+mutual reverts,MongoDB,4,"The longest query: a self-$lookup with let variables, and its inner $match repeats the outer filter.","Tingyu Lee (re-scored from Claude Code draft)"
+mutual reverts,Neo4j,2,"The query is short, but this score assumes the pre-aggregated REVERTED relationships (one per editor pair and page) already exist; the loader has to build them first.","Tingyu Lee (re-scored from Claude Code draft)"
+mutual reverts,SQLite,2,"Short, but the swapped join condition (r.a = f.b AND r.b = f.a) is easy to get wrong.","Tingyu Lee (re-scored from Claude Code draft)"
