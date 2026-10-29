@@ -1,8 +1,8 @@
 {
   "step": "comparison",
   "data_version": "data-v2",
-  "timing_label": "draft",
-  "created_at": "2026-10-27T21:28:16+00:00",
+  "timing_label": "final",
+  "created_at": "2026-10-27T22:57:15+00:00",
   "runs": 7,
   "rounds": 3,
   "rows": {
@@ -18,37 +18,37 @@
     "mutual reverts / SQLite": 462
   },
   "median_ms": {
-    "top contested pages / MongoDB": 83.6,
-    "top contested pages / Neo4j": 137.7,
-    "top contested pages / SQLite": 37.6,
-    "mutual reverts / MongoDB": 144.1,
-    "mutual reverts / Neo4j": 44.6,
-    "mutual reverts / SQLite": 26.1
+    "top contested pages / MongoDB": 71.5,
+    "top contested pages / Neo4j": 106.2,
+    "top contested pages / SQLite": 33.4,
+    "mutual reverts / MongoDB": 127.2,
+    "mutual reverts / Neo4j": 41.0,
+    "mutual reverts / SQLite": 23.1
   },
   "range_ms": {
     "top contested pages / MongoDB": [
-      75.0,
-      114.1
+      67.7,
+      73.3
     ],
     "top contested pages / Neo4j": [
-      120.7,
-      251.2
+      100.4,
+      130.9
     ],
     "top contested pages / SQLite": [
-      30.1,
-      54.1
+      28.8,
+      53.7
     ],
     "mutual reverts / MongoDB": [
-      137.6,
-      148.5
+      121.7,
+      133.6
     ],
     "mutual reverts / Neo4j": [
-      38.2,
-      57.4
+      33.9,
+      64.1
     ],
     "mutual reverts / SQLite": [
-      17.6,
-      29.0
+      17.9,
+      26.8
     ]
   },
   "faster_than": {
@@ -61,10 +61,10 @@
   },
   "extra": {
     "engine": "SQLite, pre-aggregated input",
-    "median_ms": 1.9,
+    "median_ms": 1.7,
     "min_ms": 1.5,
-    "max_ms": 3.1,
-    "setup_ms": 27.4,
+    "max_ms": 3.5,
+    "setup_ms": 19.0,
     "same_result": "yes (same rows as the SQLite raw-link query)"
   },
   "mongo_index_check": {
@@ -74,15 +74,15 @@
         "stage": "IXSCAN",
         "index": "cohort_1_page_id_1",
         "docs_examined": 19858,
-        "with_index_ms": 76.2,
-        "collection_scan_ms": 72.9
+        "with_index_ms": 69.3,
+        "collection_scan_ms": 65.9
       },
       "mutual reverts": {
         "stage": "IXSCAN",
         "index": "cohort_1_page_id_1",
         "docs_examined": 19858,
-        "with_index_ms": 130.9,
-        "collection_scan_ms": 128.9
+        "with_index_ms": 127.3,
+        "collection_scan_ms": 126.6
       }
     }
   },
@@ -92,14 +92,14 @@
   ],
   "all_identical": true,
   "load_average_start": [
-    4.646484375,
-    4.37353515625,
-    4.04638671875
+    1.91162109375,
+    2.3310546875,
+    2.8095703125
   ],
   "load_average_end": [
-    4.73046875,
-    4.40380859375,
-    4.0625
+    2.5146484375,
+    2.4443359375,
+    2.84130859375
   ],
   "idle_load_threshold": 2.0
 }
