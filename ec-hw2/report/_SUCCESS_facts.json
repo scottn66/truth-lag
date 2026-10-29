@@ -1,13 +1,13 @@
 {
   "step": "facts",
   "data_version": "data-v2",
-  "created_at": "2026-10-27T21:28:19+00:00",
+  "created_at": "2026-10-29T08:59:09+00:00",
   "rows": {
     "FACTS.md": 348
   },
   "by_status": {
-    "FINAL": 311,
-    "PROVISIONAL": 37
+    "FINAL": 341,
+    "PROVISIONAL": 7
   },
   "live_status": "FINAL"
 }
