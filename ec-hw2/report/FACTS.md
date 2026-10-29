@@ -1,6 +1,6 @@
 # FACTS: the key numbers of EC HW2
 
-Made by `ec-hw2/report/build_facts.py` on 2026-10-27 21:28 UTC (data-v2). Do not edit by hand: run the script again.
+Made by `ec-hw2/report/build_facts.py` on 2026-10-29 08:59 UTC (data-v2). Do not edit by hand: run the script again.
 
 - Use these numbers in the report. Each notebook checks its numbers against this table in its last cell.
 - **FINAL**: the number will not change. **PROVISIONAL**: it depends on the live cohort, whose stream labels are final after 2026-10-27T00:05:00Z (Mon 2026-10-26 5:05 PM PT); or it is a comparison timing that `results/comparison.csv` labels draft; or it is a modeling-pain score that is still a draft by Claude Code (`comparison/pain.csv`). Live cohort now: **FINAL** (newest parsed event: 2026-10-27T20:59:59Z).
@@ -222,67 +222,67 @@ Made by `ec-hw2/report/build_facts.py` on 2026-10-27 21:28 UTC (data-v2). Do not
 | cmp_loc_top_mongodb | 62 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_top_mongodb | 1,040 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_top_mongodb | 22 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_top_mongodb | 83.6 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_top_mongodb | 75.0 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_top_mongodb | 114.1 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_faster_than_top_mongodb | Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_top_mongodb | 71.5 | ms (final, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_min_top_mongodb | 67.7 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_max_top_mongodb | 73.3 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_faster_than_top_mongodb | Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_top_mongodb | 3 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_top_mongodb | 20 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_top_neo4j | 18 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_top_neo4j | 768 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_top_neo4j | 0 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_top_neo4j | 137.7 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_top_neo4j | 120.7 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_top_neo4j | 251.2 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_faster_than_top_neo4j | none | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_top_neo4j | 106.2 | ms (final, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_min_top_neo4j | 100.4 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_max_top_neo4j | 130.9 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_faster_than_top_neo4j | none | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_top_neo4j | 3 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_top_neo4j | 20 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_top_sqlite | 38 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_top_sqlite | 1,224 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_top_sqlite | 4 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_top_sqlite | 37.6 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_top_sqlite | 30.1 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_top_sqlite | 54.1 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_faster_than_top_sqlite | MongoDB; Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_top_sqlite | 33.4 | ms (final, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_min_top_sqlite | 28.8 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_max_top_sqlite | 53.7 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_faster_than_top_sqlite | MongoDB; Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_top_sqlite | 2 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_top_sqlite | 20 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_mutual_mongodb | 52 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_mutual_mongodb | 884 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_mutual_mongodb | 18 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_mutual_mongodb | 144.1 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_mutual_mongodb | 137.6 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_mutual_mongodb | 148.5 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_faster_than_mutual_mongodb | none | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_mutual_mongodb | 127.2 | ms (final, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_min_mutual_mongodb | 121.7 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_max_mutual_mongodb | 133.6 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_faster_than_mutual_mongodb | none | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_mutual_mongodb | 4 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_mutual_mongodb | 462 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_mutual_neo4j | 6 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_mutual_neo4j | 275 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_mutual_neo4j | 0 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_mutual_neo4j | 44.6 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_mutual_neo4j | 38.2 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_mutual_neo4j | 57.4 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_faster_than_mutual_neo4j | MongoDB | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_mutual_neo4j | 41.0 | ms (final, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_min_mutual_neo4j | 33.9 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_max_mutual_neo4j | 64.1 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_faster_than_mutual_neo4j | MongoDB | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_mutual_neo4j | 2 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_mutual_neo4j | 462 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_loc_mutual_sqlite | 13 | lines (non-blank, non-comment) | ec-hw2/results/comparison.csv | FINAL |
 | cmp_chars_mutual_sqlite | 412 | characters of query code | ec-hw2/results/comparison.csv | FINAL |
 | cmp_bracket_lines_mutual_sqlite | 1 | lines with only brackets or commas | ec-hw2/results/comparison.csv | FINAL |
-| cmp_ms_mutual_sqlite | 26.1 | ms (draft, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_min_mutual_sqlite | 17.6 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_max_mutual_sqlite | 29.0 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_faster_than_mutual_sqlite | MongoDB; Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | PROVISIONAL |
+| cmp_ms_mutual_sqlite | 23.1 | ms (final, median of 21 runs in 3 rounds) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_min_mutual_sqlite | 17.9 | ms (fastest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_max_mutual_sqlite | 26.8 | ms (slowest of 21 runs) | ec-hw2/results/comparison.csv | FINAL |
+| cmp_faster_than_mutual_sqlite | MongoDB; Neo4j | engines it beats: its slowest run is faster than their fastest | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_mutual_sqlite | 2 | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_rows_mutual_sqlite | 462 | rows | ec-hw2/results/comparison.csv | FINAL |
 | cmp_pain_scored_by | draft by Claude Code; Comparison+viz owner to re-score | who scored the modeling pain | ec-hw2/comparison/pain.csv | PROVISIONAL |
 | cmp_runs_per_query | 21 | timed runs per query | ec-hw2/results/comparison.csv | FINAL |
 | cmp_rounds | 3 | rounds (the engines take turns) | ec-hw2/results/comparison.csv | FINAL |
-| cmp_load_average_start | 4.65 | 1-minute load average when the timing started (idle below 2.0) | ec-hw2/results/_SUCCESS_comparison.json | PROVISIONAL |
+| cmp_load_average_start | 1.91 | 1-minute load average when the timing started (idle below 2.0) | ec-hw2/results/_SUCCESS_comparison.json | FINAL |
 | cmp_all_identical | yes |  | ec-hw2/results/_SUCCESS_comparison.json | FINAL |
-| cmp_timing_label | draft | draft timings are PROVISIONAL | ec-hw2/results/comparison.csv | PROVISIONAL |
-| cmp_ms_mutual_sqlite_preagg | 1.9 | ms (draft, median of 21; extra row, not compared) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
-| cmp_ms_min_mutual_sqlite_preagg | 1.5 | ms (fastest run; extra row) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
-| cmp_ms_max_mutual_sqlite_preagg | 3.1 | ms (slowest run; extra row) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
-| cmp_setup_ms_mutual_sqlite_preagg | 27.4 | ms to build the TEMP table of grouped triples (not timed in the median) | ec-hw2/results/comparison_extra.csv | PROVISIONAL |
+| cmp_timing_label | final | draft timings are PROVISIONAL | ec-hw2/results/comparison.csv | FINAL |
+| cmp_ms_mutual_sqlite_preagg | 1.7 | ms (final, median of 21; extra row, not compared) | ec-hw2/results/comparison_extra.csv | FINAL |
+| cmp_ms_min_mutual_sqlite_preagg | 1.5 | ms (fastest run; extra row) | ec-hw2/results/comparison_extra.csv | FINAL |
+| cmp_ms_max_mutual_sqlite_preagg | 3.5 | ms (slowest run; extra row) | ec-hw2/results/comparison_extra.csv | FINAL |
+| cmp_setup_ms_mutual_sqlite_preagg | 19.0 | ms to build the TEMP table of grouped triples (not timed in the median) | ec-hw2/results/comparison_extra.csv | FINAL |
 | cmp_loc_mutual_sqlite_preagg | 5 | lines (the timed query only) | ec-hw2/results/comparison_extra.csv | FINAL |
 | shard_key | {"page.id": "hashed"} |  | ec-hw2/scaleout/SHARDING.md | FINAL |
 | shard_documents | 295,016 | documents | ec-hw2/results/_SUCCESS_sharding.json | FINAL |

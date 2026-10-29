@@ -11,7 +11,7 @@
 >
 > Section headings below are the spec section 7 headings, word for word and in order. Owners are roles; write names in the "Who did what" table at the end.
 
-*Built by `ec-hw2/report/build_skeleton.py` on 2026-10-27 21:28 UTC from `report/FACTS.md` (data-v2). Live cohort: **FINAL** until 2026-10-27 00:05 UTC.*
+*Built by `ec-hw2/report/build_skeleton.py` on 2026-10-29 08:59 UTC from `report/FACTS.md` (data-v2). Live cohort: **FINAL** until 2026-10-27 00:05 UTC.*
 
 ## Abstract
 
@@ -680,23 +680,41 @@ Result: the first rows (of 8 rows in `results/mongo_q4_bot_vs_human.csv`):
 
 **Neo4j Browser screenshots** (made in Neo4j Browser by the Neo4j owner, `guides/NEO4J_SCREENSHOTS.md`)
 
-*Figure not made yet: `results/figures/neo4j_schema.png`. The graph model, CALL db.schema.visualization(); guides/NEO4J_SCREENSHOTS.md, step 7*
+![neo4j_schema.png](../results/figures/neo4j_schema.png)
 
-*Figure not made yet: `results/figures/neo4j_mutual_reverts.png`. Mutual-revert pairs (Cypher Q1 as a picture); guides/NEO4J_SCREENSHOTS.md, step 8*
+*Figure file: `results/figures/neo4j_schema.png`.* [OWNER: write the caption in your own words.]
 
-*Figure not made yet: `results/figures/neo4j_contested_page.png`. One contested page with its editors and reverts; guides/NEO4J_SCREENSHOTS.md, step 9*
+![neo4j_mutual_reverts.png](../results/figures/neo4j_mutual_reverts.png)
 
-*Figure not made yet: `results/figures/neo4j_largest_community.png`. The largest Louvain community (a patroller and the editors they reverted); guides/NEO4J_SCREENSHOTS.md, step 10*
+*Figure file: `results/figures/neo4j_mutual_reverts.png`.* [OWNER: write the caption in your own words.]
 
-*Figure not made yet: `results/figures/neo4j_cypher_q1_table.png`. The Cypher Q1 result table; guides/NEO4J_SCREENSHOTS.md, step 12*
+![neo4j_contested_page.png](../results/figures/neo4j_contested_page.png)
 
-*Figure not made yet: `results/figures/neo4j_cypher_q2_table.png`. The Cypher Q2 result table; guides/NEO4J_SCREENSHOTS.md, step 12*
+*Figure file: `results/figures/neo4j_contested_page.png`.* [OWNER: write the caption in your own words.]
 
-*Figure not made yet: `results/figures/neo4j_cypher_q3_table.png`. The Cypher Q3 result table; guides/NEO4J_SCREENSHOTS.md, step 12*
+![neo4j_largest_community.png](../results/figures/neo4j_largest_community.png)
 
-*Figure not made yet: `results/figures/neo4j_cypher_q4_table.png`. The Cypher Q4 result table; guides/NEO4J_SCREENSHOTS.md, step 12*
+*Figure file: `results/figures/neo4j_largest_community.png`.* [OWNER: write the caption in your own words.]
 
-*Figure not made yet: `results/figures/neo4j_cypher_q5_table.png`. The Cypher Q5 result table; guides/NEO4J_SCREENSHOTS.md, step 12*
+![neo4j_cypher_q1_table.png](../results/figures/neo4j_cypher_q1_table.png)
+
+*Figure file: `results/figures/neo4j_cypher_q1_table.png`.* [OWNER: write the caption in your own words.]
+
+![neo4j_cypher_q2_table.png](../results/figures/neo4j_cypher_q2_table.png)
+
+*Figure file: `results/figures/neo4j_cypher_q2_table.png`.* [OWNER: write the caption in your own words.]
+
+![neo4j_cypher_q3_table.png](../results/figures/neo4j_cypher_q3_table.png)
+
+*Figure file: `results/figures/neo4j_cypher_q3_table.png`.* [OWNER: write the caption in your own words.]
+
+![neo4j_cypher_q4_table.png](../results/figures/neo4j_cypher_q4_table.png)
+
+*Figure file: `results/figures/neo4j_cypher_q4_table.png`.* [OWNER: write the caption in your own words.]
+
+![neo4j_cypher_q5_table.png](../results/figures/neo4j_cypher_q5_table.png)
+
+*Figure file: `results/figures/neo4j_cypher_q5_table.png`.* [OWNER: write the caption in your own words.]
 
 **Query blocks** `[drafted by Claude Code; checked by <name>, <date>]`
 
@@ -1180,12 +1198,12 @@ The revert-risk score is Wikimedia's `revertrisk-language-agnostic` model: cite 
 | `cmp_loc_mutual_mongodb`  | 52      | lines (non-blank, non-comment)                                     | FINAL       |
 | `cmp_loc_mutual_neo4j`    | 6       | lines (non-blank, non-comment)                                     | FINAL       |
 | `cmp_loc_mutual_sqlite`   | 13      | lines (non-blank, non-comment)                                     | FINAL       |
-| `cmp_ms_top_mongodb`      | 83.6    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_top_neo4j`        | 137.7   | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_top_sqlite`       | 37.6    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_mutual_mongodb`   | 144.1   | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_mutual_neo4j`     | 44.6    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
-| `cmp_ms_mutual_sqlite`    | 26.1    | ms (draft, median of 21 runs in 3 rounds)                          | PROVISIONAL |
+| `cmp_ms_top_mongodb`      | 71.5    | ms (final, median of 21 runs in 3 rounds)                          | FINAL       |
+| `cmp_ms_top_neo4j`        | 106.2   | ms (final, median of 21 runs in 3 rounds)                          | FINAL       |
+| `cmp_ms_top_sqlite`       | 33.4    | ms (final, median of 21 runs in 3 rounds)                          | FINAL       |
+| `cmp_ms_mutual_mongodb`   | 127.2   | ms (final, median of 21 runs in 3 rounds)                          | FINAL       |
+| `cmp_ms_mutual_neo4j`     | 41.0    | ms (final, median of 21 runs in 3 rounds)                          | FINAL       |
+| `cmp_ms_mutual_sqlite`    | 23.1    | ms (final, median of 21 runs in 3 rounds)                          | FINAL       |
 | `cmp_pain_top_mongodb`    | 3       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
 | `cmp_pain_top_neo4j`      | 3       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
 | `cmp_pain_top_sqlite`     | 2       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
@@ -1193,7 +1211,7 @@ The revert-risk score is Wikimedia's `revertrisk-language-agnostic` model: cite 
 | `cmp_pain_mutual_neo4j`   | 2       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
 | `cmp_pain_mutual_sqlite`  | 2       | of 5 (draft by Claude Code; the Comparison+viz owner re-scores it) | PROVISIONAL |
 | `cmp_all_identical`       | yes     |                                                                    | FINAL       |
-| `cmp_timing_label`        | draft   | draft timings are PROVISIONAL                                      | PROVISIONAL |
+| `cmp_timing_label`        | final   | draft timings are PROVISIONAL                                      | FINAL       |
 
 **Figures:**
 

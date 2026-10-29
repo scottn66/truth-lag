@@ -1,13 +1,13 @@
 {
   "step": "skeleton",
   "data_version": "data-v2",
-  "created_at": "2026-10-27T21:28:30+00:00",
+  "created_at": "2026-10-29T08:59:18+00:00",
   "rows": {
-    "REPORT_SKELETON.md lines": 1922,
+    "REPORT_SKELETON.md lines": 1940,
     "headings": 13,
     "facts_boxes": 11,
-    "figures": 11,
-    "figures_missing": 19,
+    "figures": 20,
+    "figures_missing": 10,
     "query_blocks": 10
   },
   "docx": true,
