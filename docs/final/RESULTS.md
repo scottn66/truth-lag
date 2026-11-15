@@ -458,3 +458,247 @@ The "then" value at the 2026-09 load is 19,858, as the plan requires. The second
 ### End-to-end rebuild with the second snapshot (2026-11-15 10:51-11:07 UTC)
 
 Command: `SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e` (log `data/logs/lake/build_all_e2e2.log`), a new empty lake folder; the filter step was skipped because the slim files existed. 926 s, exit 0. Against the main lake: Phase 5 checks equal value for value (2 passed, 0 failed, 15 checks), Gold checks 33 of 33 at Nov 13, E(L) curves identical, both time-travel axes identical, H1/H3/H4 identical. The folder was deleted afterwards.
+
+## Loop 2 (2026-11-15 12:20-13:00 UTC): results.json, fallback notebooks, export fix
+
+### results.json and the number check
+
+- `python scripts/make_results.py` collects every reportable number from `data/lake/_runs/*.json`, the Gold and Silver tables, the export manifest, the build logs, the config constants and a pytest run (49 passed) into `docs/final/results.json`, stamped with the commit hash.
+- `python scripts/render_report.py` fills `docs/final/report_draft.template.md` into `docs/final/report_draft.md`.
+- `python scripts/check_numbers.py`: commit stamp ok; fresh collection equal; draft equals the rendered template; every number token in the draft is a fact. Last line: `ZERO MISMATCHES`.
+- `python scripts/check_evidence.py`: see the end of this section.
+
+Derived totals that the draft uses (sums of numbers above): Bronze stream lines in all 12,328,679; Bronze History rows 15,892,423 (snapshot 2026-09 plus the three month files of 2026-10); distinct pages in `gold/dim_page` 2,253,040.
+
+### Export fix found by the reservoir check
+
+`notebooks/fallback/moments_reservoir.ipynb` compares the editor-kind mix of the not-reverted sample in `data/exports/lsh_edits.parquet` with the population of not-reverted `live_ext` edits (2,284,801) and with a one-pass reservoir sample of the same size (112,937).
+- First run (12:42 UTC, export as built earlier): the export sample was off by up to 2.05 points (bots 28.04% against 30.09% in the population; registered 64.15% against 62.36%); the reservoir by 0.08.
+- Cause: `etl/exports.py` drew the sample with `sample(fraction).limit(n)`, which cuts the last sampled rows in file order (the latest edits).
+- Fix: `ORDER BY xxhash64(rev_id, seed) LIMIT n` (uniform, exact size). `python -m etl.exports` re-run at 12:46 UTC: only `lsh_edits.parquet` and `lsh_edits.csv` changed (same 261,166 rows; the label-0 rows differ). The earlier manifest is kept in `data/logs/lake/exports_manifest_before_uniform_fix.json`.
+- After the fix: export sample within 0.1 points, reservoir within 0.08. No number of RESULTS.md above changes (it reported only the row counts of the export).
+
+### Fallback notebooks (`python notebooks/fallback/make_fallback.py`; built by Claude for Scott; teammate work wins)
+
+All facts below are in `data/lake/_runs/fallback_lsh.json`, `fallback_privacy.json`, `fallback_moments.json` and in `results.json`.
+
+| Fact | Value |
+| --- | --- |
+| `lsh.distinct_texts` | 49,140 |
+| `lsh.edits_in_export` | 261,166 |
+| `lsh.edits_kept` | 91,092 |
+| `lsh.edits_sharing_exact_text` | 45,315 |
+| `lsh.exact_join_seconds` | 190.8 |
+| `lsh.full_join_seconds` | 104.2 |
+| `lsh.groups` | 1,419 |
+| `lsh.hash_tables` | 5 |
+| `lsh.jaccard_min` | 0.6 |
+| `lsh.labels.all.pairs` | 80 |
+| `lsh.labels.all.precision_hi` | 98.7 |
+| `lsh.labels.all.precision_lo` | 89.5 |
+| `lsh.labels.all.precision_pct` | 96.2 |
+| `lsh.labels.all.same_pattern` | 77 |
+| `lsh.labels.by_band.pairs` | 40 |
+| `lsh.labels.by_band.precision_hi` | 100.0 |
+| `lsh.labels.by_band.precision_lo` | 91.2 |
+| `lsh.labels.by_band.precision_pct` | 100.0 |
+| `lsh.labels.by_band.same_pattern` | 40 |
+| `lsh.labels.by_group.pairs` | 40 |
+| `lsh.labels.by_group.precision_hi` | 97.4 |
+| `lsh.labels.by_group.precision_lo` | 80.1 |
+| `lsh.labels.by_group.precision_pct` | 92.5 |
+| `lsh.labels.by_group.same_pattern` | 37 |
+| `lsh.labels.by_person` | 0 |
+| `lsh.labels.groups_sampled` | 40 |
+| `lsh.largest_group_texts` | 1,186 |
+| `lsh.min_chars` | 20 |
+| `lsh.min_words` | 4 |
+| `lsh.near_dup_pairs` | 420,629 |
+| `lsh.not_reverted.edits` | 64,446 |
+| `lsh.not_reverted.exact_dup_pct` | 63.02 |
+| `lsh.not_reverted.near_dup_pct` | 64.45 |
+| `lsh.not_reverted.reuses_pct` | 72.56 |
+| `lsh.recall_pct.tables1` | 89.32 |
+| `lsh.recall_pct.tables20` | 96.16 |
+| `lsh.recall_pct.tables5` | 96.11 |
+| `lsh.reverted.edits` | 26,646 |
+| `lsh.reverted.exact_dup_pct` | 17.63 |
+| `lsh.reverted.near_dup_pct` | 14.99 |
+| `lsh.reverted.reuses_pct` | 24.63 |
+| `lsh.sample_exact_pairs` | 2,162 |
+| `lsh.sample_pairs_compared` | 7,998,000 |
+| `lsh.sample_texts` | 4,000 |
+| `lsh.seconds.tables1` | 1.0 |
+| `lsh.seconds.tables20` | 3.6 |
+| `lsh.seconds.tables5` | 0.8 |
+| `lsh.shingle_k` | 5 |
+| `lsh.texts_with_near_dup` | 9,988 |
+| `moments.ams.v100.mean_abs_error_pct` | 63.33 |
+| `moments.ams.v100.mean_error_pct` | -60.03 |
+| `moments.ams.v100.variables` | 100 |
+| `moments.ams.v100.worst_abs_error_pct` | 84.49 |
+| `moments.ams.v1000.mean_abs_error_pct` | 20.36 |
+| `moments.ams.v1000.mean_error_pct` | -8.85 |
+| `moments.ams.v1000.variables` | 1,000 |
+| `moments.ams.v1000.worst_abs_error_pct` | 47.12 |
+| `moments.ams.v10000.mean_abs_error_pct` | 4.59 |
+| `moments.ams.v10000.mean_error_pct` | 0.0 |
+| `moments.ams.v10000.variables` | 10,000 |
+| `moments.ams.v10000.worst_abs_error_pct` | 13.16 |
+| `moments.ams.v300.mean_abs_error_pct` | 37.8 |
+| `moments.ams.v300.mean_error_pct` | -32.93 |
+| `moments.ams.v300.variables` | 300 |
+| `moments.ams.v300.worst_abs_error_pct` | 72.63 |
+| `moments.ams.v3000.mean_abs_error_pct` | 11.36 |
+| `moments.ams.v3000.mean_error_pct` | -5.45 |
+| `moments.ams.v3000.variables` | 3,000 |
+| `moments.ams.v3000.worst_abs_error_pct` | 26.26 |
+| `moments.edit_events` | 4,209,083 |
+| `moments.export_kind_max_dev_points` | 0.1 |
+| `moments.f0` | 1,889,644 |
+| `moments.f1` | 4,209,083 |
+| `moments.f2` | 249,630,183 |
+| `moments.groups` | 10 |
+| `moments.max_edits_one_page` | 4,265 |
+| `moments.neg_population` | 2,284,801 |
+| `moments.neg_sample_size` | 112,937 |
+| `moments.reservoir.k1000.binomial_se_points` | 0.623 |
+| `moments.reservoir.k1000.exact_share_pct` | 4.046 |
+| `moments.reservoir.k1000.mean_estimate_pct` | 4.104 |
+| `moments.reservoir.k1000.mean_relative_position` | 0.5 |
+| `moments.reservoir.k1000.sample_size` | 1,000 |
+| `moments.reservoir.k1000.sd_of_estimates_points` | 0.693 |
+| `moments.reservoir.k1000.within_2_se_pct` | 90.5 |
+| `moments.reservoir.k10000.binomial_se_points` | 0.197 |
+| `moments.reservoir.k10000.exact_share_pct` | 4.046 |
+| `moments.reservoir.k10000.mean_estimate_pct` | 4.063 |
+| `moments.reservoir.k10000.mean_relative_position` | 0.5 |
+| `moments.reservoir.k10000.sample_size` | 10,000 |
+| `moments.reservoir.k10000.sd_of_estimates_points` | 0.206 |
+| `moments.reservoir.k10000.within_2_se_pct` | 94.5 |
+| `moments.reservoir.k100000.binomial_se_points` | 0.062 |
+| `moments.reservoir.k100000.exact_share_pct` | 4.046 |
+| `moments.reservoir.k100000.mean_estimate_pct` | 4.048 |
+| `moments.reservoir.k100000.mean_relative_position` | 0.5 |
+| `moments.reservoir.k100000.sample_size` | 100,000 |
+| `moments.reservoir.k100000.sd_of_estimates_points` | 0.064 |
+| `moments.reservoir.k100000.within_2_se_pct` | 96.0 |
+| `moments.reservoir_kind_max_dev_points` | 0.08 |
+| `moments.reservoir_runs` | 200 |
+| `moments.seeds` | 30 |
+| `privacy.eps_high` | 1.0 |
+| `privacy.eps_low` | 0.1 |
+| `privacy.eps_mid` | 0.5 |
+| `privacy.epsilons` | 3 |
+| `privacy.grid.k10.rows_below` | 209 |
+| `privacy.grid.k10.rows_below_pct` | 11.15 |
+| `privacy.grid.k2.rows_below` | 7 |
+| `privacy.grid.k2.rows_below_pct` | 0.37 |
+| `privacy.grid.k20.rows_below` | 627 |
+| `privacy.grid.k20.rows_below_pct` | 33.44 |
+| `privacy.grid.k5.edits_kept_pct` | 99.168 |
+| `privacy.grid.k5.rows_below` | 74 |
+| `privacy.grid.k5.rows_below_pct` | 3.95 |
+| `privacy.grid.k5.rows_kept_pct` | 96.05 |
+| `privacy.grid.min_editors` | 1 |
+| `privacy.grid.rows` | 1,875 |
+| `privacy.grid.two_diverse_pct` | 92.69 |
+| `privacy.k` | 5 |
+| `privacy.k_small` | 2 |
+| `privacy.l` | 2 |
+| `privacy.laplace.history.dump.all.mae.eps_high` | 9e-05 |
+| `privacy.laplace.history.dump.all.mae.eps_low` | 0.00094 |
+| `privacy.laplace.history.dump.all.mae.eps_mid` | 0.00019 |
+| `privacy.laplace.history.dump.all.n` | 17,646 |
+| `privacy.laplace.live.stream.all.mae.eps_high` | 9e-05 |
+| `privacy.laplace.live.stream.all.mae.eps_low` | 0.00093 |
+| `privacy.laplace.live.stream.all.mae.eps_mid` | 0.00018 |
+| `privacy.laplace.live.stream.all.n` | 17,818 |
+| `privacy.laplace.live.stream.bot.mae.eps_high` | 0.01204 |
+| `privacy.laplace.live.stream.bot.mae.eps_low` | 0.15468 |
+| `privacy.laplace.live.stream.bot.mae.eps_mid` | 0.02346 |
+| `privacy.laplace.live.stream.bot.n` | 141 |
+| `privacy.laplace.live.stream.registered.mae.eps_high` | 0.0002 |
+| `privacy.laplace.live.stream.registered.mae.eps_low` | 0.002 |
+| `privacy.laplace.live.stream.registered.mae.eps_mid` | 0.00041 |
+| `privacy.laplace.live.stream.registered.n` | 7,905 |
+| `privacy.laplace.live.stream.temporary.mae.eps_high` | 0.00017 |
+| `privacy.laplace.live.stream.temporary.mae.eps_low` | 0.00168 |
+| `privacy.laplace.live.stream.temporary.mae.eps_mid` | 0.00035 |
+| `privacy.laplace.live.stream.temporary.n` | 9,772 |
+| `privacy.laplace.live_ext.stream.all.mae.eps_high` | 1e-05 |
+| `privacy.laplace.live_ext.stream.all.mae.eps_low` | 0.00014 |
+| `privacy.laplace.live_ext.stream.all.mae.eps_mid` | 3e-05 |
+| `privacy.laplace.live_ext.stream.all.n` | 112,937 |
+| `privacy.laplace.sensitivity` | 1 |
+| `privacy.laplace.small_groups` | 1 |
+| `privacy.laplace.trials` | 1,000 |
+| `privacy.page.all_reverted_pct` | 0.162 |
+| `privacy.page.all_reverted_rows` | 2,526 |
+| `privacy.page.all_reverted_single_editor` | 2,170 |
+| `privacy.page.k10.edits_below_pct` | 94.02 |
+| `privacy.page.k10.rows_below_pct` | 99.75 |
+| `privacy.page.k2.edits_below_pct` | 52.56 |
+| `privacy.page.k2.rows_below_pct` | 81.63 |
+| `privacy.page.k20.edits_below_pct` | 97.18 |
+| `privacy.page.k20.rows_below_pct` | 99.95 |
+| `privacy.page.k5.edits_below_pct` | 85.33 |
+| `privacy.page.k5.rows_below_pct` | 98.42 |
+| `privacy.page.rows` | 1,559,483 |
+| `privacy.page.single_editor_pct` | 81.63 |
+| `privacy.page.single_editor_rows` | 1,273,073 |
+| `privacy.page.two_diverse_pct` | 4.8 |
+| `privacy.suppress.history.ruleA.bias_points` | 6.52 |
+| `privacy.suppress.history.ruleA.edits_kept_pct` | 7.17 |
+| `privacy.suppress.history.ruleA.released_revert_rate_pct` | 12.5 |
+| `privacy.suppress.history.ruleA.reverts_kept_pct` | 14.99 |
+| `privacy.suppress.history.ruleA.rows_kept_pct` | 0.74 |
+| `privacy.suppress.history.ruleA.true_revert_rate_pct` | 5.98 |
+| `privacy.suppress.history.ruleB.bias_points` | 6.43 |
+| `privacy.suppress.history.ruleB.edits_kept_pct` | 7.17 |
+| `privacy.suppress.history.ruleB.released_revert_rate_pct` | 12.41 |
+| `privacy.suppress.history.ruleB.reverts_kept_pct` | 14.86 |
+| `privacy.suppress.history.ruleB.rows_kept_pct` | 0.74 |
+| `privacy.suppress.history.ruleB.true_revert_rate_pct` | 5.98 |
+| `privacy.suppress.history.ruleC.bias_points` | 15.98 |
+| `privacy.suppress.history.ruleC.edits_kept_pct` | 4.05 |
+| `privacy.suppress.history.ruleC.released_revert_rate_pct` | 21.97 |
+| `privacy.suppress.history.ruleC.reverts_kept_pct` | 14.86 |
+| `privacy.suppress.history.ruleC.rows_kept_pct` | 0.4 |
+| `privacy.suppress.history.ruleC.true_revert_rate_pct` | 5.98 |
+| `privacy.suppress.live.ruleA.bias_points` | 9.19 |
+| `privacy.suppress.live.ruleA.edits_kept_pct` | 7.38 |
+| `privacy.suppress.live.ruleA.released_revert_rate_pct` | 15.57 |
+| `privacy.suppress.live.ruleA.reverts_kept_pct` | 18.03 |
+| `privacy.suppress.live.ruleA.rows_kept_pct` | 0.73 |
+| `privacy.suppress.live.ruleA.true_revert_rate_pct` | 6.38 |
+| `privacy.suppress.live.ruleB.bias_points` | 8.76 |
+| `privacy.suppress.live.ruleB.edits_kept_pct` | 7.35 |
+| `privacy.suppress.live.ruleB.released_revert_rate_pct` | 15.14 |
+| `privacy.suppress.live.ruleB.reverts_kept_pct` | 17.44 |
+| `privacy.suppress.live.ruleB.rows_kept_pct` | 0.73 |
+| `privacy.suppress.live.ruleB.true_revert_rate_pct` | 6.38 |
+| `privacy.suppress.live.ruleC.bias_points` | 17.26 |
+| `privacy.suppress.live.ruleC.edits_kept_pct` | 4.7 |
+| `privacy.suppress.live.ruleC.released_revert_rate_pct` | 23.64 |
+| `privacy.suppress.live.ruleC.reverts_kept_pct` | 17.44 |
+| `privacy.suppress.live.ruleC.rows_kept_pct` | 0.44 |
+| `privacy.suppress.live.ruleC.true_revert_rate_pct` | 6.38 |
+| `privacy.suppress.live_ext.ruleA.bias_points` | 7.34 |
+| `privacy.suppress.live_ext.ruleA.edits_kept_pct` | 16.44 |
+| `privacy.suppress.live_ext.ruleA.released_revert_rate_pct` | 12.05 |
+| `privacy.suppress.live_ext.ruleA.reverts_kept_pct` | 42.08 |
+| `privacy.suppress.live_ext.ruleA.rows_kept_pct` | 1.8 |
+| `privacy.suppress.live_ext.ruleA.true_revert_rate_pct` | 4.71 |
+| `privacy.suppress.live_ext.ruleB.bias_points` | 7.34 |
+| `privacy.suppress.live_ext.ruleB.edits_kept_pct` | 16.44 |
+| `privacy.suppress.live_ext.ruleB.released_revert_rate_pct` | 12.05 |
+| `privacy.suppress.live_ext.ruleB.reverts_kept_pct` | 42.05 |
+| `privacy.suppress.live_ext.ruleB.rows_kept_pct` | 1.8 |
+| `privacy.suppress.live_ext.ruleB.true_revert_rate_pct` | 4.71 |
+| `privacy.suppress.live_ext.ruleC.bias_points` | 14.21 |
+| `privacy.suppress.live_ext.ruleC.edits_kept_pct` | 10.47 |
+| `privacy.suppress.live_ext.ruleC.released_revert_rate_pct` | 18.92 |
+| `privacy.suppress.live_ext.ruleC.reverts_kept_pct` | 42.05 |
+| `privacy.suppress.live_ext.ruleC.rows_kept_pct` | 1.04 |
+| `privacy.suppress.live_ext.ruleC.true_revert_rate_pct` | 4.71 |
