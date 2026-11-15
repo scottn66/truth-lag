@@ -40,11 +40,14 @@ WINDOW_S = 3600
 
 
 # ------------------------------------------------------------------ hashing
-def hash64(values) -> np.ndarray:
-    """64-bit hash of each value (blake2b of its text). Same input -> same hash in every run."""
+SALTS = ["", "a", "b", "c", "d"]     # 5 independent hash functions: each sketch is run 5 times
+
+
+def hash64(values, salt: str = "") -> np.ndarray:
+    """64-bit hash of each value (blake2b of salt + its text). Same input -> same hash in every run."""
     out = np.empty(len(values), dtype=np.uint64)
     for i, v in enumerate(values):
-        out[i] = int.from_bytes(hashlib.blake2b(str(v).encode(), digest_size=8).digest(), "little")
+        out[i] = int.from_bytes(hashlib.blake2b((salt + str(v)).encode(), digest_size=8).digest(), "little")
     return out
 
 
@@ -217,23 +220,26 @@ def run() -> dict:
     res["exact_distinct"] = exact
     res["exact_check_python"] = {"pages": int(len(set(page.tolist()))), "editors": int(len(set(user.tolist())))}
     rows = []
-    for what, h in (("pages", hp), ("editors", hu)):
-        for p in (10, 12, 14):
-            s = HLL(p)
-            s.add_hashes(h)
-            e = s.estimate()
-            rows.append({"item": what, "sketch": f"HLL p={p}", "estimate": round(e), "exact": exact[what],
-                         "rel_error_pct": round(100 * (e - exact[what]) / exact[what], 3),
-                         "theory_se_pct": round(100 * 1.04 / math.sqrt(1 << p), 2), "sketch_bytes": s.bytes(),
-                         "exact_bytes_est": 8 * exact[what]})
-        for m in (64, 256, 1024):
-            s = PCSA(m)
-            s.add_hashes(h)
-            e = s.estimate()
-            rows.append({"item": what, "sketch": f"FM-PCSA m={m}", "estimate": round(e), "exact": exact[what],
-                         "rel_error_pct": round(100 * (e - exact[what]) / exact[what], 3),
-                         "theory_se_pct": round(100 * 0.78 / math.sqrt(m), 2), "sketch_bytes": s.bytes(),
-                         "exact_bytes_est": 8 * exact[what]})
+    hashes = {("pages", ""): hp, ("editors", ""): hu}
+    for salt in SALTS[1:]:
+        hashes[("pages", salt)] = hash64(page, salt)
+        hashes[("editors", salt)] = hash64(user, salt)
+    makers = [(f"HLL p={p}", (lambda p=p: HLL(p)), 1.04 / math.sqrt(1 << p)) for p in (10, 12, 14)] + \
+             [(f"FM-PCSA m={m}", (lambda m=m: PCSA(m)), 0.78 / math.sqrt(m)) for m in (64, 256, 1024)]
+    for what in ("pages", "editors"):
+        for name, make, se in makers:
+            errs, first = [], None
+            for salt in SALTS:
+                sk = make()
+                sk.add_hashes(hashes[(what, salt)])
+                e = sk.estimate()
+                first = first if first is not None else (e, sk.bytes())
+                errs.append(100 * (e - exact[what]) / exact[what])
+            rows.append({"item": what, "sketch": name, "estimate_salt0": round(first[0]), "exact": exact[what],
+                         "rel_error_salt0_pct": round(errs[0], 3), "mean_rel_error_5_salts_pct": round(float(np.mean(errs)), 3),
+                         "sd_rel_error_5_salts_pct": round(float(np.std(errs, ddof=1)), 3),
+                         "max_abs_error_5_salts_pct": round(float(np.max(np.abs(errs))), 3),
+                         "theory_se_pct": round(100 * se, 2), "sketch_bytes": first[1], "exact_bytes_est": 8 * exact[what]})
     res["distinct"] = rows
 
     # per-day HLL sketches merged = union over the period (mergeability)

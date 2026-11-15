@@ -180,3 +180,106 @@ Design changes against LAKE_DESIGN.md, made for the real data:
 - `dim_snapshot` takes the cutoff from `config.HISTORY_DUMP_LAST_REVISION`, not from the newest slim row.
 - The mart series "live cohort, dump labels" is not built: no 2026-10 snapshot exists (see STATUS.md, blocker 1).
 
+
+## Gold extended to Nov 13 (2026-11-15 09:41 UTC)
+
+Commands: `python -m etl.run cohorts --as-of 2026-11-13T23:59:59.999999Z` (46 s, peak 6.4 GB), `python -m etl.run cohorts_ext --as-of 2026-11-13T23:59:59.999999Z` (60 s, 6.1 GB), `python -m etl.gold_run --as-of 2026-11-13T23:59:59.999999Z` (57 s), `python -m etl.gold_checks --out data/lake/_runs/gold_checks_ext.json` (**30 of 30 passed** again: the published cohorts do not move).
+
+`live_ext` = the live rules of `label_live.py`, unchanged, on the edits of 2026-10-20 to 2026-11-08 (window end 2026-11-09 00:00; every edit has 4 days of follow-up before the as_of). Only `config.LIVE_WINDOW` is swapped during the call (`etl/silver_cohorts.py: build_ext`).
+
+| Table | Rows at Nov 13 | Version | Change from the parity version |
+| --- | --- | --- | --- |
+| silver/live_ext_revisions | 2,397,738 | v1 | new |
+| silver/live_ext_revert_links | 122,192 | v1 | new |
+| gold/fact_edit | 2,972,220 | v3 | +2,397,738 inserted, 0 updated |
+| gold/dim_page | 2,324,643 | v3 | +1,558,086 versions, 15,707 closed |
+| gold/dim_user | 185,465 | v2 | +119,168, 42 updated |
+| gold/dim_time | 33,118 | v2 | +24,478 |
+| gold/mart_el_curve | 117 | v2 | overwrite |
+| gold/mart_el_by_burst | 162 | v2 | overwrite |
+
+E(L), all editors, `gold/mart_el_curve` v2:
+
+| Wait | live known of 17,818 | live E(L) | live_ext known of 112,937 | live_ext E(L) | history E(L) |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 0 | 1.0000 | 0 | 1.0000 | 1.0000 |
+| 1 min | 3,986 | 0.7763 | 25,333 | 0.7757 | 0.8013 |
+| 5 min | 6,958 | 0.6095 | 43,789 | 0.6123 | 0.6484 |
+| 15 min | 8,398 | 0.5287 | 53,335 | 0.5277 | 0.5615 |
+| 1 h | 10,326 | 0.4205 | 66,344 | 0.4126 | 0.4434 |
+| 6 h | 13,405 | 0.2477 | 85,045 | 0.2470 | 0.2690 |
+| 1 d | 15,936 | 0.1056 | 102,207 | 0.0950 | 0.1104 |
+| 2 d | 16,699 | 0.0628 | 107,367 | 0.0493 | 0.0522 |
+| 4 d | 17,818 | 0.0000 | 112,937 | 0.0000 | 0.0000 |
+
+## Hypotheses (2026-11-15 09:47 UTC)
+
+Command: `python -m etl.hypotheses` (55 s; output `data/lake/_runs/hypotheses.json`). Gold versions read: {'fact_edit': 3, 'dim_page': 3, 'fact_revert_label': 1, 'mart_el_curve': 2}. Intervals: Poisson bootstrap over pages, B = 2,000, seed 226 (a page's reverts move together).
+
+### H1, long-tailed lag (thresholds 60% at 1 h, 95% at 48 h)
+
+| Series | Eventual reverts | Pages | Known at 1 h (95% CI) | Known at 48 h (95% CI) | Verdict |
+| --- | --- | --- | --- | --- | --- |
+| live | 17,818 | 10,471 | 57.95% (56.71-59.28) | 93.72% (92.66-94.59) | not falsified |
+| live_ext_october | 67,998 | 35,420 | 58.11% (57.29-59.0) | 94.64% (94.1-95.08) | not falsified; an interval crosses its threshold, so the call is not robust |
+| live_ext | 112,937 | 56,531 | 58.74% (58.04-59.49) | 95.07% (94.72-95.37) | falsified (point estimate); an interval crosses its threshold, so the call is not robust |
+| history | 17,646 | 10,364 | 55.66% (54.49-56.88) | 94.78% (94.12-95.4) | not falsified; an interval crosses its threshold, so the call is not robust |
+
+Reading: on the October 2026 cohort that H1 names (live, Oct 20-22), H1 is **not falsified**: 57.95% < 60% and 93.72% < 95%, and both intervals lie below their thresholds. The 48 h share matches DECISIONS.md (16,699 of 17,818 = 93.7%). On the longer live_ext window the 48 h share is 95.07%, just over 95% (interval 94.72-95.37 crosses it), so the 48 h part is borderline; restricted to October edits it is 94.64% (94.10-95.08), below the threshold but also not robust. The 1 h part holds in every series.
+
+### H3, bursty pages converge slowest (burst = 10 or more page edits in the prior hour, D20)
+
+| Series | L | Burst reverts (pages) | E(L) burst (95% CI) | E(L) rest (95% CI) | Burst - rest (95% CI) | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| history | 1 h | 343 (83) | 0.2566 (0.1367-0.4051) | 0.4471 (0.4353-0.4587) | -0.1905 (-0.3125 to -0.0532) | falsified: burst E(L) lower, intervals apart |
+| history | 1 d | 343 (83) | 0.0700 (0.0060-0.1566) | 0.1113 (0.1030-0.1200) | -0.0413 (-0.1050 to +0.0509) | falsified (intervals overlap) |
+| live | 1 h | 439 (70) | 0.2255 (0.0479-0.4503) | 0.4254 (0.4138-0.4369) | -0.1999 (-0.3716 to +0.0097) | falsified (intervals overlap) |
+| live | 1 d | 439 (70) | 0.1367 (0.0023-0.3748) | 0.1048 (0.0970-0.1131) | +0.0318 (-0.1033 to +0.2528) | falsified (intervals overlap) |
+| live_ext | 1 h | 3,401 (506) | 0.2887 (0.1884-0.3965) | 0.4164 (0.4111-0.4218) | -0.1277 (-0.2259 to -0.0210) | falsified: burst E(L) lower, intervals apart |
+| live_ext | 1 d | 3,401 (506) | 0.0641 (0.0120-0.1366) | 0.0960 (0.0929-0.0991) | -0.0319 (-0.0834 to +0.0475) | falsified (intervals overlap) |
+| live_ext_october | 1 h | 2,038 (298) | 0.3548 (0.2122-0.4923) | 0.4208 (0.4146-0.4268) | -0.0661 (-0.2122 to +0.0704) | falsified (intervals overlap) |
+| live_ext_october | 1 d | 2,038 (298) | 0.1021 (0.0168-0.2165) | 0.1003 (0.0961-0.1046) | +0.0018 (-0.0836 to +0.1115) | falsified (intervals overlap) |
+
+Reading: H3 is **falsified** in every series. Its criterion is that the intervals must not overlap with burst higher; they overlap at 1 d everywhere, and at 1 h the burst E(L) is *lower* (reverts on bursty pages become known faster), with intervals apart in history and live_ext. This matches R5 (bursts do not have higher revert rates) and the plan's expectation of a null or reversed effect.
+
+### H4, page identity (title at event time via `dim_page` SCD2 vs the page's current title)
+
+Facts of a cohort are keyed by page title, as a title-keyed system would do: once by the `dim_page` version valid at the edit (as-of join on `page_key`), once by the page's current version (`is_current`). Revert label: stream label for live_ext; dump label within 4 days for history.
+
+| Measure | history (Sep 8-10) | live_ext (Oct 20 - Nov 8) |
+| --- | --- | --- |
+| Facts | 295,016 | 2,397,738 |
+| Facts whose title or namespace at edit time differs from now | 3,381 (1.146%) | 16,762 (0.699%) |
+| Pages | 165,415 | 1,238,130 |
+| Pages with a fact under an older title (pages affected) | 966 (0.584%) | 3,454 (0.279%) |
+| Title keys | 166,059 | 1,238,578 |
+| Title keys whose edit or revert count changes | 1,853 (1.116%) | 6,779 (0.547%) |
+| Title keys whose revert rate changes | 1,497 (0.901%) | 3,154 (0.255%) |
+| Title keys whose revert count changes | 168 (0.101%) | 601 (0.049%) |
+| Reverts attributed to a different title | 406 | 1,596 |
+
+Beside it (PLAN Phase 4): `silver/history_revisions` rows whose `page_title` differs from `page_title_historical`: 2,319. The fact count above (3,381) is lower because `dim_page` also uses the stream's moves after the dump and the observation at the dump cutoff, and compares title and namespace per version.
+
+Reading: the floor for H4 is not set in DECISIONS.md. The effect is real but small: 0.3-0.6% of pages, 0.5-1.1% of title keys, and 0.05-0.10% of title keys for revert counts. At a floor of 1% of pages (this build's choice, for the team to confirm) H4 is **falsified** in both cohorts; only the edit-count measure in history (1.12% of title keys) passes 1%.
+
+## Time travel, "then vs now" (2026-11-15 09:49 UTC)
+
+Command: `python -m etl.time_travel` (SQL `etl/sql/80_time_travel_then_and_now.sql`; output `data/lake/_runs/time_travel.json`). Versions are found by commit metadata `as_of`, never by timestamp: fact_edit {'early': 1, 'parity': 2, 'ext': 3}.
+
+| Known at | fact_edit version | Live revisions | Reverted as known | % reverted | Newest known_dt |
+| --- | --- | --- | --- | --- | --- |
+| then: as_of 2026-10-24T00:00:00.000000Z | v1 | 279,466 | 17,040 | 6.097 | 2026-10-23 23:59:03.674000 |
+| parity: as_of 2026-10-27T20:59:59.999999Z | v2 | 279,466 | 17,818 | 6.376 | 2026-10-26 18:30:28.229000 |
+| now: as_of 2026-11-13T23:59:59.999999Z | v3 | 279,466 | 17,818 | 6.376 | 2026-10-26 18:30:28.229000 |
+
+Change Data Feed of gold/fact_edit between the versions: v2 holds 778 update pre/post-image pairs, all live revisions that became reverted (778), none with a changed page_key; their median time from edit to known revert is 245,324 s (2.84 days). v3 holds 2,397,738 inserts (live_ext) and no update of the published cohorts.
+
+Silver by version, `silver/live_revert_links`:
+
+| Version | as_of | Links | Within 4-day follow-up |
+| --- | --- | --- | --- |
+| v1 | 2026-10-24T00:00:00.000000Z | 17,040 | 17,040 |
+| v2 | 2026-10-27T20:59:59.999999Z | 18,358 | 17,818 |
+| v3 | 2026-11-13T23:59:59.999999Z | 19,513 | 17,818 |
+
+The kit's version of the SQL compared fact_revert_label at two History snapshots. No 2026-10 snapshot exists on the VPS or the Mac (STATUS.md, blocker 1), so the knowledge axis here is the stream's as_of. fact_revert_label has one load (v1, 2026-09, 5,266,843 rows).
