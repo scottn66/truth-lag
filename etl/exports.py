@@ -85,10 +85,11 @@ def main() -> None:
     n_pos = {c: int((pos.cohort_id == c).sum()) for c in ("history", "live_ext")}
     negs = []
     for c, n in n_pos.items():
-        tot = spark.sql(f"SELECT count(*) n FROM v_edits WHERE NOT label AND cohort_id = '{c}'").first()["n"]
-        frac = min(1.0, 1.2 * n / tot)
-        negs.append(spark.sql(f"SELECT * FROM v_edits WHERE NOT label AND cohort_id = '{c}'")
-                    .sample(fraction=frac, seed=SEED).limit(n).toPandas())
+        # A uniform sample of exactly n rows: order by a hash of the revision id and the seed, keep the first n.
+        # (Until 2026-11-15 this was .sample(fraction).limit(n), which dropped the last sampled rows in file order
+        # and so under-sampled the latest edits; found by notebooks/fallback/moments_reservoir.ipynb.)
+        negs.append(spark.sql(f"""SELECT * FROM v_edits WHERE NOT label AND cohort_id = '{c}'
+                                  ORDER BY xxhash64(rev_id, {SEED}), rev_id LIMIT {n}""").toPandas())
     lsh = pd.concat([pos, *negs], ignore_index=True)
     lsh["editor"] = [public_name(k, key, name) for k, key, name in zip(lsh.user_kind, lsh.user_key, lsh.user_name)]
     lsh = lsh.drop(columns=["user_key", "user_name"]).rename(columns={"T_s": "seconds_to_revert"})

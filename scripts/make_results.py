@@ -74,7 +74,7 @@ def constants() -> dict:
         "dgim_top_pages": 200, "reservoir_k": 10000, "sss_seconds_per_rate": 30, "sss_trigger_s": 1,
         "e5_latency_limit_s": 5, "e5_target_eps": 2500, "team_size": 4, "one": 1, "two": 2, "zero": 0, "hundred": 100,
         "clocks": 4, "el_series": 4, "asof_builds": 3, "h1_wait_long_h": 48, "wait_5": 5, "wait_15": 15, "wait_6": 6,
-        "ams_vars_small": 100, "ams_vars_large": 1000, "proposal_horizon_days": 30,
+        "ams_vars_small": 100, "ams_vars_large": 1000, "proposal_horizon_days": 30, "lsh_tables_large": 20,
         "text.history_window": "2026-09-08 to 2026-09-10", "text.live_window": "2026-10-20 to 2026-10-22",
         "text.live_ext_window": "2026-10-20 to 2026-11-08", "text.early_as_of": lake_config.EARLY_AS_OF,
         "text.parity_as_of": lake_config.PARITY_AS_OF, "text.ext_as_of": lake_config.EXT_AS_OF,
