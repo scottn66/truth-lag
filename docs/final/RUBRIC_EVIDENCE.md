@@ -1,30 +1,53 @@
 # Rubric evidence (for the report appendix)
 
-For the report owner: each criterion in order, with the file, commit or table version that shows it. **The full rubric text is not in the repository.** The rows below follow the items named in `docs/delta_lake_handoff/DECISIONS.md` ("What the rubric asks for") and in the loop prompt. Re-order and rename them to match the official rubric on Canvas before you paste this into the appendix.
+For the report owner: each rubric line, with a command anyone can run, the output file that command produced, and the notebook that shows it. `scripts/check_evidence.py` confirms that every command target and every output file exists (run it on the Mac, where the lake is).
 
-Commit hashes are on the local branch `final-lake`; they change if Scott rebases before pushing. Table versions are Delta versions under `data/lake/` (not in git; rebuild with `docs/final/STATUS.md`, "How to rerun"). Numbers come from `docs/final/RESULTS.md`.
+**The official rubric text is not in the repository or on the Mac.** The lines below are the ones named in `docs/delta_lake_handoff/DECISIONS.md` ("What the rubric asks for") and in the two loop prompts. Before pasting this into the report appendix, put the rows in the order of the rubric on Canvas and rename them to its wording (decision 1 in `docs/final/GATE_MON.md`).
 
-| # | Criterion (as named in DECISIONS.md / loop prompt) | Evidence | Where |
-| --- | --- | --- | --- |
-| 1 | Data warehouse / data model (star schema, SCD) | Gold star schema: `dim_cohort`, `dim_snapshot`, `dim_time`, `dim_user`, `dim_page` (SCD Type 2, deterministic `page_key` MERGE), `fact_edit`, `fact_revert_label`, marts. 30 of 30 Gold checks pass: 0 pages without exactly one current version, 0 gaps or overlaps, every fact joins exactly one version. | `etl/sql/`, `etl/gold_run.py`, `etl/gold_checks.py`; `gold/dim_page` v3, `gold/fact_edit` v3; RESULTS.md "Gold at the parity as_of"; notebook `notebooks/final/02_gold_star_schema.ipynb` |
-| 2 | Pipeline and medallion layers (Bronze, Silver, Gold) | Bronze 12.3 M captured lines (append-only, ZSTD); Silver equal to the published EC HW2 tables value for value; Gold from Silver. Flow diagram. | `etl/bronze_stream.py`, `etl/silver_stream.py`, `etl/silver_cohorts.py`, `etl/history.py`; `docs/final/figures/flow.png`, `docs/final/flow.mmd`; notebook 01 |
-| 3 | Correctness and reproducibility | Bronze line counts equal the published parse cut for all 3 streams; Silver stream and cohort tables equal `data/tables` (same content, 6 of 6 tables); E(L) reproduces all 18 published known-by counts (live E(1 h) = 0.4205, 57.95% known at 1 h). Re-runs write no commit. | `etl/parity.py`, `etl/gold_checks.py`; `data/logs/lake/*parity*.json`; RESULTS.md |
-| 4 | New tool (3 pts): Delta Lake (delta-rs + Delta Spark) | Two engines on one lake: delta-rs writes Bronze and Silver, Spark SQL writes Gold; each reads the other's tables (gate `STEP1C OK`; delta-rs reads every Gold table with Spark's row counts). Features used: append-only tables, MERGE, Change Data Feed, time travel by version, commit metadata. | `etl/spark_session.py`, `etl/delta_io.py`; RESULTS.md "Phase 0 gate" and Gold checks |
-| 5 | Time travel / versioning / CDC | Two axes. Snapshots: fact_revert_label v1 (History 2026-09) knew 19,858 reverted history-cohort revisions, v2 (2026-10) knows 20,925; the change feed of v2 holds exactly the 40,721 changed labels (`mart_label_change`). Stream: fact_edit v1 (as_of Oct 24) knew 17,040 live reverts, v2 (Oct 27) 17,818; the change feed holds the 778 rows learned in between. Versions found by commit metadata, never by timestamp. | `etl/time_travel.py`, `etl/sql/80_time_travel_then_and_now.sql`, `etl/sql/81_time_travel_as_of.sql`, `etl/sql/50_mart_label_change_merge.sql`; notebooks 04 and 08 |
-| 5b | Reconciliation of two sources (stream vs dump) | Live cohort vs History snapshot 2026-10: 99.86% agreement; 66 stream-only, 325 dump-only revisions listed in `gold/recon_mismatch`. The dump confirms 2,967 of the 2,970 late reverts EC HW2 found in the stream. | `etl/snapshot_checks.py`, `etl/sql/69_*`, `70_*`, `71_*`; notebook 08 |
-| 6 | Hypotheses answered | H1 (not falsified on the October cohort; borderline at 48 h on Oct 20-Nov 8), H3 (falsified; bursts converge faster at 1 h), H4 (effect 0.3-1.1%, below a 1% floor). Bootstrap intervals over pages. | `etl/hypotheses.py`; RESULTS.md "Hypotheses"; notebook 03 |
-| 7 | Streaming algorithms (5): Flajolet-Martin, HyperLogLog, Bloom filter, DGIM (+ reservoir sampling, AMS moments) | Each against the exact answer with error and memory: HLL p = 14 uses 12 KB vs an estimated 17 MB for an exact page set; Bloom filter finds all 4 real repeats with 0 false negatives; DGIM within its bound wiki-wide. | `etl/streaming_algos.py`; RESULTS.md "Streaming algorithms"; notebook 05 |
-| 8 | Stream processing framework (5): Spark Structured Streaming | Bronze to Silver as a Delta-to-Delta streaming query with `foreachBatch` MERGE; replay at 1,000-20,000 events/s with throughput and p50/p95 latency; streamed rows equal batch Silver. | `etl/stream_sss.py`; RESULTS.md "Structured Streaming"; notebook 06 |
-| 9 | Locality-sensitive hashing (5) | Owned by Wanru (MinHash LSH notebook). Input extract and schema provided. | `data/exports/lsh_edits.parquet`; `docs/final/HANDOFF_TEAM.md` |
-| 10 | Privacy techniques (5) | Owned by Zhenni (k-anonymity of the marts, Laplace noise on E(L) counts). Input extracts with group sizes provided. Pseudonyms (keyed HMAC) for human editors throughout. | `data/exports/mart_el_curve.csv`, `group_sizes_by_kind_hour.csv`, `page_revert_summary*.{parquet,csv}`; `docs/final/HANDOFF_TEAM.md` |
-| 11 | Other course techniques (5) | (for the team to choose) Candidates already built: Change Data Feed / CDC on facts; SCD Type 2; bootstrap intervals; MERGE-based idempotent loads. | as above |
-| 12 | Version control (3): commits through the semester | Branch history of `scottn66/truth-lag`; this build's commits on `final-lake` (see STATUS.md). The repository is private; Scott decides when to make it public. | `git log` |
-| 13 | Report rules: no code in the text, `.py` copy of every notebook, files about 1 MB or less, GenAI disclosure, flow diagram, CRediT slide, rubric appendix | Every notebook under `notebooks/final/` has a `.py` copy; sizes listed in STATUS.md. GenAI log: `docs/final/GENAI_LOG.md`. Flow diagram: `docs/final/figures/flow.png`. This file is the appendix draft. CRediT slide: Tingyu. | `notebooks/final/`, `docs/final/` |
+How to run a command: from the repository root on the Mac, with `TRUTHLAG_HW2_DIR=$PWD/ec-hw2` set and `.venv-lake/bin/python` as `python`. Numbers for every row are in `docs/final/RESULTS.md` and `docs/final/results.json`. Commit: see `docs/final/results.json` (`meta.commit`).
+
+## Evidence table
+
+| # | Rubric line | Runnable command | Output file it produced | Notebook (executed, with `.py` copy) |
+| --- | --- | --- | --- | --- |
+| 1 | Data warehouse and data model: star schema, slowly changing dimension | `python -m etl.gold_run --as-of 2026-11-13T23:59:59.999999Z`; `python -m etl.gold_checks --out data/lake/_runs/gold_checks_ext.json` | `data/lake/_runs/gold_checks_ext.json` | `notebooks/final/02_gold_star_schema.ipynb` |
+| 2 | Pipeline with layers (Bronze, Silver, Gold) and a flow diagram | `bash etl/build_all.sh`; `python -m etl.figures` | `data/lake/_runs/bronze_parity.json`; `docs/final/figures/flow.png` | `notebooks/final/01_bronze_silver_parity.ipynb` |
+| 3 | Correctness and reproducibility: parity with the published tables, tests | `python -m etl.parity cohorts`; `python -m pytest tests_lake ec-hw2/tests/test_history.py ec-hw2/tests/test_stream.py -q -p no:cacheprovider` | `data/lake/_runs/cohort_parity.json`; `data/lake/_runs/silver_parity.json` | `notebooks/final/01_bronze_silver_parity.ipynb` |
+| 4 | New tool (3 points): Delta Lake with two engines (delta-rs and Delta Spark) | `python docs/delta_lake_handoff/proto_fixture_pipeline/checks/cross_engine.py data/spark_home`; `python -m etl.gold_checks --out data/lake/_runs/gold_checks_ext.json` | `data/lake/_runs/gold_checks_ext.json` | `notebooks/final/02_gold_star_schema.ipynb` |
+| 5 | Time travel, versioning and change data capture | `python -m etl.time_travel` | `data/lake/_runs/time_travel.json` | `notebooks/final/04_time_travel.ipynb` |
+| 6 | Reconciliation of two sources (stream labels against a second History snapshot) | `python -m etl.history_slim data/history_raw/2026-10/2026-10.enwiki.2026-10.tsv.bz2`; `python -m etl.snapshot_checks` | `data/lake/_runs/snapshot_checks.json`; `data/history_slim/2026-10/enwiki_rev_all_2026-10_slim.stats.json` | `notebooks/final/08_second_snapshot.ipynb` |
+| 7 | Hypotheses answered with numbers and intervals (H1, H3, H4) | `python -m etl.hypotheses` | `data/lake/_runs/hypotheses.json` | `notebooks/final/03_hypotheses.ipynb` |
+| 8 | Streaming algorithms (5 points): reservoir sampling, Bloom filter, Flajolet-Martin, DGIM, moments | `python -m etl.streaming_algos`; `python notebooks/fallback/make_fallback.py moments_reservoir` | `data/lake/_runs/streaming_algos.json`; `data/lake/_runs/fallback_moments.json` | `notebooks/final/05_streaming_algorithms.ipynb`; `notebooks/fallback/moments_reservoir.ipynb` |
+| 9 | Stream processing framework (5 points): Spark Structured Streaming | `python -m etl.stream_sss` | `data/lake/_runs/stream_sss.json` | `notebooks/final/06_structured_streaming.ipynb` |
+| 10 | Locality-sensitive hashing (5 points): MinHash LSH with precision on hand-labeled pairs | `python notebooks/fallback/make_fallback.py lsh_minhash` | `data/lake/_runs/fallback_lsh.json`; `notebooks/fallback/lsh_pair_labels.csv` | `notebooks/fallback/lsh_minhash.ipynb` |
+| 11 | Privacy techniques (5 points): k-anonymity, l-diversity, differential privacy (Laplace) | `python notebooks/fallback/make_fallback.py privacy` | `data/lake/_runs/fallback_privacy.json` | `notebooks/fallback/privacy.ipynb` |
+| 12 | Other course techniques (5 points): Change Data Feed, MERGE-based idempotent loads, bootstrap intervals | `python -m etl.time_travel`; `python -m etl.hypotheses` | `data/lake/_runs/time_travel.json`; `data/lake/_runs/hypotheses.json` | `notebooks/final/04_time_travel.ipynb`; `notebooks/final/03_hypotheses.ipynb` |
+| 13 | Version control (3 points): repository with commits through the semester | `git log --oneline`; `bash scripts/make_bundle.sh` | `dist/MANIFEST.txt` | `notebooks/final/07_team_exports.ipynb` |
+| 14 | Report rules: no code in the text, numbers traceable, `.py` copy of every notebook, files near 1 MB, GenAI disclosure, flow diagram, CRediT | `python scripts/check_numbers.py`; `python scripts/check_evidence.py`; `python notebooks/final/make_notebooks.py` | `docs/final/results.json`; `docs/final/report_draft.md`; `docs/final/GENAI_LOG.md`; `docs/final/figures/flow.png` | `notebooks/final/07_team_exports.ipynb` |
+
+Rows 8 (second notebook), 10 and 11 point at the fallback notebooks (built by Claude Code for Scott). If Wanru's LSH notebook or Zhenni's privacy notebook arrives, replace the command, output and notebook of that row with theirs: teammate work wins.
+
+## What each row shows, in one line
+
+1. Twelve Gold tables; every fact joins exactly one page version; the checks pass at the extended build.
+2. One script builds the three layers from the raw files; the diagram shows the flow.
+3. The lake equals the published EC HW2 tables value for value; the automated tests pass.
+4. delta-rs writes Bronze and Silver, Spark SQL writes Gold, and each engine reads the other's tables.
+5. "Then against now" on two knowledge axes (History snapshots and stream knowledge time), with the change feed holding exactly the changes in between.
+6. The second snapshot agrees with the stream labels for almost every live revision and confirms the late reverts found in EC HW2.
+7. H1 is not falsified on the October cohort; H3 and H4 are falsified; intervals come from a bootstrap over pages.
+8. Six algorithms measured against exact answers on the same stream, with error and memory.
+9. The Bronze-to-Silver step as a streaming query, with throughput and latency at five input rates.
+10. Near-duplicate comments of reverted edits found with MinHash LSH; precision on labeled pairs; recall against an exact join.
+11. Group sizes, diversity and suppression on the released tables; error of E(L) under Laplace noise at three epsilons.
+12. Techniques from the course used inside the pipeline itself.
+13. The commit history and the bundle manifest with the commit hash.
+14. The number check, this evidence check, the notebook copies, the GenAI log and the diagram.
 
 ## Stated deviations from the proposal (for the report)
 
-- Kafka (or Redpanda), Airflow and dbt were not built. The Bronze tables are the replayable log; `python -m etl.*` commands run the steps in order. (DECISIONS.md, answer 2)
-- Plain SCD Type 2 in `dim_page`, not a bitemporal model. The four clocks are kept as columns and commit metadata (LAKE_DESIGN.md).
-- E(L) uses a 4-day horizon, not 30 days (D6).
-- The 2026-10 History snapshot was not on the VPS as DECISIONS.md assumed; it was downloaded from the public dump site and filtered locally (`etl/history_slim.py`) instead of on the VPS.
-- LSH and privacy are built by teammates from extracts of the lake, not inside the pipeline.
+- Kafka (or Redpanda), Airflow and dbt were not built. The Bronze tables are the replayable log; `etl/build_all.sh` runs the steps in order.
+- Plain slowly changing dimension (Type 2) in `dim_page`, not a bitemporal model. The four clocks are kept as columns and commit metadata (`docs/delta_lake_handoff/LAKE_DESIGN.md`).
+- E(L) uses a 4-day horizon, not 30 days.
+- The 2026-10 History snapshot was not on the VPS as `DECISIONS.md` assumed; it was downloaded from the public dump site and filtered locally (`etl/history_slim.py`).
+- H2 and experiments E0, E3, E6, E7 were not built.
