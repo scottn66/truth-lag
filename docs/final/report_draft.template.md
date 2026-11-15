@@ -98,8 +98,9 @@ Figure: `docs/final/figures/flow.png` (data flow from the sources through Bronze
 
 - Streaming algorithms, each against the exact answer on {{algos.stream_events}} events: HyperLogLog, Flajolet-Martin, Bloom filter, DGIM, reservoir sampling, AMS second moment.
 - Spark Structured Streaming: the Bronze-to-Silver step as a streaming query, replayed at fixed input rates.
-- Locality-sensitive hashing (MinHash) on the comments of reverted edits. **TODO: numbers from `notebooks/fallback/lsh_minhash.ipynb` or Wanru's notebook.**
-- Privacy: k-anonymity, l-diversity and Laplace noise on the published marts. **TODO: numbers from `notebooks/fallback/privacy.ipynb` or Zhenni's notebook.**
+- Locality-sensitive hashing: MinHash LSH on character {{lsh.shingle_k}}-shingles of edit comments, at Jaccard similarity {{lsh.jaccard_min}} or more, checked against an exact join and against hand-labeled pairs.
+- Privacy: k-anonymity (k = {{privacy.k}}) and l-diversity (l = {{privacy.l}}, sensitive attribute: reverted within {{horizon_days}} days) of the tables that would be released, small-group suppression, and Laplace noise on the E(L) counts at {{privacy.epsilons}} values of epsilon.
+- The LSH and privacy numbers below come from the fallback notebooks (`notebooks/fallback/`), built with Claude Code for Scott. **If Wanru's or Zhenni's notebook arrives, its numbers replace these.**
 
 ## VI. Results
 
@@ -201,7 +202,23 @@ Exact answers on the same stream: {{algos.exact.pages}} distinct pages and {{alg
 - Bloom filter on the event id ({{algos.bloom.fp001.bloom_mb}} megabytes against an estimated {{algos.bloom.fp001.exact_set_mb_est}} for an exact set): all {{algos.bloom.fp001.exact_repeats}} repeated events found, {{algos.bloom.fp001.false_negatives}} missed, {{algos.bloom.fp001.false_positives}} false positives in {{algos.bloom.fp001.events}} events.
 - DGIM, reverts in the last hour over the whole wiki: mean error {{algos.dgim.wiki.r2.mean_rel_error_pct}}% with at most {{algos.dgim.wiki.r2.max_buckets}} buckets (bound {{algos.dgim.wiki.r2.bound_pct|.0f}}%), and {{algos.dgim.wiki.r4.mean_rel_error_pct}}% with at most {{algos.dgim.wiki.r4.max_buckets}} buckets (bound {{algos.dgim.wiki.r4.bound_pct|.0f}}%). Per page the counts are tiny and DGIM's error reaches its bound (mean {{algos.dgim.page.r2.mean_rel_error_pct}}%).
 - Reservoir sample of {{reservoir_k}} edits: revert share {{algos.reservoir.sample_pct}}% ({{algos.reservoir.ci_lo}} to {{algos.reservoir.ci_hi}}) against the exact {{algos.reservoir.exact_pct}}%.
-- AMS second moment of edits per page: error {{algos.ams.vars100.err_pct}}% with {{ams_vars_small}} variables and {{algos.ams.vars1000.err_pct}}% with {{ams_vars_large}}.
+- AMS second moment of edits per page, one run: error {{algos.ams.vars100.err_pct}}% with {{ams_vars_small}} variables and {{algos.ams.vars1000.err_pct}}% with {{ams_vars_large}}.
+
+Moments and reservoir sampling over many seeds (`notebooks/fallback/moments_reservoir.ipynb`). Exact moments of edits per page: F0 = {{moments.f0}}, F1 = {{moments.f1}}, F2 = {{moments.f2}}.
+
+| AMS variables | Mean absolute error of F2 over {{moments.seeds}} seeds | Worst error |
+| --- | --- | --- |
+| {{moments.ams.v100.variables}} | {{moments.ams.v100.mean_abs_error_pct}}% | {{moments.ams.v100.worst_abs_error_pct}}% |
+| {{moments.ams.v1000.variables}} | {{moments.ams.v1000.mean_abs_error_pct}}% | {{moments.ams.v1000.worst_abs_error_pct}}% |
+| {{moments.ams.v10000.variables}} | {{moments.ams.v10000.mean_abs_error_pct}}% | {{moments.ams.v10000.worst_abs_error_pct}}% |
+
+| Reservoir size | Spread of the revert share over {{moments.reservoir_runs}} reservoirs (points) | Binomial standard error (points) |
+| --- | --- | --- |
+| {{moments.reservoir.k1000.sample_size}} | {{moments.reservoir.k1000.sd_of_estimates_points}} | {{moments.reservoir.k1000.binomial_se_points}} |
+| {{moments.reservoir.k10000.sample_size}} | {{moments.reservoir.k10000.sd_of_estimates_points}} | {{moments.reservoir.k10000.binomial_se_points}} |
+| {{moments.reservoir.k100000.sample_size}} | {{moments.reservoir.k100000.sd_of_estimates_points}} | {{moments.reservoir.k100000.binomial_se_points}} |
+
+- A one-pass reservoir of {{moments.neg_sample_size}} not-reverted edits matches the editor-kind mix of all {{moments.neg_population}} within {{moments.reservoir_kind_max_dev_points}} points.
 
 ### G. Structured Streaming
 
@@ -219,11 +236,37 @@ Exact answers on the same stream: {{algos.exact.pages}} distinct pages and {{alg
 
 ### H. Locality-sensitive hashing
 
-**TODO: fill from `notebooks/fallback/lsh_minhash.ipynb` (or Wanru's notebook, which wins if it arrives).**
+Source: `notebooks/fallback/lsh_minhash.ipynb` (fallback; a teammate's notebook replaces it).
+
+- Input: {{lsh.edits_kept}} edit comments ({{lsh.reverted.edits}} of reverted edits, {{lsh.not_reverted.edits}} of edits not reverted) with {{lsh.distinct_texts}} distinct texts.
+- Against an exact join of {{lsh.sample_pairs_compared}} pairs ({{lsh.sample_texts}} texts, {{lsh.sample_exact_pairs}} true near-duplicate pairs, {{lsh.exact_join_seconds}} seconds), LSH finds {{lsh.recall_pct.tables1}}% of them with {{one}} hash table, {{lsh.recall_pct.tables5}}% with {{lsh.hash_tables}} and {{lsh.recall_pct.tables20}}% with {{lsh_tables_large}}, in {{lsh.seconds.tables5}} seconds at {{lsh.hash_tables}} tables.
+- All texts: {{lsh.near_dup_pairs}} near-duplicate pairs; {{lsh.texts_with_near_dup}} texts have a near-duplicate, in {{lsh.groups}} groups (largest: {{lsh.largest_group_texts}} texts).
+- Precision on hand-labeled pairs ("same edit pattern"): {{lsh.labels.by_band.same_pattern}} of {{lsh.labels.by_band.pairs}} pairs drawn by similarity band ({{lsh.labels.by_band.precision_pct}}%, interval {{lsh.labels.by_band.precision_lo}} to {{lsh.labels.by_band.precision_hi}}), and {{lsh.labels.by_group.same_pattern}} of {{lsh.labels.by_group.pairs}} pairs drawn one per group ({{lsh.labels.by_group.precision_pct}}%, interval {{lsh.labels.by_group.precision_lo}} to {{lsh.labels.by_group.precision_hi}}). Labels by Claude Code; {{lsh.labels.by_person}} re-checked by a person so far.
+- Reuse of summaries: {{lsh.reverted.reuses_pct}}% of reverted edits share their summary (exactly or nearly) with another edit, against {{lsh.not_reverted.reuses_pct}}% of edits not reverted. Near-duplicate summaries are mostly tool and bot templates, not vandal text.
 
 ### I. Privacy
 
-**TODO: fill from `notebooks/fallback/privacy.ipynb` (or Zhenni's notebook, which wins if it arrives).**
+Source: `notebooks/fallback/privacy.ipynb` (fallback; a teammate's notebook replaces it). Figure: `docs/final/figures/privacy_laplace.png`.
+
+- Tables checked: an hourly grid by editor kind ({{privacy.grid.rows}} cells) and a page-level summary ({{privacy.page.rows}} rows).
+- k-anonymity, k = {{privacy.k}}: {{privacy.grid.k5.rows_below_pct}}% of grid cells have fewer than {{privacy.k}} editors; suppressing them keeps {{privacy.grid.k5.edits_kept_pct}}% of the edits. In the page summary {{privacy.page.k5.rows_below_pct}}% of rows are below k, and {{privacy.page.single_editor_pct}}% have a single editor.
+- l-diversity, l = {{privacy.l}}: {{privacy.grid.two_diverse_pct}}% of grid cells and {{privacy.page.two_diverse_pct}}% of page rows hold both reverted and not-reverted edits. {{privacy.page.all_reverted_rows}} page rows hold only reverted edits, {{privacy.page.all_reverted_single_editor}} of them from one editor.
+
+| Suppression rule, page summary of live_ext | Rows kept | Edits kept | Reverts kept | Revert rate in the release (true {{privacy.suppress.live_ext.ruleA.true_revert_rate_pct}}%) |
+| --- | --- | --- | --- | --- |
+| At least {{privacy.k}} editors | {{privacy.suppress.live_ext.ruleA.rows_kept_pct}}% | {{privacy.suppress.live_ext.ruleA.edits_kept_pct}}% | {{privacy.suppress.live_ext.ruleA.reverts_kept_pct}}% | {{privacy.suppress.live_ext.ruleA.released_revert_rate_pct}}% |
+| At least {{privacy.k}} editors and both values present | {{privacy.suppress.live_ext.ruleC.rows_kept_pct}}% | {{privacy.suppress.live_ext.ruleC.edits_kept_pct}}% | {{privacy.suppress.live_ext.ruleC.reverts_kept_pct}}% | {{privacy.suppress.live_ext.ruleC.released_revert_rate_pct}}% |
+
+- Suppression alone biases the page-level release upward: only busy pages survive, and they are reverted more often.
+
+| Laplace noise on the E(L) counts: series | Eventual reverts | Mean absolute error of E(L), epsilon {{privacy.eps_low}} | epsilon {{privacy.eps_mid}} | epsilon {{privacy.eps_high}} |
+| --- | --- | --- | --- | --- |
+| live_ext, all editors | {{privacy.laplace.live_ext.stream.all.n}} | {{privacy.laplace.live_ext.stream.all.mae.eps_low|.5f}} | {{privacy.laplace.live_ext.stream.all.mae.eps_mid|.5f}} | {{privacy.laplace.live_ext.stream.all.mae.eps_high|.5f}} |
+| live, all editors | {{privacy.laplace.live.stream.all.n}} | {{privacy.laplace.live.stream.all.mae.eps_low|.5f}} | {{privacy.laplace.live.stream.all.mae.eps_mid|.5f}} | {{privacy.laplace.live.stream.all.mae.eps_high|.5f}} |
+| live, temporary accounts | {{privacy.laplace.live.stream.temporary.n}} | {{privacy.laplace.live.stream.temporary.mae.eps_low|.5f}} | {{privacy.laplace.live.stream.temporary.mae.eps_mid|.5f}} | {{privacy.laplace.live.stream.temporary.mae.eps_high|.5f}} |
+| live, bots | {{privacy.laplace.live.stream.bot.n}} | {{privacy.laplace.live.stream.bot.mae.eps_low|.5f}} | {{privacy.laplace.live.stream.bot.mae.eps_mid|.5f}} | {{privacy.laplace.live.stream.bot.mae.eps_high|.5f}} |
+
+- The noise is edit-level ({{privacy.laplace.trials}} trials per epsilon). For the main series the error is far below the differences between series; for the bot series it is not.
 
 ## VII. Deviations from the Proposal
 
