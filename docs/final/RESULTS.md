@@ -702,3 +702,39 @@ All facts below are in `data/lake/_runs/fallback_lsh.json`, `fallback_privacy.js
 | `privacy.suppress.live_ext.ruleC.reverts_kept_pct` | 42.05 |
 | `privacy.suppress.live_ext.ruleC.rows_kept_pct` | 1.04 |
 | `privacy.suppress.live_ext.ruleC.true_revert_rate_pct` | 4.71 |
+
+### Bundle (`bash scripts/make_bundle.sh`, 2026-11-15 13:06 UTC)
+
+Built in `dist/` (git-ignored) from a fresh `git clone` of the local repository, so only committed files go in. Output of the run:
+
+    bundle: <repo>/dist
+    files in dist: 36   total: 8236 KB
+    largest file in dist: <repo>/dist/truthlag_repo_a9af00c.zip (6630 KB)
+    code zip: truthlag_code_a9af00c.zip (702 KB, 136 files); tests from the unzipped copy: 49 passed in 4.66s
+    check_numbers:  ZERO MISMATCHES
+    check_evidence: 14 rubric lines, 0 failing
+    commit: a9af00c7a69be5314b40f31728f63f17b08d374c
+
+Head of `dist/MANIFEST.txt`:
+
+    TruthLag submission bundle
+    commit:  a9af00c7a69be5314b40f31728f63f17b08d374c
+    branch:  final-lake
+    built:   2026-11-15T13:02:49Z from a fresh clone of the local repository
+    working tree of the source repository: 0 uncommitted path(s) (not in the bundle)
+    results.json commit stamp: 84624f44d0dc0e9f0c2491bce9ea70d6baa96671
+    check_numbers (in the clone, without the lake):  ZERO MISMATCHES
+    check_evidence (in the clone, data outputs not present):  14 rubric lines, 0 failing
+    
+    tests run from the unzipped code zip:  49 passed in 4.66s
+    
+    code zip (upload this): truthlag_code_a9af00c.zip  files: 136  size: 702 KB
+    largest file inside the code zip: notebooks/final/02_gold_star_schema.ipynb (132 KB)
+    repo zip (everything tracked, with the EC HW2 material): truthlag_repo_a9af00c.zip  files: 396  size: 6630 KB
+    largest file inside the repo zip: ec-hw2/notebooks/01_data.ipynb (688 KB)
+    tracked files left out of both zips (over 1200 KB):
+      ec-hw2/report/REPORT_SKELETON.docx	3253 KB
+
+`dist/` holds the code zip, the repo zip, the 11 executed notebooks with `.py` copies, the pair labels, 3 figures, `results.json`, `report_draft.md`, `RUBRIC_EVIDENCE.md`, `GENAI_LOG.md`, `GATE_MON.md` and `MANIFEST.txt` (every file with size and SHA-256). After this entry was committed, `dist/` was rebuilt once more so that it matches the last commit; its `MANIFEST.txt` names that commit.
+
+`python scripts/check_evidence.py` on the Mac after the bundle: 14 rubric lines, 0 failing.

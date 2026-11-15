@@ -12,7 +12,7 @@ Goal of loop 2: make what is graded (report, slides, code bundle) correct by con
 2. `scripts/check_evidence.py` exits 0: 14 rubric lines in `RUBRIC_EVIDENCE.md`, each with a runnable command, its output file and an executed notebook.
 3. Every rubric technique is built. New in `notebooks/fallback/` (built by Claude for Scott; teammate work wins): `lsh_minhash` (recall 96.11% against an exact join at 5 hash tables; precision 40 of 40 and 37 of 40 on labeled pairs), `privacy` (k-anonymity, l-diversity, suppression cost, Laplace noise at 3 epsilons), `moments_reservoir` (AMS and reservoir sampling over many seeds).
 4. `docs/final/report_draft.md`: IEEE-section skeleton, facts and tables only, no code, every number from `results.json`.
-5. `scripts/make_bundle.sh` builds `dist/` from a fresh clone; its output is in RESULTS.md ("Bundle").
+5. `scripts/make_bundle.sh` builds `dist/` from a fresh clone: a 702 KB code zip (the 49 tests pass from the unzipped copy), a repo zip, the notebooks with `.py` copies, figures and `results.json`; its output is in RESULTS.md ("Bundle").
 6. `docs/final/GATE_MON.md` lists 16 decisions with defaults.
 
 Found and fixed on the way: the not-reverted sample in `data/exports/lsh_edits.parquet` was not uniform (RESULTS.md, "Export fix"). Nothing was pushed in loop 2.
