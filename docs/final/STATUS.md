@@ -8,7 +8,7 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 
 **P0: core lake**
 - [x] Phase 0 gate: Java and Spark start, parity reference exists, Spark reads a delta-rs table
-- [ ] Bronze from data/raw (3 streams, Oct 19 to Nov 13); Oct 19-27 counts match the parity reference
+- [x] Bronze from data/raw (3 streams, Oct 19 to Nov 13); Oct 19-27 counts match the parity reference
 - [ ] Silver + cohorts; test_parity on real data passes or every mismatch is explained
 - [ ] Gold: star schema, dim_page SCD2 (page_key MERGE), fact_edit, fact_revert_label, mart_el_curve; 57.95% at 1 h reproduced, then extended to Nov 13
 - [ ] Hypotheses H1, H3, H4 with numbers and verdicts

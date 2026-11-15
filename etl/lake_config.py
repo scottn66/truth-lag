@@ -18,7 +18,16 @@ from deltalake import WriterProperties
 ENV_VAR = "TRUTHLAG_LAKE_DIR"
 
 
+from datetime import datetime, timedelta, timezone
+
 REPO_DIR = Path(__file__).resolve().parents[1]
+# The published live cohort is Oct 20-22 (config.LIVE_WINDOW). live_ext applies the same rules to the edits of
+# Oct 20 to Nov 8, so that every edit has 4 days of follow-up by the end of Nov 13 (the extended as_of).
+LIVE_EXT_WINDOW = (datetime(2026, 10, 20, tzinfo=timezone.utc), datetime(2026, 11, 9, tzinfo=timezone.utc))
+LIVE_EXT_FINAL_AFTER = LIVE_EXT_WINDOW[1] + timedelta(days=4, minutes=5)       # 2026-11-13 00:05 UTC
+EXT_AS_OF = "2026-11-13T23:59:59.999999Z"        # end of the extended build
+PARITY_AS_OF = "2026-10-27T20:59:59.999999Z"     # reproduces the published data-v2 tables
+EARLY_AS_OF = "2026-10-24T00:00:00.000000Z"      # "then": live follow-up still incomplete
 DEFAULT_LAKE = REPO_DIR / "data" / "lake"           # D2: the lake lives in data/lake/ (git-ignored)
 SPARK_HOME_DIR = REPO_DIR / "data" / "spark_home"   # Spark's side folders (ivy jars, derby, tmp)
 HISTORY_RAW_DIR = REPO_DIR / "data" / "history_raw"

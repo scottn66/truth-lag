@@ -87,8 +87,14 @@ SILVER = {
                                        _micro(label_live.LINKS_ALL_SCHEMA), _P),
     "late_reverts": TableSpec("silver/late_reverts", ("rev_id",), (), _micro(late_reverts.LATE_SCHEMA), _P),
 }
+# live_ext: the live rules (label_live, unchanged) on the longer window lake_config.LIVE_EXT_WINDOW.
+for _n in ("live_revisions", "live_revert_links", "live_revert_links_all"):
+    _s = SILVER[_n]
+    SILVER[_n.replace("live_", "live_ext_", 1)] = TableSpec(_s.name.replace("live_", "live_ext_", 1), _s.key,
+                                                           _s.partition_by, _s.schema, _s.properties)
 STREAM_TABLES = ["page_change", "revert_risk", "tag_events", "capture_gaps"]
 COHORT_TABLES = ["live_revisions", "live_revert_links", "live_revert_links_all", "late_reverts"]
+EXT_TABLES = ["live_ext_revisions", "live_ext_revert_links", "live_ext_revert_links_all"]
 
 ALL = {spec.name: spec for spec in [*BRONZE.values(), *SILVER.values()]}
 

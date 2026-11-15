@@ -154,3 +154,72 @@ def build(as_of=None, history_dir: str | Path | None = None, lake=None,
     finally:
         if keep_dir is None:
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Added for the real-data build (2026-11-15)
+# ---------------------------------------------------------------------------------------------------------
+def latest_path(lake=None) -> Path:
+    return lake_config.lake_root(lake) / "_runs" / "latest.json"
+
+
+def write_latest(as_of: str, lake=None, extra: dict | None = None) -> dict:
+    """data/lake/_runs/latest.json: the as_of of the newest cohort build and the current version of every
+    Silver table Gold reads. gold_run refuses to run unless its as_of and these versions are still current."""
+    names = ["history_revisions", "history_revert_links", "page_change", *tables.COHORT_TABLES, *tables.EXT_TABLES]
+    versions = {}
+    for n in names:
+        p = tables.SILVER[n].path(lake) if n in tables.SILVER else str(lake_config.lake_root(lake) / "silver" / n)
+        if delta_io.exists(p):
+            versions[f"silver/{n}"] = delta_io.version(p)
+    doc = {"as_of": as_of, "built_at": iso(datetime.now(timezone.utc)), "versions": versions, **(extra or {})}
+    path = latest_path(lake)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    parse_stream.write_json(doc, path)
+    return doc
+
+
+def build_ext(as_of, lake=None, keep_dir=None) -> dict:
+    """live_ext cohort tables as known at as_of: label_live.run, unchanged, with config.LIVE_WINDOW set to
+    lake_config.LIVE_EXT_WINDOW for the duration of the call. No late_reverts (that step is per snapshot month)."""
+    as_of = to_utc(as_of)
+    if as_of < lake_config.LIVE_EXT_FINAL_AFTER:
+        log.warning("live_ext as of %s: follow-up incomplete before %s", iso(as_of), lake_config.LIVE_EXT_FINAL_AFTER)
+    tmp = Path(tempfile.mkdtemp(prefix="truthlag_ext_", dir=keep_dir))
+    saved = (config.LIVE_WINDOW, config.LIVE_FINAL_AFTER)
+    try:
+        parsed_dir, tables_dir = tmp / "parsed", tmp / "tables"
+        info = export_parsed(as_of, parsed_dir, lake)
+        tables_dir.mkdir()
+        config.LIVE_WINDOW, config.LIVE_FINAL_AFTER = lake_config.LIVE_EXT_WINDOW, lake_config.LIVE_EXT_FINAL_AFTER
+        try:
+            label_live.run(parsed_dir, tables_dir)
+        finally:
+            config.LIVE_WINDOW, config.LIVE_FINAL_AFTER = saved
+        out = {"as_of": iso(as_of), "window": [iso(x) for x in lake_config.LIVE_EXT_WINDOW], "tables": {}}
+        for old, new in (("live_revisions", "live_ext_revisions"), ("live_revert_links", "live_ext_revert_links"),
+                         ("live_revert_links_all", "live_ext_revert_links_all")):
+            spec = tables.SILVER[new]
+            t = pq.read_table(tables_dir / f"{old}.parquet").cast(spec.schema)
+            delta_io.ensure_table(spec.path(lake), spec.schema, spec.properties, spec.partition_by)
+            meta = {"step": "cohorts_ext", "table": spec.name, "as_of": iso(as_of), "rows": t.num_rows,
+                    "window": out["window"], "silver_versions": info["silver_versions"]}
+            out["tables"][new] = delta_io.replace_if_changed(spec.path(lake), t, spec.key, meta)
+        runs = run_dir(as_of, lake) / "ext"
+        runs.mkdir(parents=True, exist_ok=True)
+        for f in ("live_summary.json", "_SUCCESS_live.json"):
+            if (tables_dir / f).exists():
+                shutil.copyfile(tables_dir / f, runs / f)
+        log.info("cohorts_ext as of %s: %s", iso(as_of), {n: (r["wrote"], r["version"], r["rows"]) for n, r in out["tables"].items()})
+        return out
+    finally:
+        config.LIVE_WINDOW, config.LIVE_FINAL_AFTER = saved
+        if keep_dir is None:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
+def ensure_ext_tables(lake=None) -> None:
+    """Empty live_ext tables, so Gold SQL can read them before the first extended build."""
+    for n in tables.EXT_TABLES:
+        spec = tables.SILVER[n]
+        delta_io.ensure_table(spec.path(lake), spec.schema, spec.properties, spec.partition_by)

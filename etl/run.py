@@ -29,7 +29,7 @@ def _show(obj) -> None:
 
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(prog="python -m etl.run", description=__doc__.split("\n")[0])
-    ap.add_argument("step", choices=["bronze", "silver", "cohorts", "all"])
+    ap.add_argument("step", choices=["bronze", "silver", "cohorts", "cohorts_ext", "all"])
     ap.add_argument("--lake", type=Path, default=None, help="lake root (default: TRUTHLAG_LAKE_DIR)")
     ap.add_argument("--raw-dir", type=Path, default=config.RAW_STREAM_DIR)
     ap.add_argument("--include-open", action="store_true",
@@ -37,7 +37,8 @@ def main(argv=None) -> None:
     ap.add_argument("--dates", default=None, help="silver: comma-separated event dates (default: all)")
     ap.add_argument("--as-of", default=None, help="cohorts: use events with meta_dt <= this UTC time")
     ap.add_argument("--history-dir", type=Path, default=config.HISTORY_DIR)
-    ap.add_argument("--history-revisions", type=Path, default=None)
+    ap.add_argument("--history-revisions", type=Path, default=None,
+                    help="default: the history_revisions.parquet kept by python -m etl.history cohort")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s", stream=sys.stdout)
 
@@ -52,8 +53,18 @@ def main(argv=None) -> None:
             dates = {s: days for s in config.STREAM_DIRS}
         _show({"silver": silver_stream.build(dates, lake=args.lake)})
     if args.step in ("cohorts", "all"):
-        _show({"cohorts": silver_cohorts.build(args.as_of, history_dir=args.history_dir, lake=args.lake,
-                                               history_revisions=args.history_revisions)})
+        from .history import kept_revisions_file
+        hist = args.history_revisions or (kept_revisions_file(args.lake) if kept_revisions_file(args.lake).exists() else None)
+        res = silver_cohorts.build(args.as_of, history_dir=args.history_dir, lake=args.lake, history_revisions=hist)
+        silver_cohorts.ensure_ext_tables(args.lake)
+        res["latest"] = silver_cohorts.write_latest(res["as_of"], args.lake, {"step": "cohorts"})
+        _show({"cohorts": res})
+    if args.step == "cohorts_ext":
+        if not args.as_of:
+            raise SystemExit("cohorts_ext needs --as-of")
+        res = silver_cohorts.build_ext(args.as_of, lake=args.lake)
+        res["latest"] = silver_cohorts.write_latest(res["as_of"], args.lake, {"step": "cohorts_ext"})
+        _show({"cohorts_ext": res})
 
 
 if __name__ == "__main__":
