@@ -9,6 +9,8 @@ This log feeds the GenAI disclosure of the term project. It lists what Claude (C
 | 2026-11-13 | Cloud Claude Code session | Scott | Plan, research reports R1-R7, two prototypes on made-up data (`docs/delta_lake_handoff/`, commit 5079d0b). Its own provenance note is in `docs/delta_lake_handoff/README.md`. |
 | 2026-11-15 | Claude Code on Scott's Mac, branch `final-lake` | Scott, with the loop prompt `CLAUDE_LOOP_PROMPT.md` and an amendment (LSH and Privacy go to Wanru and Zhenni) | The real-data build: everything below. Local commits only; Scott pushes. |
 
+| 2026-11-15, later (loop 2) | Same session, model switched to Claude Fable 5.2 | Scott, with `NEXT_LOOP_PROMPT.md` | From the finished lake to a submittable bundle: `results.json`, the number and evidence checks, the report and slide skeletons, three fallback notebooks, the bundle script, `GATE_MON.md`. Local commits only. |
+
 ## By component (session of 2026-11-15)
 
 | Component | Files | What Claude did | What it reused | How it was checked |
@@ -28,6 +30,22 @@ This log feeds the GenAI disclosure of the term project. It lists what Claude (C
 | Figures | `etl/figures.py`, `docs/final/flow.mmd`, `docs/final/figures/*.png` | Drew the flow diagram and the E(L) figure. | | Looked at the PNGs |
 | Status and evidence documents | `docs/final/STATUS.md`, `RESULTS.md`, `RUBRIC_EVIDENCE.md`, this file | Wrote them as records of commands and numbers. They are not report text. | | Every number comes from a command shown next to it |
 
+## By component (loop 2, 2026-11-15, Claude Fable 5.2)
+
+| Component | Files | What Claude did | How it was checked |
+| --- | --- | --- | --- |
+| Results file | `scripts/make_results.py`, `docs/final/results.json` | Wrote the collector of every reportable number from the run records, the Gold tables, logs and config; chose the fact names. No number is typed by hand. | `scripts/check_numbers.py` step 2: a fresh collection equals the file |
+| Number check | `scripts/check_numbers.py`, `scripts/truthlag_numbers.py`, `scripts/render_report.py` | Wrote the template renderer and the checker (commit stamp, fresh collection, draft equals rendered template, no typed number, no code block, every number token is a fact). | Tested on a tampered copy (9 changed numbers, all caught). Known limit: a wrong free-text number that equals another fact passes; `--explain` lists the matched facts |
+| Report skeleton | `docs/final/report_draft.template.md` -> `report_draft.md` | Wrote the IEEE-section skeleton as fact bullets and tables with placeholders, the CRediT proposal, the reference list (the proposal's entries plus the standard technique papers, from memory: the owner must verify each one). **No report prose**: every section says what the owner writes. | Zero mismatches in the number check |
+| Slide outline | `docs/final/slides_outline.template.md` -> `slides_outline.md` | Wrote 15 slide blocks of facts with placeholders. Not a deck. | Same check |
+| Evidence table | `docs/final/RUBRIC_EVIDENCE.md`, `scripts/check_evidence.py` | Rewrote the table as rubric line, runnable command, output file, notebook; wrote the checker. The rubric lines are those of DECISIONS.md: the official rubric text was not available. | `scripts/check_evidence.py` |
+| Fallback: MinHash LSH | `notebooks/fallback/lsh_minhash.ipynb`, `.py`, `lsh_pair_labels.csv` | Wrote the notebook (cleaning, shingles, `MinHashLSH`, exact join for recall, groups). **Claude also labeled the 80 evaluation pairs** ("same edit pattern" or not) by reading both masked comments; the labels are in the column `claude_label`, and a person can overrule any of them in `human_label`. This is evaluation ground truth set by an LLM, disclosed here; the method itself uses no LLM. | Recall against an exact all-pairs join; a person has re-checked 0 of 80 labels so far |
+| Fallback: privacy | `notebooks/fallback/privacy.ipynb`, `.py` | Wrote the k-anonymity, l-diversity and suppression analysis and the Laplace mechanism on the histogram form of the E(L) counts; chose k = 5, l = 2, epsilons 0.1, 0.5, 1.0, 1,000 trials. | Counts cross-checked against the export files; noise error falls with epsilon and group size as expected |
+| Fallback: moments and reservoir | `notebooks/fallback/moments_reservoir.ipynb`, `.py` | Wrote the vectorized AMS estimator and Algorithm L reservoir; 30 and 200 seeds. | The AMS estimator's mean over all positions equals the exact F2 (assert); reservoir spread equals the binomial standard error |
+| Export fix | `etl/exports.py` | The reservoir check showed that the export's not-reverted sample (written by Claude earlier the same day) was not uniform; replaced `sample().limit()` by an exact uniform draw and re-exported. | Editor-kind mix within 0.10 points of the population after the fix (2.05 before) |
+| Bundle | `scripts/make_bundle.sh` | Wrote the script that builds `dist/` from a fresh clone and refuses tracked data. | Run once; output in RESULTS.md |
+| Decisions page | `docs/final/GATE_MON.md`, `docs/final/AFTER_DUE.md` | Wrote the list of decisions for Scott with defaults, and the list of ideas for after the due date. | Scott reads it |
+
 ## Decisions Claude made that the team may want to revisit
 
 1. The extended live cohort `live_ext` covers edits of 2026-10-20 to 2026-11-08, so that each has 4 days of follow-up by the end of Nov 13.
@@ -35,7 +53,10 @@ This log feeds the GenAI disclosure of the term project. It lists what Claude (C
 3. Time travel is shown on two axes: History snapshots (2026-09 vs 2026-10, the kit's query) and build `as_of` versions (added while no 2026-10 snapshot was available).
 4. `fact_edit` key includes `cohort_id`; `dim_page` ignores `visibility_change` events.
 5. In Bronze and Silver, the lake keeps every captured event through 2026-11-15; analyses stop at the end of 2026-11-13.
+6. Loop 2 defaults, logged as the prompt asked: H4 floor = 1% of pages; H1 is reported on the `live` cohort (Oct 20-22) as primary, the other series as robustness checks; the commit email stays as it is.
+7. Claude labeled the LSH evaluation pairs (see the table above). Default: keep, disclosed; a person may re-label in about 10 minutes.
+8. LSH and privacy parameters (shingle length 5, similarity 0.6, 5 hash tables; k = 5, l = 2, three epsilons) are Claude's choices for the fallback notebooks.
 
 ## Suggested disclosure text (for the report owner to edit)
 
-"The Delta Lake pipeline code, its checks and the analysis scripts were written with Claude Code (Anthropic), from a plan and prototypes also drafted with Claude Code on Nov 13, 2026. All code ran on the real data on Nov 15, 2026, and every reported number comes from a logged command. The team checked [what] and wrote all report and slide text."
+"The Delta Lake pipeline code, its checks and the analysis scripts were written with Claude Code (Anthropic), from a plan and prototypes also drafted with Claude Code on Nov 13, 2026. All code ran on the real data on Nov 15, 2026, and every reported number comes from a logged command and is checked against a results file by script. [If a fallback notebook is used: The MinHash LSH and privacy notebooks were also written with Claude Code, and the 80 evaluation pairs of the LSH notebook were labeled by Claude Code (re-checked by a person: N of 80).] The report and slide skeletons listed facts only; the team checked [what] and wrote all report and slide text."

@@ -18,6 +18,9 @@ REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "docs" / "final" / "results.json"
 TEMPLATE = REPO / "docs" / "final" / "report_draft.template.md"
 DRAFT = REPO / "docs" / "final" / "report_draft.md"
+SLIDES_TEMPLATE = REPO / "docs" / "final" / "slides_outline.template.md"
+SLIDES = REPO / "docs" / "final" / "slides_outline.md"
+DOCS = [(TEMPLATE, DRAFT), (SLIDES_TEMPLATE, SLIDES)]          # (template, rendered file)
 PLACEHOLDER = re.compile(r"\{\{\s*([A-Za-z0-9_.\-]+)\s*(?:\|\s*([A-Za-z0-9_.,]+)\s*)?\}\}")
 
 

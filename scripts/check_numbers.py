@@ -4,9 +4,9 @@ Checks
   1. results.json is stamped with a commit that is HEAD or an ancestor of HEAD.
   2. A fresh collection from the lake and the run records equals results.json (skipped with a note when data/lake
      is not on this machine, for example in the submitted bundle).
-  3. docs/final/report_draft.md is exactly the template docs/final/report_draft.template.md filled from results.json
-     (no placeholder without a fact).
-  4. Every number token in report_draft.md, and in any text file given with --text (the report PDF or the slides
+  3. docs/final/report_draft.md and docs/final/slides_outline.md are exactly their templates filled from
+     results.json: no placeholder without a fact, no number typed by hand in a template, no code block.
+  4. Every number token in the two generated documents, and in any text file given with --text (the report PDF or the slides
      exported to text), equals a fact or constant of results.json at the precision shown. Dates, citations,
      identifiers such as H1 or v3, code spans and the References section are not numbers of the results.
   5. Report only (does not fail): which numbers used in the draft do not also appear in docs/final/RESULTS.md.
@@ -72,21 +72,31 @@ def main() -> int:
         problems += len(diff) + len(cdiff)
         print(f"{'ok ' if not diff and not cdiff else 'BAD'} 2 fresh collection: {len(diff) + len(cdiff)} of {len(fresh)} facts differ")
 
-    # 3. the draft is the rendered template
-    template = tn.TEMPLATE.read_text()
-    rendered, missing = tn.render(template, results)
-    for k in sorted(set(missing)):
-        print(f"MISMATCH placeholder without a fact: {k}")
-    problems += len(set(missing))
-    draft = tn.DRAFT.read_text() if tn.DRAFT.exists() else ""
-    if draft != rendered:
-        print("MISMATCH report_draft.md is not the rendered template (run scripts/render_report.py)")
-        problems += 1
-    else:
-        print(f"ok  3 report_draft.md = template filled from results.json ({len(tn.PLACEHOLDER.findall(template))} placeholders)")
+    # 3. each generated document is its rendered template; no hand-typed number in a template; no code block
+    used_keys: set[str] = set()
+    for template_path, out_path in tn.DOCS:
+        template = template_path.read_text()
+        rendered, missing = tn.render(template, results)
+        for k in sorted(set(missing)):
+            print(f"MISMATCH {template_path.name}: placeholder without a fact: {k}")
+        problems += len(set(missing))
+        typed = tn.number_tokens(tn.PLACEHOLDER.sub(" X ", template))
+        for t in typed:
+            print(f"MISMATCH {template_path.name}:{t['line']}: number {t['text']!r} typed by hand (use a placeholder)")
+        problems += len(typed)
+        if "```" in template:
+            print(f"MISMATCH {template_path.name}: holds a code block (the report must have none)")
+            problems += 1
+        text = out_path.read_text() if out_path.exists() else ""
+        if text != rendered:
+            print(f"MISMATCH {out_path.name} is not the rendered template (run scripts/render_report.py)")
+            problems += 1
+        else:
+            print(f"ok  3 {out_path.name} = {template_path.name} filled from results.json ({len(tn.PLACEHOLDER.findall(template))} placeholders, no typed number, no code block)")
+        used_keys |= {m.group(1) for m in tn.PLACEHOLDER.finditer(template)}
 
     # 4. number tokens
-    for path in [tn.DRAFT, *map(Path, args.text)]:
+    for path in [out for _, out in tn.DOCS] + list(map(Path, args.text)):
         text = Path(path).read_text(errors="replace")
         toks = tn.number_tokens(text)
         bad = tn.unmatched_tokens(text, results)
@@ -99,8 +109,8 @@ def main() -> int:
     rmd = (REPO / "docs" / "final" / "RESULTS.md").read_text()
     rtoks = tn.number_tokens(rmd)
     values = tn.all_values(results)
-    used = {m.group(1) for m in tn.PLACEHOLDER.finditer(template) if isinstance(values.get(m.group(1)), (int, float))
-            and not isinstance(values.get(m.group(1)), bool) and m.group(1) in results["facts"]}
+    used = {k for k in used_keys if isinstance(values.get(k), (int, float)) and not isinstance(values.get(k), bool)
+            and k in results["facts"]}
     absent = sorted(k for k in used if not any(tn.matches(t, float(values[k])) for t in rtoks))
     print(f"info 5 facts used in the draft: {len(used)}; not shown in RESULTS.md: {len(absent)}" + (": " + ", ".join(absent[:25]) if absent else ""))
 

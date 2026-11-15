@@ -4,7 +4,22 @@ Branch `final-lake` (local only; Scott pushes). Numbers live in `RESULTS.md`, ea
 
 Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are teammates' items. This build writes the extracts they need to `data/exports/` and documents them in `HANDOFF_TEAM.md`. Success = P0 + streaming algorithms + Structured Streaming + those exports.
 
-## Summary (2026-11-15, about 10:15 UTC / 2:15 AM PT): stop condition 1, success
+## Loop 2 summary (2026-11-15 13:10 UTC / 5:10 AM PT): observables 1 to 6 hold
+
+Goal of loop 2: make what is graded (report, slides, code bundle) correct by construction. Decisions for Scott: `docs/final/GATE_MON.md` only.
+
+1. `scripts/check_numbers.py` exits 0 with zero mismatches. `docs/final/results.json` (1,130 facts, 62 constants) is collected by `scripts/make_results.py` from the run records and tables and stamped with the commit hash; `report_draft.md` and `slides_outline.md` are templates filled from it.
+2. `scripts/check_evidence.py` exits 0: 14 rubric lines in `RUBRIC_EVIDENCE.md`, each with a runnable command, its output file and an executed notebook.
+3. Every rubric technique is built. New in `notebooks/fallback/` (built by Claude for Scott; teammate work wins): `lsh_minhash` (recall 96.11% against an exact join at 5 hash tables; precision 40 of 40 and 37 of 40 on labeled pairs), `privacy` (k-anonymity, l-diversity, suppression cost, Laplace noise at 3 epsilons), `moments_reservoir` (AMS and reservoir sampling over many seeds).
+4. `docs/final/report_draft.md`: IEEE-section skeleton, facts and tables only, no code, every number from `results.json`.
+5. `scripts/make_bundle.sh` builds `dist/` from a fresh clone; its output is in RESULTS.md ("Bundle").
+6. `docs/final/GATE_MON.md` lists 16 decisions with defaults.
+
+Found and fixed on the way: the not-reverted sample in `data/exports/lsh_edits.parquet` was not uniform (RESULTS.md, "Export fix"). Nothing was pushed in loop 2.
+
+Loop 2 commands: `python scripts/make_results.py`, `python scripts/render_report.py`, `python scripts/check_numbers.py`, `python scripts/check_evidence.py`, `python notebooks/fallback/make_fallback.py`, `bash scripts/make_bundle.sh` (all also run at the end of `bash etl/build_all.sh`, except the bundle).
+
+## Summary of loop 1 (2026-11-15, about 10:15 UTC / 2:15 AM PT): stop condition 1, success
 
 **Done.** All P0 items, both P1 items this build owns (streaming algorithms, Structured Streaming), the extracts for the LSH and privacy owners, and all P2 items. Everything ran on the real data on Scott's Mac. Every number below is in `RESULTS.md` with its command and table version.
 
@@ -26,10 +41,7 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 - Report and slides (Tingyu and all); LSH notebook (Wanru, input `data/exports/lsh_edits.parquet`); k-anonymity and Laplace noise (Zhenni, inputs in `data/exports/`). See `HANDOFF_TEAM.md`.
 - Shortcuts, stated: the lab's 75 Gold checks on made-up data were not ported into `tests_lake/test_gold.py`; the 30 real-data checks in `etl/gold_checks.py` replace them. Not built: OPTIMIZE/Z-order, `is_redirect`.
 
-**Questions for Scott (stop condition 3: a decision looks wrong)**
-1. ~~The 2026-10 History snapshot was not on the VPS.~~ Resolved: Scott downloaded the public files to `data/history_raw/2026-10/`; Phase 5 is built (RESULTS.md, "Second History snapshot 2026-10"). Note for the report: DECISIONS.md answer 3 (snapshot on the VPS) was not accurate.
-2. H4 needs a floor. This build uses 1% of pages. Confirm it or give another value.
-3. Commits use the author email scottn66@users.noreply.github.com (as the memory notes say for this repo). Your recent commits on main use your personal email. Change before pushing if you prefer.
+**Decisions for Scott.** Only in `docs/final/GATE_MON.md`, each with a default. (The three earlier questions moved there: the 2026-10 snapshot is resolved; the H4 floor and the commit email have logged defaults.)
 
 **How to rerun** (from the repository root on the Mac)
 1. Environment, once: `uv venv --python 3.12 .venv-lake && uv pip install --python .venv-lake/bin/python -r docs/delta_lake_handoff/requirements-lake.txt`; Java: `brew install openjdk@21` (`etl/spark_session.py` finds it).
@@ -59,3 +71,11 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 - [x] docs/final/RUBRIC_EVIDENCE.md
 - [x] docs/final/GENAI_LOG.md
 - [x] Gold mart extracts in data/exports/ (< 50 MB each, not committed)
+
+**Loop 2: submittable bundle**
+- [x] results.json + check_numbers.py (zero mismatches)
+- [x] RUBRIC_EVIDENCE.md with commands and outputs + check_evidence.py
+- [x] report_draft.md (and slides_outline.md) from results.json
+- [x] notebooks/fallback/: lsh_minhash, privacy, moments_reservoir, each with a .py copy
+- [x] scripts/make_bundle.sh, run once, output in RESULTS.md
+- [x] GATE_MON.md, AFTER_DUE.md

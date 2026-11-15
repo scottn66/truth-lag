@@ -19,7 +19,11 @@ It reads the current versions of the Gold tables (listed in `manifest.json`) and
 
 ## For Wanru: MinHash LSH on comments and titles
 
-File: `lsh_edits.parquet` (same rows in `lsh_edits.csv`). One row per edit. It holds every cohort edit reverted within 4 days (label 1) and, per cohort, a random sample of the same size of edits not reverted within 4 days (label 0, seed 226). The cohorts are `history` (Sep 8-10, labels from the 2026-09 dump) and `live_ext` (Oct 20 - Nov 8, labels from the stream).
+File: `lsh_edits.parquet` (same rows in `lsh_edits.csv`). One row per edit. It holds every cohort edit reverted within 4 days (label 1) and, per cohort, a uniform random sample of the same size of edits not reverted within 4 days (label 0, seed 226).
+
+**Changed on 2026-11-15 12:46 UTC:** the label-0 rows were re-drawn. The first version of this file (made about 10:10 UTC) under-sampled the latest edits (its editor-kind mix was off by up to 2 points). If you got the file before that time, take the new one; the schema and the label-1 rows are the same.
+
+A fallback version of this analysis exists in `notebooks/fallback/lsh_minhash.ipynb` (built with Claude Code for Scott). Your notebook wins: if it arrives, the report uses yours. You can reuse the fallback's cleaning and the labeled pairs in `notebooks/fallback/lsh_pair_labels.csv` (fill the `human_label` column to overrule a label). The cohorts are `history` (Sep 8-10, labels from the 2026-09 dump) and `live_ext` (Oct 20 - Nov 8, labels from the stream).
 
 | Column | Type | Meaning |
 | --- | --- | --- |
@@ -41,6 +45,8 @@ File: `lsh_edits.parquet` (same rows in `lsh_edits.csv`). One row per edit. It h
 Suggested use: shingle `comment` (or `page_title + comment`), run `pyspark.ml.feature.MinHashLSH`, and check precision on a hand-labeled sample of at least 30 candidate pairs. `label` lets you ask whether near-duplicate groups are mostly reverted edits.
 
 ## For Zhenni: k-anonymity and Laplace noise
+
+A fallback version of this analysis exists in `notebooks/fallback/privacy.ipynb` (built with Claude Code for Scott). Your notebook wins: if it arrives, the report uses yours.
 
 | File | One row per | Columns | Use |
 | --- | --- | --- | --- |

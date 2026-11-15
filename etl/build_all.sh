@@ -48,5 +48,9 @@ if [ "${SKIP_EXTRAS:-0}" != "1" ]; then
   step exports;         $PY -m etl.exports > /dev/null
   step figures;         $PY -m etl.figures
   step notebooks;       $PY notebooks/final/make_notebooks.py
+  step fallback notebooks; $PY notebooks/fallback/make_fallback.py
+  step results.json;    $PY scripts/make_results.py && $PY scripts/render_report.py
+  step number check;    $PY scripts/check_numbers.py
+  step evidence check;  $PY scripts/check_evidence.py || true     # dist/MANIFEST.txt exists only after scripts/make_bundle.sh
 fi
 step done
