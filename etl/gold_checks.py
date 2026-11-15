@@ -49,7 +49,9 @@ def run(out_path: str | None = None) -> dict:
         check(f"fact_edit {c} rows by user_kind", got, want)
     # E(L) curve, all editors
     curve = {}
-    for r in q("SELECT cohort_id, wait_label, n_known, n_eventual, e_l FROM delta.`{G}/mart_el_curve` WHERE user_kind = 'all'"):
+    # the published series: history with dump labels, live and live_ext with stream labels
+    for r in q("""SELECT cohort_id, wait_label, n_known, n_eventual, e_l FROM delta.`{G}/mart_el_curve`
+                  WHERE user_kind = 'all' AND label_source = CASE WHEN cohort_id = 'history' THEN 'dump' ELSE 'stream' END"""):
         curve.setdefault(r["cohort_id"], {})[r["wait_label"]] = (r["n_known"], r["n_eventual"], r["e_l"])
     for c, want in EXPECTED_KNOWN.items():
         check(f"mart_el_curve {c} known by wait (all editors)", {k: curve[c][k][0] for k in want}, want)
@@ -58,7 +60,8 @@ def run(out_path: str | None = None) -> dict:
     check("live share known at 1 h = 57.95%", round(100 * curve["live"]["1 h"][0] / curve["live"]["1 h"][1], 2), 57.95)
     # by kind at 1 h
     for (c, k), want in EXPECTED_KIND_1H.items():
-        r = q(f"SELECT n_known, n_eventual FROM delta.`{{G}}/mart_el_curve` WHERE cohort_id = '{c}' AND user_kind = '{k}' AND wait_label = '1 h'")[0]
+        src = "dump" if c == "history" else "stream"
+        r = q(f"SELECT n_known, n_eventual FROM delta.`{{G}}/mart_el_curve` WHERE cohort_id = '{c}' AND label_source = '{src}' AND user_kind = '{k}' AND wait_label = '1 h'")[0]
         check(f"mart_el_curve {c} {k} at 1 h (known, eventual)", (r["n_known"], r["n_eventual"]), want)
     # burst groups: revisions per group
     for c, want in EXPECTED_BURST_REVS.items():
@@ -66,7 +69,8 @@ def run(out_path: str | None = None) -> dict:
                     count_if(page_edits_prev_1h BETWEEN 2 AND 4) c, count_if(page_edits_prev_1h BETWEEN 5 AND 9) d,
                     count_if(page_edits_prev_1h >= 10) e FROM delta.`{{G}}/fact_edit` WHERE cohort_id = '{c}'""")[0]
         check(f"fact_edit {c} revisions per burst group (0,1,2-4,5-9,10+)", list(got), want)
-        r = q(f"SELECT n_eventual FROM delta.`{{G}}/mart_el_by_burst` WHERE cohort_id = '{c}' AND burst_group = '10+' AND wait_label = '1 h'")[0]
+        src = "dump" if c == "history" else "stream"
+        r = q(f"SELECT n_eventual FROM delta.`{{G}}/mart_el_by_burst` WHERE cohort_id = '{c}' AND label_source = '{src}' AND burst_group = '10+' AND wait_label = '1 h'")[0]
         check(f"mart_el_by_burst {c} eventual reverts in 10+", r["n_eventual"], EXPECTED_BURST_10_REVERTS[c])
     # dim_page integrity
     check("dim_page: pages without exactly one current row",
@@ -83,7 +87,8 @@ def run(out_path: str | None = None) -> dict:
                GROUP BY f.cohort_id, f.rev_id) WHERE k <> 1""")[0]["n"], 0)
     # delta-rs reads every Gold table with the same row counts
     for t in ["dim_cohort", "dim_snapshot", "dim_time", "dim_user", "dim_page", "fact_edit", "fact_revert_label",
-              "mart_el_curve", "mart_el_by_burst"]:
+              "mart_el_curve", "mart_el_by_burst"] + [t for t in ("mart_label_change", "mart_reconciliation", "recon_mismatch")
+                                                       if (lake_config.lake_root() / "gold" / t / "_delta_log").is_dir()]:
         spark_n = q(f"SELECT count(*) n FROM delta.`{{G}}/{t}`")[0]["n"]
         rs = DeltaTable(f"{G}/{t}")
         rs_n = sum(a.num_rows for a in rs.to_pyarrow_dataset().to_batches(columns=[rs.schema().to_arrow().names[0]]))

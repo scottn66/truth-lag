@@ -22,14 +22,14 @@ COLS = {"Sources": "#e8e8e8", "Bronze": "#e9c99b", "Silver": "#d5d9de", "Gold": 
 
 def flow() -> None:
     lanes = [
-        ("Sources", ["EventStreams capture (VPS)\npage_change, revert_risk, tags", "MediaWiki History dump\nsnapshot 2026-09 (filtered)"]),
+        ("Sources", ["EventStreams capture (VPS)\npage_change, revert_risk, tags", "MediaWiki History dumps\n2026-09 and 2026-10"]),
         ("Bronze", ["page_change_events 4.87 M", "revert_risk_events 3.11 M", "tags_events 4.34 M",
-                    "history_slim 5.27 M\nhistory_full 0.30 M"]),
+                    "history_slim 15.9 M\nhistory_full 0.30 M"]),
         ("Silver", ["page_change, revert_risk,\ntag_events, capture_gaps", "history_slim, history_revisions,\nhistory_revert_links",
                     "live_*, late_reverts, live_ext_*\n(rebuilt per as_of)"]),
-        ("Gold", ["dim_cohort, dim_snapshot,\ndim_time, dim_user", "dim_page (SCD Type 2)", "fact_edit, fact_revert_label\n(Change Data Feed)",
-                  "mart_el_curve,\nmart_el_by_burst"]),
-        ("Analyses", ["H1, H3, H4\n(bootstrap intervals)", "time travel: then vs now", "streaming algorithms\nHLL, FM, Bloom, DGIM",
+        ("Gold", ["dim_cohort, dim_snapshot,\ndim_time, dim_user", "dim_page (SCD Type 2)", "fact_edit, fact_revert_label\n(CDF; 1 commit per snapshot)",
+                  "E(L) marts, label changes,\nreconciliation"]),
+        ("Analyses", ["H1, H3, H4\n(bootstrap intervals)", "time travel: then vs now\n(snapshot and as_of axes)", "streaming algorithms\nHLL, FM, Bloom, DGIM",
                       "Structured Streaming\nreplay (E5)", "data/exports\n(LSH, privacy, charts)"]),
     ]
     sub = {"Sources": "", "Bronze": "delta-rs, append-only", "Silver": "delta-rs + EC HW2 rules", "Gold": "Spark SQL, MERGE",
@@ -67,13 +67,16 @@ def el_curve() -> None:
     df = DeltaTable(str(lake_config.lake_root() / "gold" / "mart_el_curve")).to_pandas()
     df = df[df.user_kind == "all"].sort_values("wait_s")
     fig, ax = plt.subplots(figsize=(7.5, 4.4), dpi=120)
-    names = {"history": "history (Sep 8-10, dump labels)", "live": "live (Oct 20-22, stream)",
-             "live_ext": "live_ext (Oct 20 - Nov 8, stream)"}
-    for c, style in (("history", "o-"), ("live", "s-"), ("live_ext", "^--")):
-        g = df[df.cohort_id == c]
-        ax.plot(range(len(g)), g.e_l, style, label=f"{names[c]}, n = {int(g.n_eventual.iloc[0]):,}")
+    names = {("history", "dump"): "history (Sep 8-10), dump labels", ("live", "stream"): "live (Oct 20-22), stream labels",
+             ("live", "dump"): "live (Oct 20-22), 2026-10 dump labels", ("live_ext", "stream"): "live_ext (Oct 20 - Nov 8), stream"}
+    for (c, src), style in ((("history", "dump"), "o-"), (("live", "stream"), "s-"), (("live", "dump"), "s:"),
+                            (("live_ext", "stream"), "^--")):
+        g = df[(df.cohort_id == c) & (df.label_source == src)]
+        if g.empty:
+            continue
+        ax.plot(range(len(g)), g.e_l, style, label=f"{names[(c, src)]}, n = {int(g.n_eventual.iloc[0]):,}")
     ax.set_xticks(range(9))
-    ax.set_xticklabels(df[df.cohort_id == "live"].wait_label)
+    ax.set_xticklabels(df[(df.cohort_id == "live") & (df.label_source == "stream")].wait_label)
     ax.set_xlabel("wait L after the edit")
     ax.set_ylabel("E(L): share of eventual reverts not yet known")
     ax.grid(alpha=0.3)

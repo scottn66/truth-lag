@@ -9,6 +9,8 @@
   page_revert_summary_top.csv  the same for pages with >= 5 edits (CSV for MongoDB Charts / slides)
   hypotheses_h1.csv, hypotheses_h3.csv, h4.json   the hypothesis tables
   daily_counts.csv             Bronze and Silver rows per stream and event date
+  mart_reconciliation.csv      live cohort: stream label vs the 2026-10 dump label, five classes
+  label_change_by_class.csv    revisions whose dump label changed between snapshot 2026-09 and 2026-10, by class
   manifest.json                versions, row counts, sizes and SHA-256 of every file
 
 Human editors appear only as pseudonyms (ec-hw2/ingest/build_documents.public_name); bots keep their names.
@@ -140,6 +142,15 @@ def main() -> None:
     top.to_csv(OUT / "page_revert_summary_top.csv", index=False)
     files["page_revert_summary.parquet"] = len(p)
     files["page_revert_summary_top.csv"] = len(top)
+
+    # ---- second snapshot: reconciliation and label changes (when the 2026-10 load exists) ----
+    if (root / "gold" / "mart_reconciliation" / "_delta_log").is_dir():
+        r = spark.sql(f"SELECT * FROM delta.`{G}/mart_reconciliation` ORDER BY cohort_id, snapshot, recon_class").toPandas()
+        r.to_csv(OUT / "mart_reconciliation.csv", index=False)
+        c = spark.sql(f"""SELECT from_snapshot, to_snapshot, change_class, count(*) AS revisions
+                          FROM delta.`{G}/mart_label_change` GROUP BY 1, 2, 3 ORDER BY 1, 2, 3""").toPandas()
+        c.to_csv(OUT / "label_change_by_class.csv", index=False)
+        files.update({"mart_reconciliation.csv": len(r), "label_change_by_class.csv": len(c)})
 
     # ---- hypotheses and daily counts ----
     hyp = json.loads((root / "_runs" / "hypotheses.json").read_text())

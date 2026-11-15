@@ -370,3 +370,87 @@ Command: `SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e` (log `data/logs/lak
 | Time travel (fact_edit v1, v2, v3 known reverts) | identical |
 
 The rebuild folder was deleted afterwards to free 5.7 GB; the command above recreates it.
+
+## Second History snapshot 2026-10: filter, load, label changes, reconciliation (2026-11-15 10:39-10:50 UTC)
+
+Input: the public month files of snapshot 2026-10, downloaded by Scott to `data/history_raw/2026-10/` (Last-Modified 2026-11-04 20:19-21:28 GMT, `LAST_MODIFIED.txt`). This answers blocker 1 of STATUS.md.
+
+### Filter (`python -m etl.history_slim <file>`)
+
+Local cut to the 12 slim columns, modeled on `ingest/vps/filter_history.py`: keep `event_entity = 'revision'`, stop on any row without 78 fields, only an empty field becomes null, write `.tmp` then rename, refuse `data/history/` and any existing output. Tests: `tests_lake/test_history_slim.py`, 3 passed. Attempt 1 wrote correct files but failed on the stats line (a relative path); the three outputs were deleted and attempt 2 ran clean.
+
+| Month file | bz2 size | Rows in (page / revision / user) | Revision rows out | Slim Parquet | Seconds |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10.enwiki.2026-09.tsv.bz2 | 557,770,750 | 6,369,591 (646,922 / 5,266,819 / 455,850) | 5,266,819 | 102,193,721 B | 39.8 |
+| 2026-10.enwiki.2026-10.tsv.bz2 | 573,546,947 | 6,560,727 (720,361 / 5,344,733 / 495,633) | 5,344,733 | 103,567,804 B | 40.8 |
+| 2026-10.enwiki.2026-11.tsv.bz2 | 1,301,790 | 16,131 (1,234 / 14,028 / 869) | 14,028 | 265,564 B | 0.1 |
+
+No row had other than 78 fields. The September file of snapshot 2026-10 holds 5,266,819 revisions, 24 fewer than the same month in snapshot 2026-09 (5,266,843).
+
+### Bronze and Silver (`python -m etl.history bronze --snapshot 2026-10`, then `silver --snapshot 2026-10`)
+
+`bronze/history_slim` v12-v34: 3 files appended (5,266,819 + 5,344,733 + 14,028 rows; each file's row count equals its highest source_row), 8 s. `silver/history_slim` v2: 10,625,580 typed rows in partition `snapshot = 2026-10`, 20 s.
+
+### Gold (`python -m etl.gold_run --as-of 2026-11-13T23:59:59.999999Z --snapshot 2026-10 --steps ddl,dims,labels,label_change,recon,marts`, 68 s)
+
+| Table | Version | Change |
+| --- | --- | --- |
+| gold/dim_snapshot | v3 | column `snapshot_published_at` added (v2), row 2026-10 inserted: cutoff 2026-11-01 01:30:05 (newest revision of the 2026-11 file), published 2026-11-04 21:28:39 UTC, 10,625,580 revisions. Row 2026-09: cutoff 2026-10-01 01:38:27, published unknown |
+| gold/fact_revert_label | v2 | ONE MERGE commit, 10.5 s: 5,358,769 revisions inserted, 40,721 labels updated (10,625,612 rows) |
+| gold/mart_label_change | v1 | 40,721 rows from the change feed of v2 |
+| gold/mart_reconciliation | v1 | live cohort vs 2026-10, 5 classes |
+| gold/recon_mismatch | v1 | 391 rows (stream_only + dump_only + not_in_dump) |
+| gold/mart_el_curve, mart_el_by_burst | v3 | new series: live cohort with dump labels |
+
+A re-run of either snapshot load (`--snapshot 2026-09` and `--snapshot 2026-10`, `--steps dims,labels,label_change`) wrote no commit in any table. `python -m etl.gold_checks`: 33 of 33 passed (the 30 earlier checks plus delta-rs read-back of the 3 new marts).
+
+### Phase 5 checks (`python -m etl.snapshot_checks`, output `data/lake/_runs/snapshot_checks.json`)
+
+| Check | Expected | Got |
+| --- | --- | --- |
+| History cohort at the 2026-09 load (fact_revert_label v1): reverted / within 20 d / within 4 d | 19,858 / 19,700 / 17,646 | 19,858 / 19,700 / 17,646 |
+| History cohort at the 2026-10 load (v2): reverted / within 20 d / within 4 d | (new) | 20,925 / 19,695 / 17,641 |
+| Change feed of v2: update pre-images = post-images = mart_label_change rows | equal | 40,721 = 40,721 = 40,721 |
+| Label changes by class (all namespaces) | (new) | became_reverted 40,683; became_unreverted 36; reverter or time changed 2 |
+| Label changes among history-cohort revisions | (new) | became_reverted 1,072; became_unreverted 5; other 1 |
+| Live revisions with less than 4 days before the 2026-10 cutoff | report | 0 of 279,466 (live_ext: 1,560,837 of 2,397,738, so live_ext is not reconciled) |
+| EC HW2 cross-check: `late_reverts` class exact (published 2,970) shown as became_reverted | high share | 2,967 of 2,970 (99.9%); method_unknown 1,122 of 1,182; inexact_undo 2 of 198 (an inexact undo is not an identity revert in the dump) |
+
+Reconciliation of the live cohort (Oct 20-22, stream label = a covering exact revert within 4 days, seen in the stream) with the 2026-10 dump label (identity-reverted within 4 days), `gold/mart_reconciliation` v1, label version 2:
+
+| Class | Revisions | Share |
+| --- | --- | --- |
+| both_reverted | 17,752 | 6.352% |
+| dump_only | 325 | 0.116% |
+| neither | 261,323 | 93.508% |
+| not_in_dump | 0 | 0.000% |
+| stream_only | 66 | 0.024% |
+
+Agreement 279,075 of 279,466 = 99.86%. Of the dump's 18,077 reverts the stream found 98.2%; of the stream's 17,818 the dump confirms 99.6%. Median time to revert in the dump: 106,870 s for the dump-only cases; the stream-only cases have a median stream T of 929 s and, where the dump reverts them later, a median dump T of 431,291 s (beyond 4 days).
+
+E(L) of the live cohort with the two label sources, `gold/mart_el_curve` v3, all editors:
+
+| Wait | Stream: known of 17,818 | Stream E(L) | 2026-10 dump: known of 18,077 | Dump E(L) |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 1.0000 | 0 | 1.0000 |
+| 1 min | 3,986 | 0.7763 | 4,186 | 0.7684 |
+| 5 min | 6,958 | 0.6095 | 6,994 | 0.6131 |
+| 15 min | 8,398 | 0.5287 | 8,427 | 0.5338 |
+| 1 h | 10,326 | 0.4205 | 10,365 | 0.4266 |
+| 6 h | 13,405 | 0.2477 | 13,470 | 0.2549 |
+| 1 d | 15,936 | 0.1056 | 16,028 | 0.1133 |
+| 2 d | 16,699 | 0.0628 | 16,843 | 0.0683 |
+| 4 d | 17,818 | 0.0000 | 18,077 | 0.0000 |
+
+The dump series uses T only (no stream delay K): it is when the reverting edit was saved, not when a subscriber could know it.
+
+### Time travel on the snapshot axis (restored `etl/sql/80_time_travel_then_and_now.sql`)
+
+Command: `python -m etl.time_travel` (output `data/lake/_runs/time_travel.json`; it also re-runs the as_of demo, now `etl/sql/81_time_travel_as_of.sql`, with unchanged results). fact_revert_label versions found by commit metadata `snapshot`: {'2026-09': 1, '2026-10': 2}.
+
+| Snapshot loaded | fact_revert_label version | History-cohort revisions reverted as known then | Reverted now |
+| --- | --- | --- | --- |
+| 2026-09 | v1 | 19,858 | 20,925 |
+| 2026-10 | v2 | 20,925 | 20,925 |
+
+The "then" value at the 2026-09 load is 19,858, as the plan requires. The second snapshot adds 1,067 reverted history-cohort revisions (reverts made after the 2026-09 cutoff), while the within-4-day count barely moves (17,646 to 17,641: 5 labels became unreverted).

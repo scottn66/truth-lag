@@ -77,7 +77,7 @@ dp[dp.page_id == pid].sort_values('valid_from')
 
 
 el = table('gold/mart_el_curve')
-el[el.user_kind == 'all'].pivot_table(index=['wait_s', 'wait_label'], columns='cohort_id', values='e_l').round(4)
+el[el.user_kind == 'all'].pivot_table(index=['wait_s', 'wait_label'], columns=['cohort_id', 'label_source'], values='e_l').round(4)
 
 
 # ## E(L) at 1 h by editor kind (kind at edit time); small groups flagged
@@ -85,7 +85,7 @@ el[el.user_kind == 'all'].pivot_table(index=['wait_s', 'wait_label'], columns='c
 # In[7]:
 
 
-el[el.wait_label == '1 h'][['cohort_id', 'user_kind', 'n_eventual', 'n_known', 'e_l', 'small_group']].sort_values(['cohort_id', 'user_kind'])
+el[el.wait_label == '1 h'][['cohort_id', 'label_source', 'user_kind', 'n_eventual', 'n_known', 'e_l', 'small_group']].sort_values(['cohort_id', 'label_source', 'user_kind'])
 
 
 # ## Figure

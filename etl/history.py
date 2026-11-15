@@ -15,7 +15,7 @@ Purpose
        for the late_reverts step of the stream cohort build.
 
 Run
-    python -m etl.history bronze | silver | cohort | all
+    python -m etl.history bronze | silver | cohort | all  [--snapshot 2026-10]
 """
 from __future__ import annotations
 
@@ -63,9 +63,20 @@ def _micro(schema: pa.Schema) -> pa.Schema:
 
 
 # ---------------------------------------------------------------- Bronze
-def bronze_history(lake=None, snapshot: str = SNAPSHOT, dump_month: str = DUMP_MONTH) -> dict:
+def snapshot_files(snapshot: str) -> list[tuple[str, Path, str]]:
+    """(table, source file, dump_month) for one snapshot. 2026-09: the VPS-filtered files in data/history/.
+    Later snapshots: the slim files that etl/history_slim.py wrote to data/history_slim/<snapshot>/."""
+    if snapshot == SNAPSHOT:
+        return [(name, src, DUMP_MONTH) for name, src in BRONZE_FILES.items()]
+    files = sorted((lake_config.HISTORY_SLIM_DIR / snapshot).glob("*_rev_all_*_slim.parquet"))
+    if not files:
+        raise SystemExit(f"no slim files in {lake_config.HISTORY_SLIM_DIR / snapshot}; run python -m etl.history_slim first")
+    return [("bronze/history_slim", f, f.name.split("_rev_all_")[1].split("_slim")[0]) for f in files]
+
+
+def bronze_history(lake=None, snapshot: str = SNAPSHOT) -> dict:
     out = {}
-    for name, src in BRONZE_FILES.items():
+    for name, src, dump_month in snapshot_files(snapshot):
         t0 = time.time()
         pf = pq.ParquetFile(src)
         src_schema = pf.schema_arrow
@@ -101,10 +112,10 @@ def bronze_history(lake=None, snapshot: str = SNAPSHOT, dump_month: str = DUMP_M
             commits.append(v)
             rows += m
         total = delta_io.sql(DeltaTable(path), f"SELECT count(*) AS n, max(source_row) AS m FROM t WHERE source_file = '{rel}'")
-        out[name] = {"source_file": rel, "file_rows": pf.metadata.num_rows, "new_rows": rows, "commits": commits,
+        out[f"{name} <- {rel}"] = {"source_file": rel, "dump_month": dump_month, "file_rows": pf.metadata.num_rows, "new_rows": rows, "commits": commits,
                      "table_rows_for_file": total.column("n")[0].as_py(), "max_source_row": total.column("m")[0].as_py(),
                      "version": delta_io.version(path), "seconds": round(time.time() - t0, 1)}
-        log.info("%s: %s", name, out[name])
+        log.info("%s <- %s: %s", name, rel, out[f"{name} <- {rel}"])
     return out
 
 
@@ -181,14 +192,15 @@ def main(argv=None) -> None:
     ap = argparse.ArgumentParser(prog="python -m etl.history")
     ap.add_argument("step", choices=["bronze", "silver", "cohort", "all"])
     ap.add_argument("--lake", default=None)
+    ap.add_argument("--snapshot", default=SNAPSHOT, help="2026-09 (data/history) or a later one (data/history_slim/<snapshot>)")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s", stream=sys.stdout)
     res = {}
     if args.step in ("bronze", "all"):
-        res["bronze"] = bronze_history(args.lake)
+        res["bronze"] = bronze_history(args.lake, args.snapshot)
     if args.step in ("silver", "all"):
-        res["silver_slim"] = build_silver_slim(args.lake)
-    if args.step in ("cohort", "all"):
+        res["silver_slim"] = build_silver_slim(args.lake, args.snapshot)
+    if args.step in ("cohort", "all") and args.snapshot == SNAPSHOT:      # the history cohort is built from 2026-09 only
         res["cohort"] = build_history_cohort(args.lake)
     print(json.dumps(res, indent=2, default=str))
 

@@ -15,7 +15,8 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 - H1: not falsified on the October cohort (57.95% < 60%, 93.72% < 95%, intervals below both). Borderline at 48 h on the longer window (95.07%, CI 94.72-95.37).
 - H3: falsified. At 1 h, burst edits' reverts become known *faster* (E(1 h) 0.23-0.35 for bursts vs 0.42-0.45 for the rest; intervals apart in history and live_ext); at 1 d the intervals overlap.
 - H4: small effect. 0.3-0.6% of pages and 0.5-1.1% of title keys change; falsified at a 1% floor (the floor is our choice; see question 2).
-- Time travel: fact_edit v1 (as_of Oct 24) knew 17,040 live reverts; v2 (Oct 27) knew 17,818. The change feed holds exactly the 778 updates in between.
+- Time travel on two axes. Snapshots: fact_revert_label v1 (2026-09 load) knew 19,858 reverted history-cohort revisions; v2 (2026-10 load) knows 20,925. Stream as_of: fact_edit v1 (Oct 24) knew 17,040 live reverts; v2 (Oct 27) knew 17,818. Each change feed holds exactly the updates in between (40,721 and 778).
+- Second History snapshot (2026-10, added later on 2026-11-15): filtered locally (10,625,580 revisions, no malformed row), loaded as one MERGE commit (40,721 labels changed, 40,683 of them became reverted). The 2026-10 dump confirms 2,967 of the 2,970 late reverts that EC HW2 found in the stream. Live cohort vs dump: 99.86% agreement (17,752 both, 66 stream only, 325 dump only); E(1 h) 0.4205 with stream labels, 0.4266 with dump labels.
 - Streaming algorithms: HLL p = 14 in 12 KB gives -0.30% mean error (5 salts) on 2,153,428 distinct pages. The Bloom filter finds all 4 real repeats with no false negative. DGIM stays within its bound wiki-wide.
 - Structured Streaming: p95 latency 3.30 s at 2,500 events/s and 4.07 s at 10,000/s; it first passes 5 s at 20,000/s (5.22 s). The drain runs at 16,615 events/s, and the streamed rows equal batch Silver.
 
@@ -23,19 +24,18 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 
 **Not done / left for others**
 - Report and slides (Tingyu and all); LSH notebook (Wanru, input `data/exports/lsh_edits.parquet`); k-anonymity and Laplace noise (Zhenni, inputs in `data/exports/`). See `HANDOFF_TEAM.md`.
-- Phase 5 of the plan (second History snapshot, reconciliation, label-change mart): **blocked**, no 2026-10 snapshot (question 1).
 - Shortcuts, stated: the lab's 75 Gold checks on made-up data were not ported into `tests_lake/test_gold.py`; the 30 real-data checks in `etl/gold_checks.py` replace them. Not built: OPTIMIZE/Z-order, `is_redirect`.
 
 **Questions for Scott (stop condition 3: a decision looks wrong)**
-1. DECISIONS.md, answer 3, says the 2026-10 History snapshot is on the VPS. It is not. `/opt/truthlag/data/history/` holds only the 2026-09 files (checked read-only on 2026-11-15), and no `2026-10.enwiki*` file exists anywhere on the VPS disk. The fixed decisions forbid a fresh download, so nothing was downloaded. Options: (a) state the reconciliation as future work (current state); (b) allow a download from dumps.wikimedia.org to `data/history_raw/2026-10/` and build Phase 5 (about 4 hours by the plan's estimate).
+1. ~~The 2026-10 History snapshot was not on the VPS.~~ Resolved: Scott downloaded the public files to `data/history_raw/2026-10/`; Phase 5 is built (RESULTS.md, "Second History snapshot 2026-10"). Note for the report: DECISIONS.md answer 3 (snapshot on the VPS) was not accurate.
 2. H4 needs a floor. This build uses 1% of pages. Confirm it or give another value.
 3. Commits use the author email scottn66@users.noreply.github.com (as the memory notes say for this repo). Your recent commits on main use your personal email. Change before pushing if you prefer.
 
 **How to rerun** (from the repository root on the Mac)
 1. Environment, once: `uv venv --python 3.12 .venv-lake && uv pip install --python .venv-lake/bin/python -r docs/delta_lake_handoff/requirements-lake.txt`; Java: `brew install openjdk@21` (`etl/spark_session.py` finds it).
 2. Data: `rsync -az --partial vps-coin:/opt/truthlag/data/raw/ data/raw/` (never `--delete`); `data/parity_ref/` must hold the copy of `data/parsed` and `data/tables` (SHA-256 list in `data/parity_ref/SHA256SUMS.txt`).
-3. Everything: `bash etl/build_all.sh` (lake in `data/lake/`). Or a fresh folder: `SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e` (core build and checks only).
-4. Tests: `TRUTHLAG_HW2_DIR=$PWD/ec-hw2 .venv-lake/bin/python -m pytest tests_lake/test_parity.py ec-hw2/tests/test_history.py ec-hw2/tests/test_stream.py -q -p no:cacheprovider` (46 passed).
+3. Everything: `bash etl/build_all.sh` (lake in `data/lake/`; it includes the 2026-10 snapshot steps when `data/history_raw/2026-10/*.tsv.bz2` exist, and runs the filter only for missing slim files). Or a fresh folder: `SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e` (core build and checks only).
+4. Tests: `TRUTHLAG_HW2_DIR=$PWD/ec-hw2 .venv-lake/bin/python -m pytest tests_lake/test_parity.py ec-hw2/tests/test_history.py ec-hw2/tests/test_stream.py -q -p no:cacheprovider` plus `tests_lake/test_history_slim.py` (49 passed).
 
 ## Work queue
 
@@ -46,6 +46,7 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 - [x] Gold: star schema, dim_page SCD2 (page_key MERGE), fact_edit, fact_revert_label, mart_el_curve; 57.95% at 1 h reproduced, then extended to Nov 13
 - [x] Hypotheses H1, H3, H4 with numbers and verdicts
 - [x] Time travel "then vs now" (80_time_travel_then_and_now.sql)
+- [x] Phase 5, second History snapshot 2026-10: local filter, Bronze/Silver load, label MERGE + change feed mart, reconciliation, snapshot-axis time travel (80) restored, as_of demo kept (81)
 
 **P1: course techniques**
 - [x] Streaming algorithms: FM/HLL distinct editors and pages, Bloom filter on meta_id, DGIM reverts per page per hour; error and memory vs exact

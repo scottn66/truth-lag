@@ -64,5 +64,5 @@ print('history_revisions rows with page_title != page_title_historical:', h['H4'
 
 
 b = table('gold/mart_el_by_burst')
-b[b.wait_label.isin(['1 h', '1 d'])].pivot_table(index=['cohort_id', 'burst_group'], columns='wait_label', values=['n_eventual', 'e_l']).round(4)
+b[b.wait_label.isin(['1 h', '1 d'])].pivot_table(index=['cohort_id', 'label_source', 'burst_group'], columns='wait_label', values=['n_eventual', 'e_l']).round(4)
 

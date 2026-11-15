@@ -50,7 +50,7 @@ Suggested use: shingle `comment` (or `page_title + comment`), run `pyspark.ml.fe
 | `page_revert_summary.parquet` | cohort, page | cohort_id, page_id, current_title, namespace, edits, distinct_editors, reverted_4d, reverts_known_1h, burst_edits | Page-level release: rows with `distinct_editors < k` could single out an editor. Suppress or generalize them. |
 | `page_revert_summary_top.csv` | same, pages with 5 or more edits | same | Smaller CSV of the same table, for MongoDB Charts. |
 
-Notes: `cohort_id` in the marts and grids is `history`, `live` (Oct 20-22, the published cohort) or `live_ext` (Oct 20 - Nov 8, which contains `live`). Do not add `live` and `live_ext` together.
+Notes: `cohort_id` in the marts and grids is `history`, `live` (Oct 20-22, the published cohort) or `live_ext` (Oct 20 - Nov 8, which contains `live`). Do not add `live` and `live_ext` together. `label_source` is `stream` or `dump`; the `live` cohort has both (dump = History snapshot 2026-10). Pick one source per series.
 
 ## For charts and slides
 
@@ -60,10 +60,12 @@ Notes: `cohort_id` in the marts and grids is `history`, `live` (Oct 20-22, the p
 | `hypotheses_h3.csv` | H3 E(L) burst vs rest at 1 h and 1 d with intervals |
 | `hypotheses_h4.json` | H4 counts and shares |
 | `daily_counts.csv` | Bronze and Silver rows per stream and event date |
+| `mart_reconciliation.csv` | Live cohort (Oct 20-22): stream label vs the 2026-10 History dump label, five classes with counts and shares |
+| `label_change_by_class.csv` | Revisions whose dump label changed between snapshot 2026-09 and 2026-10, by class |
 | `mart_el_curve.csv` | E(L) curve (see above) |
 
 Figures already drawn: `docs/final/figures/flow.png` (data flow) and `docs/final/figures/el_curve.png` (E(L) curves).
 
 ## Lake versions behind this hand-off
 
-See `data/exports/manifest.json` (`lake_versions`). At the time of writing: gold/fact_edit v3, gold/dim_page v3, gold/fact_revert_label v1, gold/mart_el_curve v2, gold/mart_el_by_burst v2, silver/live_ext_revisions v1. Built at as_of 2026-11-13T23:59:59.999999Z.
+See `data/exports/manifest.json` (`lake_versions`). At the time of writing: gold/fact_edit v3, gold/dim_page v3, gold/fact_revert_label v2 (snapshot 2026-10 loaded), gold/mart_el_curve v3, gold/mart_el_by_burst v3, silver/live_ext_revisions v1. Built at as_of 2026-11-13T23:59:59.999999Z.

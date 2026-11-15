@@ -34,7 +34,8 @@ SAFE_VALUE = re.compile(r"^[A-Za-z0-9_ :./\-]*$")
 METRIC_KEYS = ["numTargetRowsInserted", "numTargetRowsUpdated", "numTargetRowsDeleted", "numOutputRows",
                "numTargetRowsCopied", "numSourceRows", "executionTimeMs"]
 TABLES = ["dim_cohort", "dim_snapshot", "dim_time", "dim_user", "dim_page", "fact_edit", "fact_revert_label",
-          "mart_el_curve", "mart_el_by_burst"]
+          "mart_el_curve", "mart_el_by_burst", "mart_label_change", "mart_reconciliation", "recon_mismatch"]
+RECON_COHORTS = ["live"]      # live_ext edits after Oct 28 have less than 4 days before the 2026-10 cutoff
 STEPS: list[dict] = []
 
 
@@ -154,6 +155,27 @@ def one(spark, sql: str):
     return spark.sql(PLACEHOLDER.sub(lambda m: str(BASE[m.group(1)]), sql)).first()[0]
 
 
+def snapshot_meta(spark, snapshot: str) -> dict:
+    """Cutoff and published time of a snapshot. 2026-09: config.HISTORY_DUMP_LAST_REVISION, published unknown.
+    Later: the newest revision time in the snapshot (its YYYY-MM+1 file holds the first hours of the next month) and
+    the newest Last-Modified in data/history_raw/<snapshot>/LAST_MODIFIED.txt."""
+    if snapshot == "2026-09":
+        return {"snapshot_cutoff": sql_ts(config.HISTORY_DUMP_LAST_REVISION), "snapshot_published_at": ""}
+    cut = spark.sql(f"SELECT max(event_timestamp) m FROM delta.`{BASE['silver']}/history_slim` WHERE snapshot = '{snapshot}'").first()["m"]
+    pub = ""
+    lm = lake_config.HISTORY_RAW_DIR / snapshot / "LAST_MODIFIED.txt"
+    if lm.exists():
+        from email.utils import parsedate_to_datetime
+        times = [parsedate_to_datetime(ln.split("Last-Modified:", 1)[1].strip()) for ln in lm.read_text().splitlines()
+                 if "Last-Modified:" in ln]
+        pub = sql_ts(max(times)) if times else ""
+    return {"snapshot_cutoff": sql_ts(cut.replace(tzinfo=timezone.utc)), "snapshot_published_at": pub}
+
+
+def label_version(spark, snapshot: str) -> int:
+    return find_version(spark, f"{BASE['gold']}/fact_revert_label", step="fact_revert_label", snapshot=snapshot)
+
+
 def make_waits_view(spark) -> None:
     rows = [(label, int(s)) for label, s in config.WAIT_POINTS_S.items()]
     spark.createDataFrame(rows, "wait_label string, wait_s bigint").createOrReplaceTempView("v_waits")
@@ -180,7 +202,8 @@ def main(argv=None) -> None:
     ap = argparse.ArgumentParser(prog="python -m etl.gold_run")
     ap.add_argument("--as-of", required=True, help="YYYY-MM-DDTHH:MM:SS.ffffffZ")
     ap.add_argument("--snapshot", default="2026-09")
-    ap.add_argument("--steps", default="ddl,dims,facts,labels,marts")
+    ap.add_argument("--steps", default="ddl,dims,facts,labels,marts",
+                    help="any of ddl,dims,facts,labels,label_change,recon,marts")
     ap.add_argument("--lake", default=None)
     args = ap.parse_args(argv)
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z", args.as_of):
@@ -205,8 +228,11 @@ def main(argv=None) -> None:
             write_step(spark, f"ddl {t}", f"ddl/{t}.sql", t, step=f"ddl:{t}")
     if "dims" in steps:
         write_step(spark, "dim_cohort", "10_dim_cohort_merge.sql", "dim_cohort")
+        cols = [r["col_name"] for r in spark.sql(f"DESCRIBE delta.`{G}/dim_snapshot`").collect()]
+        if "snapshot_published_at" not in cols:      # tables made before the 2026-10 load lack the column
+            spark.sql(f"ALTER TABLE delta.`{G}/dim_snapshot` ADD COLUMNS (snapshot_published_at TIMESTAMP)")
         write_step(spark, "dim_snapshot", "11_dim_snapshot_merge.sql", "dim_snapshot", snapshot=args.snapshot,
-                   params={"snapshot_cutoff": sql_ts(config.HISTORY_DUMP_LAST_REVISION)})
+                   params=snapshot_meta(spark, args.snapshot))
         write_step(spark, "dim_time", "12_dim_time_merge.sql", "dim_time", as_of=as_of)
         write_step(spark, "dim_user", "13_dim_user_merge.sql", "dim_user", as_of=as_of)
         view_step(spark, "20_page_obs_view.sql", as_of=sql_ts(as_of_dt))
@@ -216,8 +242,28 @@ def main(argv=None) -> None:
     if "facts" in steps:
         write_step(spark, "fact_edit", "30_fact_edit_merge.sql", "fact_edit", as_of=as_of)
     if "labels" in steps:
-        write_step(spark, f"fact_revert_label {args.snapshot}", "40_fact_revert_label_merge.sql", "fact_revert_label",
-                   snapshot=args.snapshot)
+        spark.conf.set("spark.sql.shuffle.partitions", "16")       # about 5.3 M rows per month file (PLAN Phase 5)
+        r = write_step(spark, f"fact_revert_label {args.snapshot}", "40_fact_revert_label_merge.sql", "fact_revert_label",
+                       snapshot=args.snapshot)
+        spark.conf.set("spark.sql.shuffle.partitions", "8")
+        if r["seconds"] > 600:
+            print(f"WARNING: the label load took {r['seconds']} s (> 10 min, PLAN Phase 5)", flush=True)
+    if "label_change" in steps:
+        snaps = sorted({m.get("snapshot") for _, m in _metas(spark, f"{G}/fact_revert_label")
+                        if m.get("step") == "fact_revert_label" and m.get("snapshot")})
+        for prev, cur in zip(snaps, snaps[1:]):
+            v_prev, v_cur = label_version(spark, prev), label_version(spark, cur)
+            write_step(spark, f"mart_label_change {prev}->{cur}", "50_mart_label_change_merge.sql", "mart_label_change",
+                       snapshot=cur, params={"start_version": v_prev + 1, "end_version": v_cur})
+    if "recon" in steps:
+        lv = label_version(spark, args.snapshot)
+        for c in RECON_COHORTS:
+            view_step(spark, "69_recon_view.sql", cohort_id=c, snapshot=args.snapshot, label_version=lv)
+            write_step(spark, f"mart_reconciliation {c} {args.snapshot}", "70_mart_reconciliation_replace.sql",
+                       "mart_reconciliation", snapshot=args.snapshot, params={"cohort_id": c, "label_version": lv},
+                       step=f"mart_reconciliation:{c}")
+            write_step(spark, f"recon_mismatch {c} {args.snapshot}", "71_recon_mismatch_replace.sql", "recon_mismatch",
+                       snapshot=args.snapshot, params={"cohort_id": c, "label_version": lv}, step=f"recon_mismatch:{c}")
     if "marts" in steps:
         make_waits_view(spark)
         view_step(spark, "55_reverts_view.sql")

@@ -1,8 +1,10 @@
-"""Time travel demo, "then vs now" (rubric: warehouse / new tool), on gold/fact_edit and the Change Data Feed.
+"""Time travel demos, "then vs now" (rubric: warehouse / new tool), on two knowledge axes. Versions are always found
+by their commit metadata (D9), never by timestamp.
 
-Finds the fact_edit versions written at the three build as_of values by their commit metadata (D9), runs
-etl/sql/80_time_travel_then_and_now.sql, then reads the change feed between the early and the parity version
-(the labels learned in between) and the same numbers from Silver by version.
+  Snapshot axis (etl/sql/80_time_travel_then_and_now.sql, the kit's query): gold/fact_revert_label as loaded from the
+  2026-09 History snapshot and from the 2026-10 snapshot; reverted history-cohort revisions as known then and now.
+  Stream axis (etl/sql/81_time_travel_as_of.sql): gold/fact_edit at the three build as_of values; the live cohort's
+  reverts as known then and now, with the change feed between the early and the parity version.
 
 Run
     python -m etl.time_travel          # writes data/lake/_runs/time_travel.json
@@ -22,7 +24,12 @@ def main() -> None:
     G, S = BASE["gold"], BASE["silver"]
     v = {k: find_version(spark, f"{G}/fact_edit", step="fact_edit", as_of=a) for k, a in
          (("early", lake_config.EARLY_AS_OF), ("parity", lake_config.PARITY_AS_OF), ("ext", lake_config.EXT_AS_OF))}
-    sql = render("80_time_travel_then_and_now.sql", {**BASE, "v_early": v["early"], "v_parity": v["parity"], "v_ext": v["ext"],
+    lv = {s_: find_version(spark, f"{G}/fact_revert_label", step="fact_revert_label", snapshot=s_) for s_ in ("2026-09", "2026-10")}
+    snap_rows = [r.asDict() for r in spark.sql(render("80_time_travel_then_and_now.sql",
+                 {**BASE, "v_2026_09": lv["2026-09"], "v_2026_10": lv["2026-10"]})).collect()]
+    for r in snap_rows:
+        print(r)
+    sql = render("81_time_travel_as_of.sql", {**BASE, "v_early": v["early"], "v_parity": v["parity"], "v_ext": v["ext"],
                                                      "as_of_early": lake_config.EARLY_AS_OF, "as_of_parity": lake_config.PARITY_AS_OF,
                                                      "as_of_ext": lake_config.EXT_AS_OF})
     rows = [r.asDict() for r in spark.sql(sql).collect()]
@@ -56,7 +63,8 @@ def main() -> None:
             silver.append({"version": h["version"], "as_of": meta["as_of"], "links": n["n"], "within_followup": n["w"]})
     for r in silver:
         print(r)
-    out = {"fact_edit_versions": v, "then_and_now": rows, "change_feed": cdf, "early_to_parity_updates": flips,
+    out = {"snapshot_axis": {"fact_revert_label_versions": lv, "then_and_now": snap_rows},
+           "fact_edit_versions": v, "then_and_now": rows, "change_feed": cdf, "early_to_parity_updates": flips,
            "silver_live_revert_links_by_version": silver}
     (lake_config.lake_root() / "_runs" / "time_travel.json").write_text(json.dumps(out, indent=1, default=str))
     spark.stop()

@@ -28,7 +28,20 @@ tt = run('time_travel.json')
 print(tt['fact_edit_versions'])
 
 
+# ## Snapshot axis: fact_revert_label as loaded from History snapshot 2026-09 and 2026-10
+# 
+# `etl/sql/80_time_travel_then_and_now.sql`: reverted history-cohort revisions as known at each snapshot's load (VERSION AS OF) and now.
+
 # In[2]:
+
+
+print(tt['snapshot_axis']['fact_revert_label_versions'])
+pd.DataFrame(tt['snapshot_axis']['then_and_now'])
+
+
+# ## Stream axis: fact_edit at the three build as_of values (`etl/sql/81_time_travel_as_of.sql`)
+
+# In[3]:
 
 
 pd.DataFrame(tt['then_and_now'])
@@ -36,7 +49,7 @@ pd.DataFrame(tt['then_and_now'])
 
 # ## The same, read by delta-rs at each version
 
-# In[3]:
+# In[4]:
 
 
 rows = []
@@ -49,13 +62,13 @@ pd.DataFrame(rows)
 
 # ## Change Data Feed of fact_edit between the versions
 
-# In[4]:
+# In[5]:
 
 
 pd.DataFrame(tt['change_feed'])
 
 
-# In[5]:
+# In[6]:
 
 
 tt['early_to_parity_updates']
@@ -63,7 +76,7 @@ tt['early_to_parity_updates']
 
 # ## Silver by version: live_revert_links at each build
 
-# In[6]:
+# In[7]:
 
 
 pd.DataFrame(tt['silver_live_revert_links_by_version'])
