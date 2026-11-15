@@ -454,3 +454,7 @@ Command: `python -m etl.time_travel` (output `data/lake/_runs/time_travel.json`;
 | 2026-10 | v2 | 20,925 | 20,925 |
 
 The "then" value at the 2026-09 load is 19,858, as the plan requires. The second snapshot adds 1,067 reverted history-cohort revisions (reverts made after the 2026-09 cutoff), while the within-4-day count barely moves (17,646 to 17,641: 5 labels became unreverted).
+
+### End-to-end rebuild with the second snapshot (2026-11-15 10:51-11:07 UTC)
+
+Command: `SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e` (log `data/logs/lake/build_all_e2e2.log`), a new empty lake folder; the filter step was skipped because the slim files existed. 926 s, exit 0. Against the main lake: Phase 5 checks equal value for value (2 passed, 0 failed, 15 checks), Gold checks 33 of 33 at Nov 13, E(L) curves identical, both time-travel axes identical, H1/H3/H4 identical. The folder was deleted afterwards.

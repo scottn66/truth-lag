@@ -20,7 +20,7 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 - Streaming algorithms: HLL p = 14 in 12 KB gives -0.30% mean error (5 salts) on 2,153,428 distinct pages. The Bloom filter finds all 4 real repeats with no false negative. DGIM stays within its bound wiki-wide.
 - Structured Streaming: p95 latency 3.30 s at 2,500 events/s and 4.07 s at 10,000/s; it first passes 5 s at 20,000/s (5.22 s). The drain runs at 16,615 events/s, and the streamed rows equal batch Silver.
 
-- End to end: a rebuild from scratch into an empty folder (`SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e`, 12 min) gives the same parity results, 30 of 30 checks, and identical E(L), hypothesis and time-travel numbers.
+- End to end: a rebuild from scratch into an empty folder (`SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e`, 15 min with the 2026-10 snapshot) gives the same parity results, the same Gold and snapshot checks, and identical E(L), hypothesis and time-travel numbers.
 
 **Not done / left for others**
 - Report and slides (Tingyu and all); LSH notebook (Wanru, input `data/exports/lsh_edits.parquet`); k-anonymity and Laplace noise (Zhenni, inputs in `data/exports/`). See `HANDOFF_TEAM.md`.
