@@ -5,7 +5,7 @@ bronze_parity()   rebuilds the exact line cut of the published parse from _SUCCE
 compare_parquet() compares a lake table (or an Arrow table) with an old Parquet file after sorting by key.
 
 Run
-    python -m etl.parity bronze
+    python -m etl.parity bronze | silver | cohorts
 """
 from __future__ import annotations
 
@@ -138,9 +138,25 @@ def differing_columns(a: pa.Table, ref: pa.Table, key: list[str]) -> dict:
     return out
 
 
+COHORT_KEYS = {"history_revisions": ["rev_id"], "history_revert_links": ["reverted_rev_id"],
+               "live_revisions": ["rev_id"], "live_revert_links": ["reverted_rev_id"],
+               "live_revert_links_all": ["reverted_rev_id", "reverting_rev_id"], "late_reverts": ["rev_id"]}
+
+
+def cohort_parity(lake=None) -> dict:
+    """The current Silver cohort tables against data/parity_ref/tables/*.parquet (build them at PARITY_AS_OF first)."""
+    out = {}
+    for name, key in COHORT_KEYS.items():
+        path = str(lake_config.lake_root(lake) / "silver" / name)
+        ref = pq.read_table(PARITY_DIR / "tables" / f"{name}.parquet")
+        out[name] = compare(delta_io.read_table(path).select(ref.schema.names), ref, key)
+        out[name]["lake_version"] = delta_io.version(path)
+    return out
+
+
 def main(argv=None) -> None:
     step = (argv or sys.argv[1:] or ["bronze"])[0]
-    res = bronze_parity() if step == "bronze" else silver_parity()
+    res = {"bronze": bronze_parity, "silver": silver_parity, "cohorts": cohort_parity}[step]()
     print(json.dumps(res, indent=1, default=str))
 
 

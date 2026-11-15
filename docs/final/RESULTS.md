@@ -79,3 +79,104 @@ Bronze rows per event date (UTC date of meta_dt; Nov 15 is partial):
 | 2026-11-13 | 210,368 | 139,317 | 146,018 |
 | 2026-11-14 | 168,640 | 105,159 | 139,374 |
 | 2026-11-15 | 84,477 | 56,701 | 53,426 |
+
+## Silver stream tables (2026-11-15 09:31 UTC)
+
+Command: `python -m etl.run silver` (log `data/logs/lake/silver_run1.log`), all 28 event dates, 181 s, peak RSS 6.4 GB.
+
+| Table | Rows (all dates) | Repeats removed | Version |
+| --- | --- | --- | --- |
+| silver/page_change | 4,871,010 | 4 repeated meta_id | v28 |
+| silver/revert_risk | 3,113,807 (one per revision) | 3 repeated rev_id | v28 |
+| silver/tag_events | 4,343,852 | 3 repeated meta_id | v30 |
+| silver/capture_gaps | 5 gaps over 120 s | | v1 |
+
+Parity at `meta_dt <= 2026-10-27T20:59:59.999999Z` against `data/parity_ref/parsed/*.parquet` (`python -m etl.parity silver`, output `data/logs/lake/silver_parity.json`): same keys and same values, times to the microsecond.
+
+| Table | Lake rows at the cut | Published rows | Only in lake | Only in published | Same content |
+| --- | --- | --- | --- | --- | --- |
+| page_change | 1,231,427 | 1,231,427 | 0 | 0 | True |
+| tag_events | 1,603,253 | 1,603,253 | 0 | 0 | True |
+| revert_risk | 789,631 | 789,631 | 0 | 0 | True |
+
+Rows per day at the cut equal `rows_per_day` of the published parse for every date (page_change Oct 19-27, tag_events Oct 17-27). Capture gaps: the 3 published gaps (revert-risk stream, 850 s in total, before the cut) are reproduced; 2 more gaps fall after the cut.
+
+## Silver cohort tables at the parity as_of (2026-11-15 09:35 UTC)
+
+Commands: `python -m etl.history all` (Bronze history_slim 5,266,843 rows and history_full 300,564 rows, each equal to its file's highest source_row; silver/history_slim 5,266,843; history cohort via `parse_history.run`, 22.5 s), then `python -m etl.run cohorts --as-of 2026-10-27T20:59:59.999999Z` (7 s), then `python -m etl.parity cohorts` (output `data/logs/lake/cohort_parity.json`). This is the real-data parity test: every table equals the published Parquet file in `data/parity_ref/tables/`, value for value.
+
+| Table | Lake rows | Published rows | Same content | Lake version |
+| --- | --- | --- | --- | --- |
+| silver/history_revisions | 295,016 | 295,016 | True | v1 |
+| silver/history_revert_links | 19,858 | 19,858 | True | v1 |
+| silver/live_revisions | 279,466 | 279,466 | True | v2 |
+| silver/live_revert_links | 18,358 | 18,358 | True | v2 |
+| silver/live_revert_links_all | 59,127 | 59,127 | True | v2 |
+| silver/late_reverts | 4,350 | 4,350 | True | v2 |
+
+A second cohort build with the same as_of wrote no new version (`cohorts_parity_rerun.log`: wrote=False for all four tables). The prototype fixture test still passes (`tests_lake/test_parity.py`, 16 passed); the real-data parity above is the stronger check.
+
+
+## Gold at the parity as_of: star schema and E(L) (2026-11-15 09:37 UTC)
+
+Build order (knowledge order, so the table histories tell the story; each `gold_run` refuses an older as_of):
+1. `python -m etl.run cohorts --as-of 2026-10-24T00:00:00.000000Z`, then `python -m etl.gold_run --as-of 2026-10-24T00:00:00.000000Z --steps ddl,dims,facts,labels` (37 s; the marts step is refused before 2026-10-27 00:05, guard 4). Gold versions v1.
+2. `python -m etl.run cohorts --as-of 2026-10-27T20:59:59.999999Z`, then `python -m etl.gold_run --as-of 2026-10-27T20:59:59.999999Z` (41 s). dim_page v2 (+302,576 versions, 1,499 closed), fact_edit v2 (778 rows updated: live labels learned between Oct 24 and Oct 27), mart_el_curve v1, mart_el_by_burst v1.
+3. `python -m etl.gold_checks --out data/lake/_runs/gold_checks_parity.json`: **30 of 30 checks passed**.
+
+| Check | Expected | Got |
+| --- | --- | --- |
+| fact_edit history rows | 295016 | 295016  |
+| fact_edit live rows | 279466 | 279466  |
+| fact_edit history rows by user_kind | {"bot": 33483, "temporary": 38164, "registered": 223366, "unknown": 3} | {"temporary": 38164, "registered": 223366, "unknown": 3, "bot": 33483}  |
+| fact_edit live rows by user_kind | {"bot": 31973, "temporary": 36314, "registered": 211179} | {"temporary": 36314, "registered": 211179, "bot": 31973}  |
+| mart_el_curve history known by wait (all editors) | {"0": 0, "1 min": 3506, "5 min": 6204, "15 min": 7737, "1 h": 9822, "6 h": 12900, "1 d": 15697, "2 d": 16725, "4 d": 17646} | {"0": 0, "1 min": 3506, "5 min": 6204, "15 min": 7737, "1 h": 9822, "6 h": 12900, "1 d": 15697, "2 d": 16725, "4 d": 17646}  |
+| mart_el_curve live known by wait (all editors) | {"0": 0, "1 min": 3986, "5 min": 6958, "15 min": 8398, "1 h": 10326, "6 h": 13405, "1 d": 15936, "2 d": 16699, "4 d": 17818} | {"0": 0, "1 min": 3986, "5 min": 6958, "15 min": 8398, "1 h": 10326, "6 h": 13405, "1 d": 15936, "2 d": 16699, "4 d": 17818}  |
+| live E(1 h) = 0.4205 | 0.4205 | 0.4205  |
+| history E(1 h) = 0.4434 | 0.4434 | 0.4434  |
+| live share known at 1 h = 57.95% | 57.95 | 57.95  |
+| mart_el_curve history temporary at 1 h (known, eventual) | [6157, 9863] | [6157, 9863]  |
+| mart_el_curve history registered at 1 h (known, eventual) | [3622, 7623] | [3622, 7623]  |
+| mart_el_curve live temporary at 1 h (known, eventual) | [6358, 9772] | [6358, 9772]  |
+| mart_el_curve live registered at 1 h (known, eventual) | [3928, 7905] | [3928, 7905]  |
+| fact_edit history revisions per burst group (0,1,2-4,5-9,10+) | [202410, 42155, 32697, 11888, 5866] | [202410, 42155, 32697, 11888, 5866]  |
+| mart_el_by_burst history eventual reverts in 10+ | 343 | 343  |
+| fact_edit live revisions per burst group (0,1,2-4,5-9,10+) | [190392, 39277, 30782, 11929, 7086] | [190392, 39277, 30782, 11929, 7086]  |
+| mart_el_by_burst live eventual reverts in 10+ | 439 | 439  |
+| dim_page: pages without exactly one current row | 0 | 0  |
+| dim_page: gaps or overlaps between consecutive versions | 0 | 0  |
+| fact_edit rows with no page_key | 0 | 0  |
+| fact_edit rows that join to other than exactly one dim_page version | 0 | 0  |
+| delta-rs row count of gold/dim_cohort equals Spark's | 3 | 3  |
+| delta-rs row count of gold/dim_snapshot equals Spark's | 1 | 1  |
+| delta-rs row count of gold/dim_time equals Spark's | 8640 | 8640  |
+| delta-rs row count of gold/dim_user equals Spark's | 66297 | 66297  |
+| delta-rs row count of gold/dim_page equals Spark's | 766557 | 766557  |
+| delta-rs row count of gold/fact_edit equals Spark's | 574482 | 574482  |
+| delta-rs row count of gold/fact_revert_label equals Spark's | 5266843 | 5266843  |
+| delta-rs row count of gold/mart_el_curve equals Spark's | 81 | 81  |
+| delta-rs row count of gold/mart_el_by_burst equals Spark's | 108 | 108  |
+
+E(L) from `gold/mart_el_curve` v1, all editors (4-day horizon, 9 waits from `config.WAIT_POINTS_S`):
+
+| Wait | History known of 17,646 | History E(L) | Live known of 17,818 | Live E(L) |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 1.0000 | 0 | 1.0000 |
+| 1 min | 3,506 | 0.8013 | 3,986 | 0.7763 |
+| 5 min | 6,204 | 0.6484 | 6,958 | 0.6095 |
+| 15 min | 7,737 | 0.5615 | 8,398 | 0.5287 |
+| 1 h | 9,822 | 0.4434 | 10,326 | 0.4205 |
+| 6 h | 12,900 | 0.2690 | 13,405 | 0.2477 |
+| 1 d | 15,697 | 0.1104 | 15,936 | 0.1056 |
+| 2 d | 16,725 | 0.0522 | 16,699 | 0.0628 |
+| 4 d | 17,646 | 0.0000 | 17,818 | 0.0000 |
+
+A re-run at the same as_of (`--steps dims,facts,labels`, `gold_parity_rerun.log`) wrote no commit in any dimension or fact. A run at the older as_of 2026-10-24 is refused (guard 3: it differs from `_runs/latest.json`).
+
+Design changes against LAKE_DESIGN.md, made for the real data:
+- `fact_edit` key is `(cohort_id, wiki_db, rev_id)`: the extended cohort `live_ext` contains the live cohort, so one revision can be a fact of two cohorts.
+- `fact_edit.user_kind` (D19) added. `visibility_change` events are left out of the page observations (they change no title, namespace or deleted state). Stream observations need `meta_dt <= as_of` too.
+- The dump's current title enters `dim_page` as an observation at `config.HISTORY_DUMP_LAST_REVISION` (PLAN Phase 4 step 7).
+- `dim_snapshot` takes the cutoff from `config.HISTORY_DUMP_LAST_REVISION`, not from the newest slim row.
+- The mart series "live cohort, dump labels" is not built: no 2026-10 snapshot exists (see STATUS.md, blocker 1).
+

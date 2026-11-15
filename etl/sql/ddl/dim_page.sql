@@ -1,5 +1,5 @@
--- dim_page: SCD Type 2. {dim_page} is the table folder (dim_page, or dim_page_classic for the comparison).
-CREATE TABLE IF NOT EXISTS delta.`{gold}/{dim_page}` (
+-- dim_page: SCD Type 2, one row per page version. Key page_key = page_id + start of the version (D8).
+CREATE TABLE IF NOT EXISTS delta.`{gold}/dim_page` (
   page_key    STRING NOT NULL,
   wiki_db     STRING,
   page_id     BIGINT,
