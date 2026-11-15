@@ -12,7 +12,8 @@
   manifest.json                versions, row counts, sizes and SHA-256 of every file
 
 Human editors appear only as pseudonyms (ec-hw2/ingest/build_documents.public_name); bots keep their names.
-No user_text, user_name, user_id or editor key leaves the lake.
+No user_text, user_name, user_id or editor key leaves the lake. Inside edit comments, user links become [[USER]],
+temporary-account names ~TEMP and IP addresses IP (scrub_comment).
 
 Run
     python -m etl.exports
@@ -21,6 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 
 import pandas as pd
@@ -31,6 +33,20 @@ from .spark_session import get_spark
 
 OUT = lake_config.EXPORTS_DIR
 SEED = 226
+_USER_LINK = re.compile(r"\[\[\s*:?\s*(?:[a-z]{1,3}:)?\s*(?:Users?[ _]|User:|Special:Contrib)[^\]]*\]{0,2}", re.I)
+_TEMP = re.compile(r"~\d{4}-[\d-]*")
+_IPV4 = re.compile(r"\b\d{1,3}(?:\.\d{1,3}){3}\b")
+_IPV6 = re.compile(r"\b(?:[0-9A-Fa-f]{1,4}:){2,7}[0-9A-Fa-f]{1,4}\b")
+
+
+def scrub_comment(text):
+    """Mask editor identities inside an edit summary: user links, temporary-account names, IP addresses."""
+    if not isinstance(text, str):
+        return text
+    text = _USER_LINK.sub("[[USER]]", text)
+    text = _TEMP.sub("~TEMP", text)
+    text = _IPV6.sub("IP", _IPV4.sub("IP", text))
+    return text
 
 
 def main() -> None:
@@ -74,6 +90,7 @@ def main() -> None:
     lsh = pd.concat([pos, *negs], ignore_index=True)
     lsh["editor"] = [public_name(k, key, name) for k, key, name in zip(lsh.user_kind, lsh.user_key, lsh.user_name)]
     lsh = lsh.drop(columns=["user_key", "user_name"]).rename(columns={"T_s": "seconds_to_revert"})
+    lsh["comment"] = lsh["comment"].map(scrub_comment)
     lsh["label"] = lsh["label"].astype(int)
     lsh = lsh.sort_values(["cohort_id", "rev_id"]).reset_index(drop=True)
     lsh.to_parquet(OUT / "lsh_edits.parquet", index=False)

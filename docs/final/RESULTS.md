@@ -337,3 +337,22 @@ Wiki-wide, DGIM stays inside its bound with 17-31 buckets instead of every times
 - Reservoir sampling (k = 10,000, seed 226) over 4,209,083 edit events: revert-event share in the sample 3.76% (95% CI 3.387-4.133%) against the exact 4.046%: the interval holds the exact value.
 - AMS estimate of the second moment F2 of edits per page (exact 249,630,183): 100 variables give 50,088,088 (-79.94%), 1000 variables give 215,925,958 (-13.5%). Edits per page are heavy-tailed, so few variables underestimate badly; error falls with more variables (median of 10 means).
 
+
+## Spark Structured Streaming, Bronze to Silver (2026-11-15 10:01 UTC)
+
+Command: `python -m etl.stream_sss` (346 s in all; output `data/lake/_runs/stream_sss.json`). Spark 4.2.0, master `local[4]`, on the laptop. A producer process appends captured page-change lines from `bronze/page_change_events` (capture order, from 2026-10-20) to a demo Delta table at a fixed rate, one delta-rs commit per second, each row stamped `produced_at` just before its commit. The streaming query reads that table as a Delta stream (trigger 1 s), parses `raw_json` with `from_json`, keeps enwiki, non-canary events with meta.id and meta.dt, drops repeated meta_id, and in `foreachBatch` MERGEs (insert-only on meta_id) into a demo Silver table. Latency of an event = the commit time of its micro-batch MERGE - produced_at (so it includes the producer's commit). 30 s per rate. Demo tables: `data/lake/stream_demo/` (the lake tables are only read).
+
+| Input rate (events/s) | Events | Micro-batches | Throughput (events/s) | p50 latency (s) | p95 latency (s) | Max latency (s) | Mean rows per batch | Mean batch time (s) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1,000 | 30,000 | 24 | 981.8 | 1.897 | 2.901 | 3.045 | 1,250.0 | 1.229 |
+| 2,500 | 75,000 | 22 | 2,428.0 | 2.046 | 3.303 | 3.808 | 3,409.1 | 1.255 |
+| 5,000 | 150,000 | 22 | 4,717.6 | 2.177 | 3.406 | 3.791 | 6,818.2 | 1.291 |
+| 10,000 | 300,000 | 19 | 9,391.2 | 2.544 | 4.066 | 4.16 | 15,789.5 | 1.562 |
+| 20,000 | 599,997 | 16 | 18,275.9 | 3.483 | 5.216 | 5.492 | 37,499.8 | 1.925 |
+
+Drain without a rate limit: 500,000 lines pre-loaded in 50 commits, read with `availableNow` and 5 files per micro-batch: 10 batches in 30.1 s = **16,614.6 events/s**.
+
+Correctness: the 500,000 rows that the drain wrote equal the batch `silver/page_change` rows for the same events (0 rows only in the stream output; 0 rows differ in rev_id, page_id, kind or meta_dt).
+
+E5 reading: p95 latency stays under 5 s up to 10,000 events/s (4.07 s) and first passes 5 s at 20,000 events/s (5.22 s). The proposal's target of 2,500 events/s or more is met (p95 3.30 s at 2,500/s). For scale, the captured enwiki page-change stream averages about 2.1 events/s (4,871,014 events in 26.4 days). At 20,000/s the stream wrote 599,997 of 600,000 lines: the 3 missing lines are repeated meta_ids in that slice of Bronze (1 on Oct 24, 2 on Oct 26), which Silver also drops.
+

@@ -4,7 +4,7 @@ For Wanru (MinHash LSH), Zhenni (k-anonymity and Laplace noise) and anyone makin
 
 Rules for these files:
 - Human editors appear only as pseudonyms (`editor_` + 10 hex digits, keyed HMAC, the same as in EC HW2). Bots keep their names. No user name, user id or editor key is exported.
-- Page titles and edit comments are public Wikipedia data. Comments can still name people. Do not quote comments on slides without checking them.
+- Page titles and edit comments are public Wikipedia data. In `comment`, links to user pages and contributions become `[[USER]]`, temporary-account names `~TEMP` and IP addresses `IP` (about 36,000 links and 500 names masked). A name typed as plain text, without a link, can remain. Do not quote comments on slides without checking them.
 - Times are UTC. "Reverted" means reverted within 4 days (the E(L) horizon), unless a column says otherwise.
 
 ## How to rebuild
@@ -29,7 +29,7 @@ File: `lsh_edits.parquet` (same rows in `lsh_edits.csv`). One row per edit. It h
 | page_title | string | history: the title in the 2026-09 dump; live_ext: the title in the edit event |
 | page_ns | int64 | namespace (always 0 in these cohorts) |
 | ts | timestamp (UTC) | when the edit was saved |
-| comment | string | the edit summary written by the editor (may be empty) |
+| comment | string | the edit summary written by the editor, with user links, temporary-account names and IPs masked (may be empty) |
 | user_kind | string | `temporary`, `registered`, `bot` or `unknown`, at edit time |
 | size_delta | int64 | bytes added (negative: removed) |
 | is_revert | bool | the edit itself is a revert |

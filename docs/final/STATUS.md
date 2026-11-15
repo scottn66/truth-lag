@@ -15,13 +15,13 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 - [x] Time travel "then vs now" (80_time_travel_then_and_now.sql)
 
 **P1: course techniques**
-- [ ] Streaming algorithms: FM/HLL distinct editors and pages, Bloom filter on meta_id, DGIM reverts per page per hour; error and memory vs exact
-- [ ] Spark Structured Streaming Bronze -> Silver (foreachBatch); events/s and p95 latency
-- [ ] Team extracts for LSH (Wanru) and Privacy (Zhenni) + docs/final/HANDOFF_TEAM.md  *(replaces building LSH and Privacy)*
+- [x] Streaming algorithms: FM/HLL distinct editors and pages, Bloom filter on meta_id, DGIM reverts per page per hour; error and memory vs exact
+- [x] Spark Structured Streaming Bronze -> Silver (foreachBatch); events/s and p95 latency
+- [x] Team extracts for LSH (Wanru) and Privacy (Zhenni) + docs/final/HANDOFF_TEAM.md  *(replaces building LSH and Privacy)*
 
 **P2: report-ready outputs**
-- [ ] One notebook per component under notebooks/final/ with .py exports (each about 1 MB or less)
-- [ ] Flow diagram (mermaid + PNG)
-- [ ] docs/final/RUBRIC_EVIDENCE.md
-- [ ] docs/final/GENAI_LOG.md
-- [ ] Gold mart extracts in data/exports/ (< 50 MB each, not committed)
+- [x] One notebook per component under notebooks/final/ with .py exports (each about 1 MB or less)
+- [x] Flow diagram (mermaid + PNG)
+- [x] docs/final/RUBRIC_EVIDENCE.md
+- [x] docs/final/GENAI_LOG.md
+- [x] Gold mart extracts in data/exports/ (< 50 MB each, not committed)

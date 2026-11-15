@@ -16,6 +16,7 @@ import nbformat as nbf
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
+NBCONVERT = str(Path(sys.executable).parent / "jupyter-nbconvert")   # the venv's own, not one on PATH
 
 SETUP = """import json, os, sys
 from pathlib import Path
@@ -42,13 +43,13 @@ NOTEBOOKS = {
         ("md", "## Bronze tables: versions and commits"),
         ("code", "for t in ['bronze/page_change_events', 'bronze/revert_risk_events', 'bronze/tags_events', 'bronze/history_slim', 'bronze/history_full']:\n    print(t, 'version', DeltaTable(str(LAKE / t)).version())\nhistory('bronze/page_change_events', 5)"),
         ("md", "## Bronze parity with the published parse cut\n\nThe cut is rebuilt from `_SUCCESS_parsed.json`: hour folders up to 2026-10-27 hour 20, minus files skipped as open, cut-short files limited to the lines the parse kept."),
-        ("code", "bp = json.loads((REPO / 'data/logs/lake/bronze_parity.json').read_text())\npd.DataFrame({s.split('.')[1] if 'revision' not in s else 'tags': {k: v for k, v in d.items() if k != 'bronze_rows_per_day'} for s, d in bp.items()}).T"),
+        ("code", "bp = run('bronze_parity.json')\npd.DataFrame({s.split('.')[1] if 'revision' not in s else 'tags': {k: v for k, v in d.items() if k != 'bronze_rows_per_day'} for s, d in bp.items()}).T"),
         ("md", "## Bronze rows per event date"),
         ("code", "pd.DataFrame({s.split('mediawiki.')[1]: d['bronze_rows_per_day'] for s, d in bp.items()}).fillna(0).astype(int)"),
         ("md", "## Silver parity at the published cut (meta_dt <= 2026-10-27T20:59:59.999999Z)"),
-        ("code", "sp = json.loads((REPO / 'data/logs/lake/silver_parity.json').read_text())\npd.DataFrame({k: {c: v[c] for c in ('rows_lake', 'rows_ref', 'only_in_lake', 'only_in_ref', 'same_content')} for k, v in sp.items()}).T"),
+        ("code", "sp = run('silver_parity.json')\npd.DataFrame({k: {c: v[c] for c in ('rows_lake', 'rows_ref', 'only_in_lake', 'only_in_ref', 'same_content')} for k, v in sp.items()}).T"),
         ("md", "## Cohort tables against `data/tables` (built at the parity as_of)"),
-        ("code", "cp = json.loads((REPO / 'data/logs/lake/cohort_parity.json').read_text())\npd.DataFrame({k: {c: v[c] for c in ('rows_lake', 'rows_ref', 'only_in_lake', 'only_in_ref', 'same_content', 'lake_version')} for k, v in cp.items()}).T"),
+        ("code", "cp = run('cohort_parity.json')\npd.DataFrame({k: {c: v[c] for c in ('rows_lake', 'rows_ref', 'only_in_lake', 'only_in_ref', 'same_content', 'lake_version')} for k, v in cp.items()}).T"),
         ("md", "## Capture gaps over 120 s"),
         ("code", "table('silver/capture_gaps')"),
     ],
@@ -128,12 +129,12 @@ def build() -> None:
     for name, cells in NOTEBOOKS.items():
         nb = nbf.v4.new_notebook()
         nb.cells = [nbf.v4.new_markdown_cell(src) if kind == "md" else nbf.v4.new_code_cell(src) for kind, src in cells]
-        nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
+        nb.metadata["kernelspec"] = {"name": "truthlag-lake", "display_name": "TruthLag lake (.venv-lake)", "language": "python"}
         path = HERE / f"{name}.ipynb"
         nbf.write(nb, path)
-        subprocess.run([sys.executable, "-m", "jupyter", "nbconvert", "--to", "notebook", "--execute", "--inplace",
-                        "--ExecutePreprocessor.timeout=600", str(path)], check=True, cwd=HERE)
-        subprocess.run([sys.executable, "-m", "jupyter", "nbconvert", "--to", "script", str(path)], check=True, cwd=HERE)
+        subprocess.run([NBCONVERT, "--to", "notebook", "--execute", "--inplace",
+                        "--ExecutePreprocessor.timeout=600", "--ExecutePreprocessor.kernel_name=truthlag-lake", str(path)], check=True, cwd=HERE)
+        subprocess.run([NBCONVERT, "--to", "script", str(path)], check=True, cwd=HERE)
         print(name, path.stat().st_size, "bytes")
 
 
