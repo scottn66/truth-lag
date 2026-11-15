@@ -4,7 +4,8 @@
 #   bash scripts/make_bundle.sh [out_dir]          default out_dir: dist/ in the repository (git-ignored)
 #
 # dist/
-#   truthlag_code_<commit>.zip   every tracked file up to 1.2 MB (code, docs, notebooks; never data/)
+#   truthlag_code_<commit>.zip   the code to upload: lake code, checks, notebooks, final docs, the EC HW2 modules it imports
+#   truthlag_repo_<commit>.zip   every tracked file up to 1.2 MB (also the EC HW2 submission material; never data/)
 #   notebooks/final, notebooks/fallback   the executed notebooks with their .py copies
 #   figures/                      the report figures (PNG)
 #   results.json, report_draft.md, RUBRIC_EVIDENCE.md, GENAI_LOG.md, GATE_MON.md
@@ -35,7 +36,15 @@ git ls-files | while IFS= read -r f; do
   kb=$(( ($(wc -c < "$f") + 1023) / 1024 ))
   if [ "$kb" -gt "$LIMIT_KB" ]; then printf '%s\t%s KB\n' "$f" "$kb" >> "$TMP/excluded.txt"; else printf '%s\n' "$f" >> "$TMP/keep.txt"; fi
 done
-zip -q -X "$OUT/truthlag_code_${SHORT}.zip" -@ < "$TMP/keep.txt"
+zip -q -X "$OUT/truthlag_repo_${SHORT}.zip" -@ < "$TMP/keep.txt"
+
+# The code zip to upload: only what the final project needs (the lake code, its checks, notebooks, final docs, and
+# the EC HW2 modules that the lake imports). The repo zip above also holds the EC HW2 submission material.
+git ls-files -- etl scripts tests_lake notebooks/final notebooks/fallback docs/final ingest \
+    ':(glob)docs/delta_lake_handoff/*.md' docs/delta_lake_handoff/requirements-lake.txt \
+    ec-hw2/config.py ec-hw2/ingest ec-hw2/tests/__init__.py ec-hw2/tests/test_history.py ec-hw2/tests/test_stream.py \
+    ec-hw2/STYLE.md ec-hw2/DATA_MODEL.md README.md requirements.txt .gitignore | grep -F -x -f "$TMP/keep.txt" > "$TMP/code.txt"
+zip -q -X "$OUT/truthlag_code_${SHORT}.zip" -@ < "$TMP/code.txt"
 
 cp notebooks/final/*.ipynb notebooks/final/*.py "$OUT/notebooks/final/"
 cp notebooks/fallback/*.ipynb notebooks/fallback/*.py "$OUT/notebooks/fallback/" 2>/dev/null || true
@@ -46,6 +55,9 @@ for f in results.json report_draft.md RUBRIC_EVIDENCE.md GENAI_LOG.md GATE_MON.m
 done
 
 PY="$REPO/.venv-lake/bin/python"; [ -x "$PY" ] || PY=python3
+# prove the code zip stands alone: unzip it and run the fixture tests from the unzipped copy
+mkdir "$TMP/unzipped" && (cd "$TMP/unzipped" && unzip -q "$OUT/truthlag_code_${SHORT}.zip")
+ZIPTESTS="$(cd "$TMP/unzipped" && TRUTHLAG_HW2_DIR="$PWD/ec-hw2" PYTHONDONTWRITEBYTECODE=1 "$PY" -m pytest tests_lake ec-hw2/tests/test_history.py ec-hw2/tests/test_stream.py -q -p no:cacheprovider 2>&1 | tail -1)"
 NUMBERS="$("$PY" scripts/check_numbers.py --no-regen 2>&1 | tail -1)"
 EVIDENCE="$("$PY" scripts/check_evidence.py --allow-missing-data 2>&1 | tail -1)"
 
@@ -59,9 +71,13 @@ EVIDENCE="$("$PY" scripts/check_evidence.py --allow-missing-data 2>&1 | tail -1)
   echo "check_numbers (in the clone, without the lake):  $NUMBERS"
   echo "check_evidence (in the clone, data outputs not present):  $EVIDENCE"
   echo
-  echo "code zip: truthlag_code_${SHORT}.zip  files: $(wc -l < "$TMP/keep.txt" | tr -d ' ')  size: $(( $(wc -c < "$OUT/truthlag_code_${SHORT}.zip") / 1024 )) KB"
-  echo "largest file inside the zip: $(xargs ls -l < "$TMP/keep.txt" 2>/dev/null | sort -k5 -n -r | head -1 | awk '{printf "%s (%d KB)", $NF, $5/1024}')"
-  echo "tracked files left out of the zip (over ${LIMIT_KB} KB):"
+  echo "tests run from the unzipped code zip:  $ZIPTESTS"
+  echo
+  echo "code zip (upload this): truthlag_code_${SHORT}.zip  files: $(wc -l < "$TMP/code.txt" | tr -d ' ')  size: $(( $(wc -c < "$OUT/truthlag_code_${SHORT}.zip") / 1024 )) KB"
+  echo "largest file inside the code zip: $(xargs ls -l < "$TMP/code.txt" 2>/dev/null | sort -k5 -n -r | head -1 | awk '{printf "%s (%d KB)", $NF, $5/1024}')"
+  echo "repo zip (everything tracked, with the EC HW2 material): truthlag_repo_${SHORT}.zip  files: $(wc -l < "$TMP/keep.txt" | tr -d ' ')  size: $(( $(wc -c < "$OUT/truthlag_repo_${SHORT}.zip") / 1024 )) KB"
+  echo "largest file inside the repo zip: $(xargs ls -l < "$TMP/keep.txt" 2>/dev/null | sort -k5 -n -r | head -1 | awk '{printf "%s (%d KB)", $NF, $5/1024}')"
+  echo "tracked files left out of both zips (over ${LIMIT_KB} KB):"
   if [ -s "$TMP/excluded.txt" ]; then sed 's/^/  /' "$TMP/excluded.txt"; else echo "  none"; fi
   echo
   echo "files (bytes, sha256, path):"
@@ -72,6 +88,7 @@ EVIDENCE="$("$PY" scripts/check_evidence.py --allow-missing-data 2>&1 | tail -1)
 echo "bundle: $OUT"
 echo "files in dist: $(find "$OUT" -type f | wc -l | tr -d ' ')   total: $(du -sk "$OUT" | cut -f1) KB"
 echo "largest file in dist: $(find "$OUT" -type f -exec ls -l {} + | sort -k5 -n -r | head -1 | awk '{printf "%s (%d KB)", $NF, $5/1024}')"
+echo "code zip: truthlag_code_${SHORT}.zip ($(( $(wc -c < "$OUT/truthlag_code_${SHORT}.zip") / 1024 )) KB, $(wc -l < "$TMP/code.txt" | tr -d ' ') files); tests from the unzipped copy: $ZIPTESTS"
 echo "check_numbers:  $NUMBERS"
 echo "check_evidence: $EVIDENCE"
 echo "commit: $HASH"
