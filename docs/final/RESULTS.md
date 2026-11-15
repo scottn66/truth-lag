@@ -356,3 +356,17 @@ Correctness: the 500,000 rows that the drain wrote equal the batch `silver/page_
 
 E5 reading: p95 latency stays under 5 s up to 10,000 events/s (4.07 s) and first passes 5 s at 20,000 events/s (5.22 s). The proposal's target of 2,500 events/s or more is met (p95 3.30 s at 2,500/s). For scale, the captured enwiki page-change stream averages about 2.1 events/s (4,871,014 events in 26.4 days). At 20,000/s the stream wrote 599,997 of 600,000 lines: the 3 missing lines are repeated meta_ids in that slice of Bronze (1 on Oct 24, 2 on Oct 26), which Silver also drops.
 
+
+## End-to-end rebuild from scratch (2026-11-15 10:00-10:12 UTC)
+
+Command: `SKIP_EXTRAS=1 bash etl/build_all.sh data/lake_e2e` (log `data/logs/lake/build_all_e2e.log`): a new, empty lake folder, built from `data/raw` and `data/history` through every step and check in knowledge order. 729 s wall time, exit 0.
+
+| Compared with the main lake (`data/lake`) | Result |
+| --- | --- |
+| Bronze parity (3 streams), Silver parity (3 tables), cohort parity (6 tables) | all match |
+| Gold checks at the parity as_of / at Nov 13 | 30 of 30 / 30 of 30 |
+| E(L) curves (all cohorts, all waits) | identical |
+| H1, H3, H4 results (bootstrap seed 226) | identical |
+| Time travel (fact_edit v1, v2, v3 known reverts) | identical |
+
+The rebuild folder was deleted afterwards to free 5.7 GB; the command above recreates it.
