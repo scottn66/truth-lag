@@ -1,6 +1,6 @@
 # Truth Lag: Measuring How Fast Live Wikipedia Metrics Converge to Reconciled History
 
-**Report draft for the team (source for Tingyu, not the final text).** Group 9, DATA 226. Generated from `docs/final/results.json` at commit `6607797` (2026-11-15T12:28:09Z). Every number below is filled from that file by `scripts/render_report.py`; edit `docs/final/report_draft.template.md`, never this file. `scripts/check_numbers.py` fails if a number here is not in `results.json`.
+**Report draft for the team (source for Tingyu, not the final text).** Group 9, DATA 226. Generated from `docs/final/results.json` at commit `84624f4` (2026-11-15T12:58:49Z). Every number below is filled from that file by `scripts/render_report.py`; edit `docs/final/report_draft.template.md`, never this file. `scripts/check_numbers.py` fails if a number here is not in `results.json`.
 
 How to use it: each section holds the facts and tables the final IEEE-format report needs. Sentences are short fact statements, not report prose: the section owner rewrites them in their own words. Lines that start with **TODO** need a person. Do not quote edit comments anywhere (they can contain names).
 
@@ -98,8 +98,9 @@ Figure: `docs/final/figures/flow.png` (data flow from the sources through Bronze
 
 - Streaming algorithms, each against the exact answer on 4,617,893 events: HyperLogLog, Flajolet-Martin, Bloom filter, DGIM, reservoir sampling, AMS second moment.
 - Spark Structured Streaming: the Bronze-to-Silver step as a streaming query, replayed at fixed input rates.
-- Locality-sensitive hashing (MinHash) on the comments of reverted edits. **TODO: numbers from `notebooks/fallback/lsh_minhash.ipynb` or Wanru's notebook.**
-- Privacy: k-anonymity, l-diversity and Laplace noise on the published marts. **TODO: numbers from `notebooks/fallback/privacy.ipynb` or Zhenni's notebook.**
+- Locality-sensitive hashing: MinHash LSH on character 5-shingles of edit comments, at Jaccard similarity 0.6 or more, checked against an exact join and against hand-labeled pairs.
+- Privacy: k-anonymity (k = 5) and l-diversity (l = 2, sensitive attribute: reverted within 4 days) of the tables that would be released, small-group suppression, and Laplace noise on the E(L) counts at 3 values of epsilon.
+- The LSH and privacy numbers below come from the fallback notebooks (`notebooks/fallback/`), built with Claude Code for Scott. **If Wanru's or Zhenni's notebook arrives, its numbers replace these.**
 
 ## VI. Results
 
@@ -201,7 +202,23 @@ Exact answers on the same stream: 2,153,428 distinct pages and 229,828 distinct 
 - Bloom filter on the event id (8.3 megabytes against an estimated 36.9 for an exact set): all 4 repeated events found, 0 missed, 587 false positives in 4,617,897 events.
 - DGIM, reverts in the last hour over the whole wiki: mean error 11.25% with at most 17 buckets (bound 50%), and 5.24% with at most 31 buckets (bound 25%). Per page the counts are tiny and DGIM's error reaches its bound (mean 41.18%).
 - Reservoir sample of 10,000 edits: revert share 3.76% (3.387 to 4.133) against the exact 4.046%.
-- AMS second moment of edits per page: error -79.94% with 100 variables and -13.5% with 1,000.
+- AMS second moment of edits per page, one run: error -79.94% with 100 variables and -13.5% with 1,000.
+
+Moments and reservoir sampling over many seeds (`notebooks/fallback/moments_reservoir.ipynb`). Exact moments of edits per page: F0 = 1,889,644, F1 = 4,209,083, F2 = 249,630,183.
+
+| AMS variables | Mean absolute error of F2 over 30 seeds | Worst error |
+| --- | --- | --- |
+| 100 | 63.33% | 84.49% |
+| 1,000 | 20.36% | 47.12% |
+| 10,000 | 4.59% | 13.16% |
+
+| Reservoir size | Spread of the revert share over 200 reservoirs (points) | Binomial standard error (points) |
+| --- | --- | --- |
+| 1,000 | 0.693 | 0.623 |
+| 10,000 | 0.206 | 0.197 |
+| 100,000 | 0.064 | 0.062 |
+
+- A one-pass reservoir of 112,937 not-reverted edits matches the editor-kind mix of all 2,284,801 within 0.08 points.
 
 ### G. Structured Streaming
 
@@ -219,11 +236,37 @@ Exact answers on the same stream: 2,153,428 distinct pages and 229,828 distinct 
 
 ### H. Locality-sensitive hashing
 
-**TODO: fill from `notebooks/fallback/lsh_minhash.ipynb` (or Wanru's notebook, which wins if it arrives).**
+Source: `notebooks/fallback/lsh_minhash.ipynb` (fallback; a teammate's notebook replaces it).
+
+- Input: 91,092 edit comments (26,646 of reverted edits, 64,446 of edits not reverted) with 49,140 distinct texts.
+- Against an exact join of 7,998,000 pairs (4,000 texts, 2,162 true near-duplicate pairs, 190.8 seconds), LSH finds 89.32% of them with 1 hash table, 96.11% with 5 and 96.16% with 20, in 0.8 seconds at 5 tables.
+- All texts: 420,629 near-duplicate pairs; 9,988 texts have a near-duplicate, in 1,419 groups (largest: 1,186 texts).
+- Precision on hand-labeled pairs ("same edit pattern"): 40 of 40 pairs drawn by similarity band (100.0%, interval 91.2 to 100.0), and 37 of 40 pairs drawn one per group (92.5%, interval 80.1 to 97.4). Labels by Claude Code; 0 re-checked by a person so far.
+- Reuse of summaries: 24.63% of reverted edits share their summary (exactly or nearly) with another edit, against 72.56% of edits not reverted. Near-duplicate summaries are mostly tool and bot templates, not vandal text.
 
 ### I. Privacy
 
-**TODO: fill from `notebooks/fallback/privacy.ipynb` (or Zhenni's notebook, which wins if it arrives).**
+Source: `notebooks/fallback/privacy.ipynb` (fallback; a teammate's notebook replaces it). Figure: `docs/final/figures/privacy_laplace.png`.
+
+- Tables checked: an hourly grid by editor kind (1,875 cells) and a page-level summary (1,559,483 rows).
+- k-anonymity, k = 5: 3.95% of grid cells have fewer than 5 editors; suppressing them keeps 99.168% of the edits. In the page summary 98.42% of rows are below k, and 81.63% have a single editor.
+- l-diversity, l = 2: 92.69% of grid cells and 4.8% of page rows hold both reverted and not-reverted edits. 2,526 page rows hold only reverted edits, 2,170 of them from one editor.
+
+| Suppression rule, page summary of live_ext | Rows kept | Edits kept | Reverts kept | Revert rate in the release (true 4.71%) |
+| --- | --- | --- | --- | --- |
+| At least 5 editors | 1.8% | 16.44% | 42.08% | 12.05% |
+| At least 5 editors and both values present | 1.04% | 10.47% | 42.05% | 18.92% |
+
+- Suppression alone biases the page-level release upward: only busy pages survive, and they are reverted more often.
+
+| Laplace noise on the E(L) counts: series | Eventual reverts | Mean absolute error of E(L), epsilon 0.1 | epsilon 0.5 | epsilon 1.0 |
+| --- | --- | --- | --- | --- |
+| live_ext, all editors | 112,937 | 0.00014 | 0.00003 | 0.00001 |
+| live, all editors | 17,818 | 0.00093 | 0.00018 | 0.00009 |
+| live, temporary accounts | 9,772 | 0.00168 | 0.00035 | 0.00017 |
+| live, bots | 141 | 0.15468 | 0.02346 | 0.01204 |
+
+- The noise is edit-level (1,000 trials per epsilon). For the main series the error is far below the differences between series; for the bot series it is not.
 
 ## VII. Deviations from the Proposal
 
