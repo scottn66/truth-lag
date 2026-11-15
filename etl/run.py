@@ -56,7 +56,6 @@ def main(argv=None) -> None:
         from .history import kept_revisions_file
         hist = args.history_revisions or (kept_revisions_file(args.lake) if kept_revisions_file(args.lake).exists() else None)
         res = silver_cohorts.build(args.as_of, history_dir=args.history_dir, lake=args.lake, history_revisions=hist)
-        silver_cohorts.ensure_ext_tables(args.lake)
         res["latest"] = silver_cohorts.write_latest(res["as_of"], args.lake, {"step": "cohorts"})
         _show({"cohorts": res})
     if args.step == "cohorts_ext":

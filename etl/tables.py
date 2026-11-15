@@ -96,7 +96,8 @@ STREAM_TABLES = ["page_change", "revert_risk", "tag_events", "capture_gaps"]
 COHORT_TABLES = ["live_revisions", "live_revert_links", "live_revert_links_all", "late_reverts"]
 EXT_TABLES = ["live_ext_revisions", "live_ext_revert_links", "live_ext_revert_links_all"]
 
-ALL = {spec.name: spec for spec in [*BRONZE.values(), *SILVER.values()]}
+ALL = {spec.name: spec for spec in [*BRONZE.values(), *SILVER.values()]
+       if spec.name.split("/")[1] not in EXT_TABLES}     # the extension tables are optional (built by cohorts_ext)
 
 
 def bronze_spec(stream: str) -> TableSpec:

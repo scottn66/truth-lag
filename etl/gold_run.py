@@ -191,6 +191,8 @@ def main(argv=None) -> None:
     if "marts" in steps and as_of_dt < config.LIVE_FINAL_AFTER:                       # guard 4
         raise SystemExit(f"refused: marts need as_of >= {config.LIVE_FINAL_AFTER.isoformat()}")
     latest = check_latest(as_of, args.lake)                                            # guard 3
+    from .silver_cohorts import ensure_ext_tables
+    ensure_ext_tables(args.lake)          # empty live_ext tables before the first extended build (Gold reads them)
     BASE.update(base_params(args.lake))
     t_all = time.time()
     spark = get_spark("truthlag_gold")
