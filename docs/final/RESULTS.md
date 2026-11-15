@@ -283,3 +283,57 @@ Silver by version, `silver/live_revert_links`:
 | v3 | 2026-11-13T23:59:59.999999Z | 19,513 | 17,818 |
 
 The kit's version of the SQL compared fact_revert_label at two History snapshots. No 2026-10 snapshot exists on the VPS or the Mac (STATUS.md, blocker 1), so the knowledge axis here is the stream's as_of. fact_revert_label has one load (v1, 2026-09, 5,266,843 rows).
+
+## Streaming algorithms against exact answers (2026-11-15 09:53 UTC)
+
+Command: `python -m etl.streaming_algos` (85 s; output `data/lake/_runs/streaming_algos.json`). Stream: enwiki page-change events of `silver/page_change` v28 in publish order, 2026-10-19 23:00:00.504000+00:00 to 2026-11-13 23:59:59.844000+00:00: 4,617,893 events, 170,315 revert events. Bloom filter: the raw `bronze/page_change_events` v49 lines in capture order (repeats included). One pass per sketch; memory is the sketch's own size. "Exact bytes" is an estimate (8 bytes per distinct 64-bit hash, a lower bound for a hash set).
+
+### Distinct pages and editors (E4): HyperLogLog and Flajolet-Martin (PCSA)
+
+Exact: 2,153,428 distinct pages, 229,828 distinct editors (user id + name). Each sketch ran with 5 independent hash functions (salts); the table gives the first run and the spread.
+
+| Item | Sketch | Memory (bytes) | Estimate (salt 1) | Error salt 1 | Mean error, 5 salts | SD, 5 salts | Max abs error | Theory SE | Exact memory est. (bytes) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pages | HLL p=10 | 768 | 2,163,285 | +0.46% | +1.60% | 2.94% | 5.62% | 3.25% | 17,227,424 |
+| pages | HLL p=12 | 3,072 | 2,169,372 | +0.74% | +0.60% | 1.20% | 1.52% | 1.62% | 17,227,424 |
+| pages | HLL p=14 | 12,288 | 2,148,428 | -0.23% | -0.30% | 1.18% | 2.36% | 0.81% | 17,227,424 |
+| pages | FM-PCSA m=64 | 256 | 2,304,677 | +7.02% | +2.05% | 10.21% | 15.67% | 9.75% | 17,227,424 |
+| pages | FM-PCSA m=256 | 1,024 | 2,224,966 | +3.32% | +5.35% | 5.17% | 10.26% | 4.88% | 17,227,424 |
+| pages | FM-PCSA m=1024 | 4,096 | 2,156,754 | +0.15% | +2.37% | 2.88% | 7.17% | 2.44% | 17,227,424 |
+| editors | HLL p=10 | 768 | 219,584 | -4.46% | +0.11% | 2.60% | 4.46% | 3.25% | 1,838,624 |
+| editors | HLL p=12 | 3,072 | 225,641 | -1.82% | -0.56% | 1.60% | 2.61% | 1.62% | 1,838,624 |
+| editors | HLL p=14 | 12,288 | 225,220 | -2.00% | -0.74% | 1.16% | 2.00% | 0.81% | 1,838,624 |
+| editors | FM-PCSA m=64 | 256 | 264,175 | +14.95% | +3.30% | 12.26% | 14.95% | 9.75% | 1,838,624 |
+| editors | FM-PCSA m=256 | 1,024 | 240,941 | +4.83% | +2.20% | 3.62% | 4.83% | 4.88% | 1,838,624 |
+| editors | FM-PCSA m=1024 | 4,096 | 239,478 | +4.20% | +1.44% | 3.63% | 5.05% | 2.44% | 1,838,624 |
+
+Spark's built-in HyperLogLog++ (`approx_count_distinct`) on the same rows: rsd 0.05 gives 2,198,477 pages and 220,940 editors; rsd 0.01 gives 2,153,746 pages (+0.01%) and 229,227 editors (-0.26%).
+
+Mergeability: one HLL (p = 12) per day, merged by register-wise max = 225,641 distinct editors over the whole period (-1.82%, the same registers as one sketch over the whole stream). Adding the exact daily counts instead gives 466,959, double-counting editors active on several days.
+
+A check of the HLL code on synthetic data (8 trials of 229,828 random 64-bit keys): p = 14 mean error +0.36%, SD 0.76% (theory 0.81%); p = 12 mean +1.31%, SD 2.32%.
+
+### Bloom filter on meta_id (repeat check) against the Silver MERGE
+
+| Target FP rate | Bits | Hashes | Memory | Events | Exact repeats (= removed by Silver) | Flagged | True repeats found | False positives | False negatives | Observed FP rate | Exact set memory est. |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.01 | 44,262,813 | 7 | 5,532,852 B | 4,617,897 | 4 | 7,566 | 4 | 7,562 | 0 | 0.001638 | 36,943,144 B |
+| 0.001 | 66,394,219 | 10 | 8,299,278 B | 4,617,897 | 4 | 591 | 4 | 587 | 0 | 0.000127 | 36,943,144 B |
+
+The filter was sized for the whole stream, so the observed rate over the stream is below the target (the target holds when the filter is full). A Bloom filter has no false negatives, so it can screen events: only the flagged ones (0.013% at the 0.001 target) need the exact lookup that the insert-only MERGE does on every event.
+
+### DGIM: revert events in the last hour (time-based window, 10-minute evaluation marks)
+
+| Scope | r (buckets per size) | Eval points | Mean rel. error | p95 rel. error | Max rel. error | Bound | Max buckets | Memory est. |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| wiki-wide | 2 | 3,599 | 11.25% | 24.1% | 40.13% | 50.0% | 17 | 136 B vs exact window 7,024 B |
+| wiki-wide | 4 | 3,599 | 5.24% | 10.84% | 16.32% | 25.0% | 31 | 248 B vs exact window 7,024 B |
+| per page (200 pages with most reverts) | 2 | 34,634 | 41.18% | 50.0% | 50.0% | 50.0% | 9 | 9 buckets |
+
+Wiki-wide, DGIM stays inside its bound with 17-31 buckets instead of every timestamp in the window. Per page, hourly revert counts are tiny (often 1), and DGIM's "half the oldest bucket" rule then costs up to 50%: for single pages an exact deque is as small and exact. This is the expected trade-off, reported as measured.
+
+### Two more course techniques, small
+
+- Reservoir sampling (k = 10,000, seed 226) over 4,209,083 edit events: revert-event share in the sample 3.76% (95% CI 3.387-4.133%) against the exact 4.046%: the interval holds the exact value.
+- AMS estimate of the second moment F2 of edits per page (exact 249,630,183): 100 variables give 50,088,088 (-79.94%), 1000 variables give 215,925,958 (-13.5%). Edits per page are heavy-tailed, so few variables underestimate badly; error falls with more variables (median of 10 means).
+
