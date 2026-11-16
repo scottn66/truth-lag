@@ -286,7 +286,21 @@ Source: `notebooks/fallback/privacy.ipynb` (fallback; a teammate's notebook repl
 - The burst rule also catches edit wars. The burst groups are small (439 reverts in the live cohort).
 - The H4 floor (1%) was set after seeing the data.
 
-## IX. Conclusion
+## IX. Lessons Learned
+
+Rubric line "Lessons learned" (report and presentation), and the Canvas instruction to document key learnings, technical difficulties and best practices. These are facts from the build; the team adds its own.
+
+- **Technical difficulty:** Spark would not start on the laptop until the driver was bound to the loopback address and the network transport was switched; timestamps were shifted until the session was forced to UTC. **Practice:** one session factory that every job uses.
+- **Technical difficulty:** a planning note said the second History snapshot was already on the capture server; it was not. **Practice:** check that each input exists before planning work on it.
+- **Learning:** a sample drawn by "sample, then limit" was not uniform; it under-sampled the latest edits. It was found only because the reservoir sample was compared with the exact mix of editor kinds. **Practice:** compare every sample with its population before using it.
+- **Learning:** a cardinality sketch looked biased on one run; a test on made-up data showed the sketch was right and the spread came from the hash. **Practice:** report several hash salts, not one run.
+- **Learning:** edit comments hold user names typed as plain text. **Practice:** mask comments before any export, and do not quote them.
+- **Learning:** a failing test went unnoticed because only the last lines of the test output were read. **Practice:** check the exit code.
+- **Best practice:** loads that can run twice without changing the table (a re-run writes no new version), and table versions addressed by commit metadata, not by timestamp.
+- **Best practice:** every number in this draft is filled from one results file and checked by a script, so no number is typed by hand.
+- **TODO (owner):** the team's own lessons (teamwork, tools, what you would do differently), and the text.
+
+## X. Conclusion
 
 - Facts to close on: 57.95% of eventual reverts are known after 1 hour and 89.44% after 1 day; stream and dump labels agree for 99.86% of revisions; the lake reproduces every published number.
 - **TODO (owner):** what a dashboard owner should do with the curve, and next steps.
@@ -311,7 +325,7 @@ Proposed from the team message of 2026-11-15; each person confirms or corrects t
 
 ## Appendix: Rubric Criteria in Order
 
-The table of criteria with a runnable command and its output file for each is `docs/final/RUBRIC_EVIDENCE.md` (checked by `scripts/check_evidence.py`). **TODO (owner):** paste that table here in the order of the official rubric on Canvas.
+The criteria in the order of the Canvas rubric (`docs/final/CANVAS_SPEC.md`), each with a runnable command, its output file and its notebook, are in `docs/final/RUBRIC_EVIDENCE.md` (checked by `scripts/check_evidence.py`). Rows marked open there have no evidence yet. **TODO (owner):** paste that table here, fill the open rows with real evidence or leave them stated as not done, and add the external links and the list of tools from the same file.
 
 ## References
 

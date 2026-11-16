@@ -82,3 +82,8 @@
 ## Slide 15: GenAI disclosure
 
 - Code, checks and analysis scripts were written with Claude Code; every number comes from a logged command; the team wrote the text. Details: `docs/final/GENAI_LOG.md`.
+
+## Slide 16: Lessons learned (rubric line)
+
+- From the build: check every sample against its population; check that inputs exist before planning; one Spark session factory; mask comments before export; numbers filled from one file, never typed.
+- **TODO (owner):** the team's own lessons.

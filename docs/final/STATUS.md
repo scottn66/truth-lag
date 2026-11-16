@@ -9,7 +9,7 @@ Scope amendment (from Scott, 2026-11-15): LSH (Wanru) and Privacy (Zhenni) are t
 Goal of loop 2: make what is graded (report, slides, code bundle) correct by construction. Decisions for Scott: `docs/final/GATE_MON.md` only.
 
 1. `scripts/check_numbers.py` exits 0 with zero mismatches. `docs/final/results.json` (1,130 facts, 62 constants) is collected by `scripts/make_results.py` from the run records and tables and stamped with the commit hash; `report_draft.md` and `slides_outline.md` are templates filled from it.
-2. `scripts/check_evidence.py` exits 0: 14 rubric lines in `RUBRIC_EVIDENCE.md`, each with a runnable command, its output file and an executed notebook.
+2. `scripts/check_evidence.py` exits 0: `RUBRIC_EVIDENCE.md` follows the 24 Canvas rubric lines (`CANVAS_SPEC.md`) in order; 14 have a runnable command and an output file that exist, 10 are open and need a person (re-mapped on Nov 15 after the rubric was added).
 3. Every rubric technique is built. New in `notebooks/fallback/` (built by Claude for Scott; teammate work wins): `lsh_minhash` (recall 96.11% against an exact join at 5 hash tables; precision 40 of 40 and 37 of 40 on labeled pairs), `privacy` (k-anonymity, l-diversity, suppression cost, Laplace noise at 3 epsilons), `moments_reservoir` (AMS and reservoir sampling over many seeds).
 4. `docs/final/report_draft.md`: IEEE-section skeleton, facts and tables only, no code, every number from `results.json`.
 5. `scripts/make_bundle.sh` builds `dist/` from a fresh clone: a 702 KB code zip (the 49 tests pass from the unzipped copy), a repo zip, the notebooks with `.py` copies, figures and `results.json`; its output is in RESULTS.md ("Bundle").
