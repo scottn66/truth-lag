@@ -1,0 +1,10 @@
+cohort,rule,rows_kept_pct,edits_kept_pct,reverts_kept_pct,true_revert_rate_pct,released_revert_rate_pct,bias_points
+history,A,0.74,7.17,14.99,5.98,12.5,6.52
+history,B,0.74,7.17,14.86,5.98,12.41,6.43
+history,C,0.4,4.05,14.86,5.98,21.97,15.98
+live,A,0.73,7.38,18.03,6.38,15.57,9.19
+live,B,0.73,7.35,17.44,6.38,15.14,8.76
+live,C,0.44,4.7,17.44,6.38,23.64,17.26
+live_ext,A,1.8,16.44,42.08,4.71,12.05,7.34
+live_ext,B,1.8,16.44,42.05,4.71,12.05,7.34
+live_ext,C,1.04,10.47,42.05,4.71,18.92,14.21
