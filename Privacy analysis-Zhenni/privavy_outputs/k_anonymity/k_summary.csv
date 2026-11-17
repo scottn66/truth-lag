@@ -1,0 +1,9 @@
+table,k,rows,rows_below_k,rows_below_k_pct,edits_in_those_rows_pct
+kind x date x hour,2,1875,7,0.37,0.01
+kind x date x hour,5,1875,74,3.95,0.83
+kind x date x hour,10,1875,209,11.15,3.04
+kind x date x hour,20,1875,627,33.44,25.4
+page summary,2,1559483,1273073,81.63,52.56
+page summary,5,1559483,1534855,98.42,85.33
+page summary,10,1559483,1555567,99.75,94.02
+page summary,20,1559483,1558722,99.95,97.18
