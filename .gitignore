@@ -20,3 +20,4 @@ ec-hw2/.env.*
 !ec-hw2/.env.example
 .venv-lake/
 dist/
+.DS_Store

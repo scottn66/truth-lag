@@ -7,6 +7,7 @@
 #   truthlag_code_<commit>.zip   the code to upload: lake code, checks, notebooks, final docs, the EC HW2 modules it imports
 #   truthlag_repo_<commit>.zip   every tracked file up to 1.2 MB (also the EC HW2 submission material; never data/)
 #   notebooks/final, notebooks/fallback   the executed notebooks with their .py copies
+#   notebooks/teammates                   Wanru's (LSH, Neo4j) and Zhenni's (privacy) notebooks with their .py copies
 #   figures/                      the report figures (PNG)
 #   results.json, report_draft.md, RUBRIC_EVIDENCE.md, GENAI_LOG.md, GATE_MON.md
 #   MANIFEST.txt                  commit hash, every file with size and SHA-256, excluded files, check results
@@ -29,7 +30,7 @@ if git ls-files data | grep -v '^data/.gitkeep$' | grep -q .; then
   echo "refused: tracked files under data/"; git ls-files data; exit 1
 fi
 
-rm -rf "$OUT"; mkdir -p "$OUT/notebooks/final" "$OUT/notebooks/fallback" "$OUT/figures"
+rm -rf "$OUT"; mkdir -p "$OUT/notebooks/final" "$OUT/notebooks/fallback" "$OUT/notebooks/teammates" "$OUT/figures"
 : > "$TMP/keep.txt"; : > "$TMP/excluded.txt"
 git ls-files | while IFS= read -r f; do
   [ -f "$f" ] || continue
@@ -40,15 +41,23 @@ zip -q -X "$OUT/truthlag_repo_${SHORT}.zip" -@ < "$TMP/keep.txt"
 
 # The code zip to upload: only what the final project needs (the lake code, its checks, notebooks, final docs, and
 # the EC HW2 modules that the lake imports). The repo zip above also holds the EC HW2 submission material.
+# Teammates' notebooks and their outputs are part of it; Word files (.docx) stay in the repository only.
 git ls-files -- etl scripts tests_lake notebooks/final notebooks/fallback docs/final ingest \
+    notebooks/privacy_zhenni ':(glob)notebooks/*_wanru.*' notebooks/lsh_pair_labels.csv \
     ':(glob)docs/delta_lake_handoff/*.md' docs/delta_lake_handoff/requirements-lake.txt \
     ec-hw2/config.py ec-hw2/ingest ec-hw2/tests/__init__.py ec-hw2/tests/test_history.py ec-hw2/tests/test_stream.py \
-    ec-hw2/STYLE.md ec-hw2/DATA_MODEL.md README.md requirements.txt .gitignore | grep -F -x -f "$TMP/keep.txt" > "$TMP/code.txt"
+    ec-hw2/STYLE.md ec-hw2/DATA_MODEL.md README.md requirements.txt .gitignore | grep -v -i '\.docx$' | grep -F -x -f "$TMP/keep.txt" > "$TMP/code.txt"
 zip -q -X "$OUT/truthlag_code_${SHORT}.zip" -@ < "$TMP/code.txt"
+# the code zip must hold no secrets file, no data dump and no Word file
+if grep -E -i '(^|/)\.env|\.docx$|^data/|\.(ndjson|parquet|tsv|bz2|gz|sqlite)$' "$TMP/code.txt" | grep -v -x 'ec-hw2/.env.example' | grep -q .; then
+  echo "refused: the code zip would hold a secrets, data or Word file:"; grep -E -i '(^|/)\.env|\.docx$|^data/|\.(ndjson|parquet|tsv|bz2|gz|sqlite)$' "$TMP/code.txt"; exit 1
+fi
 
 cp notebooks/final/*.ipynb notebooks/final/*.py "$OUT/notebooks/final/"
 cp notebooks/fallback/*.ipynb notebooks/fallback/*.py "$OUT/notebooks/fallback/" 2>/dev/null || true
 cp notebooks/fallback/*.csv "$OUT/notebooks/fallback/" 2>/dev/null || true
+cp notebooks/*_wanru.ipynb notebooks/*_wanru.py notebooks/lsh_pair_labels.csv "$OUT/notebooks/teammates/" 2>/dev/null || true
+cp notebooks/privacy_zhenni/*.ipynb notebooks/privacy_zhenni/*.py "$OUT/notebooks/teammates/" 2>/dev/null || true
 cp docs/final/figures/*.png "$OUT/figures/"
 for f in results.json report_draft.md RUBRIC_EVIDENCE.md GENAI_LOG.md GATE_MON.md; do
   [ -f "docs/final/$f" ] && cp "docs/final/$f" "$OUT/"
