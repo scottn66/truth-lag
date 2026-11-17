@@ -336,7 +336,7 @@ def teammates_md(doc: dict) -> str:
     if bad:
         L += ["", "| Teammate fact | Value | Lake or fallback fact | Value |", "| --- | --- | --- | --- |"]
         L += [f"| `{a}` | {n(a)} | `{b}` | {n(b)} |" for a, b in bad]
-    L += ["", END]
+    L += ["", f"Automated tests at this collection: {n('tests.passed')} passed.", "", END]
     return "\n".join(L)
 
 
@@ -540,7 +540,9 @@ def collect() -> dict:
         f[b + ".estimate"], f[b + ".err_pct"], f["algos.ams.exact_f2"] = r["estimate"], r["rel_error_pct"], r["exact_f2"]
 
     # ---------------- Structured Streaming
-    ss = run("stream_sss.json")
+    # `python -m etl.stream_sss` is also the live demo: every run overwrites stream_sss.json with new timings. The
+    # published timings are the frozen copy of the 2026-11-15 run; a later demo run does not change a reported number.
+    ss = run("stream_sss.published_2026-11-15.json") or run("stream_sss.json")
     for r in ss["rates"]:
         b = f"sss.rate{r['target_rate_eps']}"
         f[b + ".rate"] = r["target_rate_eps"]
