@@ -18,6 +18,13 @@ Writes only under data/lake/stream_demo/ (one folder per run). The lake tables a
 
 Run
     python -m etl.stream_sss                       # all rates + drain; results in data/lake/_runs/stream_sss.json
+    python -m etl.stream_sss --quick               # live demo, about 1 minute: one rate (2,500 events/s for 15 s),
+                                                   # each micro-batch printed as it commits, then the parity check
+    python -m etl.stream_sss --rates 2500,10000    # chosen rates, 30 s each, with the drain
+
+Only the full run writes stream_sss.json. --quick and --rates write stream_sss_demo.json, so a demo never
+replaces the full record. (The report's timings come from the frozen copy stream_sss.published_2026-11-15.json.)
+Spark's start-up output goes to a log file (TRUTHLAG_SPARK_VERBOSE=1 shows it on the terminal).
 """
 from __future__ import annotations
 
@@ -40,6 +47,7 @@ from .hw2 import config
 DEMO = lake_config.lake_root() / "stream_demo"
 RATES = [1000, 2500, 5000, 10000, 20000]
 SECONDS = 30
+QUICK_RATE, QUICK_SECONDS = 2500, 15
 DRAIN_ROWS = 500_000
 START_DATE = "2026-10-20"
 TS = pa.timestamp("us", tz="UTC")
@@ -91,7 +99,9 @@ def produce(dest: str, rate: int, seconds: int, offset: int) -> None:
 
 
 # ------------------------------------------------------------------ consumer
-def _process(spark, silver_out: str, records: list):
+def _process(spark, silver_out: str, records: list, show: bool = False):
+    """The foreachBatch function: parse one micro-batch, apply the Silver rules, MERGE it into silver_out.
+    With show=True each micro-batch is printed when its MERGE commits."""
     from pyspark.sql import functions as F
 
     def fb(df, batch_id):
@@ -117,6 +127,11 @@ def _process(spark, silver_out: str, records: list):
                      for r in s.groupBy("produced_at").count().collect()]
         s.unpersist()
         records.append({"batch_id": batch_id, "rows": n, "t_start": t_start, "t_done": t_done, "per_stamp": per_stamp})
+        if show and n:
+            oldest = t_done - min(st for st, _ in per_stamp)
+            total = sum(r["rows"] for r in records)
+            print(f"   micro-batch {batch_id:>3}: {n:>7,} events parsed and merged in {t_done - t_start:4.1f} s; "
+                  f"oldest event waited {oldest:4.1f} s; total in Silver {total:>9,}", flush=True)
 
     return fb
 
@@ -148,7 +163,7 @@ def summarize(records: list, label: str, rate: int | None) -> dict:
             "mean_batch_merge_s": round(float(np.mean([r["t_done"] - r["t_start"] for r in records])), 3)}
 
 
-def run_rate(spark, rate: int, offset: int) -> tuple[dict, str]:
+def run_rate(spark, rate: int, offset: int, seconds: int = SECONDS, show: bool = False) -> tuple[dict, str]:
     d = DEMO / f"rate_{rate}"
     shutil.rmtree(d, ignore_errors=True)
     d.mkdir(parents=True)
@@ -156,12 +171,12 @@ def run_rate(spark, rate: int, offset: int) -> tuple[dict, str]:
     delta_io.ensure_table(src, SCHEMA_IN, lake_config.KEEP_HISTORY)
     _silver_ddl(spark, out)
     records: list = []
-    q = (spark.readStream.format("delta").load(src).writeStream.foreachBatch(_process(spark, out, records))
+    q = (spark.readStream.format("delta").load(src).writeStream.foreachBatch(_process(spark, out, records, show))
          .option("checkpointLocation", ck).trigger(processingTime="1 second").start())
     time.sleep(3)
-    prod = subprocess.run([sys.executable, "-m", "etl.stream_sss", "produce", src, str(rate), str(SECONDS), str(offset)],
+    prod = subprocess.run([sys.executable, "-m", "etl.stream_sss", "produce", src, str(rate), str(seconds), str(offset)],
                           capture_output=True, text=True, env=os.environ.copy())
-    produced = rate * SECONDS
+    produced = rate * seconds
     t_wait = time.time()
     while sum(r["rows"] for r in records) < produced and time.time() - t_wait < 120:
         time.sleep(0.5)
@@ -211,25 +226,69 @@ def parity(spark, out: str) -> dict:
     return r.asDict()
 
 
+def rate_line(res: dict) -> str:
+    verdict = "keeps up" if res["latency_p95_s"] <= 5 else "falls behind (p95 over 5 s)"
+    return (f"   {res['target_rate_eps']:>6,} events/s target: {res['events']:>9,} events in {res['micro_batches']:>3} micro-batches; "
+            f"throughput {res['throughput_eps']:>8,.1f}/s; latency median {res['latency_p50_s']:.2f} s, "
+            f"p95 {res['latency_p95_s']:.2f} s, max {res['latency_max_s']:.2f} s -> {verdict}")
+
+
+def parity_lines(p: dict) -> None:
+    print(f"   rows written by the stream: {p['stream_rows']:,}; not in batch Silver: {p['only_stream']:,}; "
+          f"with a different value: {p['differing']:,}")
+    print("   -> the streamed rows equal the batch pipeline's rows." if not p["only_stream"] and not p["differing"]
+          else "   -> DIFFERENCE between the stream and the batch pipeline: look at the two tables.", flush=True)
+
+
 def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == "produce":
         produce(sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]))
         return
+    args = sys.argv[1:]
+    quick = "--quick" in args
+    rates, seconds = (list(RATES), SECONDS)
+    if quick:
+        rates, seconds = [QUICK_RATE], QUICK_SECONDS
+    elif "--rates" in args:
+        rates = [int(x) for x in args[args.index("--rates") + 1].split(",")]
+    full = not quick and rates == RATES
+
+    print("TruthLag Structured Streaming demo: the Bronze -> Silver step as a streaming query.")
+    print("A producer process appends captured Wikipedia page-change events to a Delta table at a fixed rate.")
+    print("A Spark streaming query reads that table every second, parses the JSON, applies the Silver rules")
+    print("and MERGEs each micro-batch into a Silver table. Latency = MERGE commit time - time the event was produced.")
+    print(f"This run: rates {', '.join(f'{r:,}' for r in rates)} events/s, {seconds} s each"
+          + ("" if quick else "; then a drain of 500,000 pre-loaded events at full speed") + ".\n", flush=True)
     from .spark_session import get_spark
-    spark = get_spark("truthlag_sss", shuffle_partitions=4)
+    spark = get_spark("truthlag_sss", shuffle_partitions=4, quiet=True)
     results, offset = [], 0
-    for rate in RATES:
-        res, out = run_rate(spark, rate, offset)
-        offset += rate * SECONDS
-        print(json.dumps(res), flush=True)
+    for i, rate in enumerate(rates, 1):
+        print(f"{i}. Replay at {rate:,} events/s for {seconds} s (about {seconds + 10} s with start and stop)", flush=True)
+        res, out = run_rate(spark, rate, offset, seconds, show=quick)
+        offset += rate * seconds
+        print(rate_line(res) + "\n", flush=True)
         results.append(res)
-    drain, out = run_drain(spark)
-    drain["parity_with_batch_silver"] = parity(spark, out)
-    print(json.dumps(drain), flush=True)
-    doc = {"rates": results, "drain": drain, "seconds_per_rate": SECONDS, "spark": spark.version,
-           "master": spark.sparkContext.master}
-    path = lake_config.lake_root() / "_runs" / "stream_sss.json"
+    step = len(rates) + 1
+    if quick:
+        print(f"{step}. Correctness: the streamed rows against the batch Silver table for the same Bronze lines")
+        par = parity(spark, out)
+        parity_lines(par)
+        doc = {"rates": results, "parity_with_batch_silver": par, "seconds_per_rate": seconds,
+               "spark": spark.version, "master": spark.sparkContext.master, "mode": "quick"}
+    else:
+        print(f"{step}. Drain: {DRAIN_ROWS:,} events already waiting, processed as fast as possible (availableNow)", flush=True)
+        drain, out = run_drain(spark)
+        drain["parity_with_batch_silver"] = parity(spark, out)
+        print(f"   {drain['events']:,} events in {drain['micro_batches']} micro-batches, {drain['wall_s']} s: "
+              f"{drain['throughput_eps']:,.1f} events/s")
+        print(f"\n{step + 1}. Correctness: the drained rows against the batch Silver table for the same Bronze lines")
+        parity_lines(drain["parity_with_batch_silver"])
+        doc = {"rates": results, "drain": drain, "seconds_per_rate": seconds, "spark": spark.version,
+               "master": spark.sparkContext.master}
+    name = "stream_sss.json" if full else "stream_sss_demo.json"
+    path = lake_config.lake_root() / "_runs" / name
     path.write_text(json.dumps(doc, indent=1))
+    print(f"\nSaved to {path}" + ("" if full else " (demo record; the full record stream_sss.json is untouched)"))
     spark.stop()
 
 
