@@ -34,8 +34,35 @@ def prepare_env() -> None:
     os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
 
 
+def _start_quietly(builder, app: str):
+    """Start the JVM with its console output (Ivy resolution, start-up warnings) sent to a log file.
+
+    The JVM inherits file descriptors 1 and 2 from Python when it starts, so they point at the log file only
+    while the session is created; Python's own output goes back to the terminal right after. Errors still reach
+    Python as exceptions. Set TRUTHLAG_SPARK_VERBOSE=1 to see everything on the terminal instead.
+    """
+    log_dir = SPARK_HOME_DIR / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / f"{app}.log"
+    sys.stdout.flush()
+    sys.stderr.flush()
+    saved_out, saved_err = os.dup(1), os.dup(2)
+    with open(log_path, "w") as log:
+        os.dup2(log.fileno(), 1)
+        os.dup2(log.fileno(), 2)
+        try:
+            spark = builder.getOrCreate()
+        finally:
+            os.dup2(saved_out, 1)
+            os.dup2(saved_err, 2)
+            os.close(saved_out)
+            os.close(saved_err)
+    return spark, log_path
+
+
 def get_spark(app: str = "truthlag", extra: dict | None = None, driver_mem: str = "6g",
-              master: str = "local[4]", shuffle_partitions: int = 8):
+              master: str = "local[4]", shuffle_partitions: int = 8, quiet: bool = False):
+    """quiet=True (used by the demo programs) keeps Spark's start-up output out of the terminal."""
     prepare_env()
     from delta import configure_spark_with_delta_pip
     from pyspark.sql import SparkSession
@@ -60,6 +87,17 @@ def get_spark(app: str = "truthlag", extra: dict | None = None, driver_mem: str 
          .config("spark.driver.extraJavaOptions", f"-Dderby.system.home={home}/derby -Duser.timezone=UTC"))
     for k, v in (extra or {}).items():
         b = b.config(k, v)
-    spark = configure_spark_with_delta_pip(b).getOrCreate()
+    builder = configure_spark_with_delta_pip(b)
+    if quiet and not os.environ.get("TRUTHLAG_SPARK_VERBOSE"):
+        t0 = time.time()
+        print("Starting Spark with Delta Lake ...", flush=True)
+        try:
+            spark, log_path = _start_quietly(builder, app)
+        except Exception:
+            print(f"Spark did not start; its output is in {SPARK_HOME_DIR / 'logs' / (app + '.log')}", flush=True)
+            raise
+        print(f"Spark {spark.version} ready in {time.time() - t0:.0f} s (start-up log: {log_path})\n", flush=True)
+    else:
+        spark = builder.getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     return spark
