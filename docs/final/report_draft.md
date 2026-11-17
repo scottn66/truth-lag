@@ -1,6 +1,6 @@
 # Truth Lag: Measuring How Fast Live Wikipedia Metrics Converge to Reconciled History
 
-**Report draft for the team (source for Tingyu, not the final text).** Group 9, DATA 226. Generated from `docs/final/results.json` at commit `84624f4` (2026-11-15T12:58:49Z). Every number below is filled from that file by `scripts/render_report.py`; edit `docs/final/report_draft.template.md`, never this file. `scripts/check_numbers.py` fails if a number here is not in `results.json`.
+**Report draft for the team (source for Tingyu, not the final text).** Group 9, DATA 226. Generated from `docs/final/results.json` at commit `ddde933` (2026-11-17T08:59:46Z). Every number below is filled from that file by `scripts/render_report.py`; edit `docs/final/report_draft.template.md`, never this file. `scripts/check_numbers.py` fails if a number here is not in `results.json`.
 
 How to use it: each section holds the facts and tables the final IEEE-format report needs. Sentences are short fact statements, not report prose: the section owner rewrites them in their own words. Lines that start with **TODO** need a person. Do not quote edit comments anywhere (they can contain names).
 
@@ -71,7 +71,7 @@ Figure: `docs/final/figures/flow.png` (data flow from the sources through Bronze
 - Star schema: `dim_cohort`, `dim_snapshot`, `dim_time`, `dim_user`, `dim_page` (slowly changing dimension, Type 2), `fact_edit`, `fact_revert_label`, and the marts.
 - Every build takes a knowledge time ("as of"). The lake was built at 3 knowledge times, so each table's history shows what was known when.
 - One engine writes each table. Both engines read every table.
-- A full rebuild from the raw files into an empty folder takes about 15 minutes on one laptop and reproduces every number in this draft. 49 automated tests pass.
+- A full rebuild from the raw files into an empty folder takes about 15 minutes on one laptop and reproduces every number in this draft. 51 automated tests pass.
 
 ## V. Methods
 

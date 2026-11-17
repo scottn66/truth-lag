@@ -738,3 +738,140 @@ Head of `dist/MANIFEST.txt`:
 `dist/` holds the code zip, the repo zip, the 11 executed notebooks with `.py` copies, the pair labels, 3 figures, `results.json`, `report_draft.md`, `RUBRIC_EVIDENCE.md`, `GENAI_LOG.md`, `GATE_MON.md` and `MANIFEST.txt` (every file with size and SHA-256). After this entry was committed, `dist/` was rebuilt once more so that it matches the last commit; its `MANIFEST.txt` names that commit.
 
 `python scripts/check_evidence.py` on the Mac after the bundle: 14 rubric lines, 0 failing.
+
+<!-- teammates:begin (written by scripts/make_results.py; do not edit by hand) -->
+
+## Teammates' analyses, collected into results.json (2026-11-17T08:59:46Z)
+
+`python scripts/make_results.py` reads these numbers from files the teammates committed. Nothing is recomputed and no lake number is replaced: the keys are `wanru.*` and `zhenni.*`. Sources: `ec-hw2/results/cypher_*.csv`, the stored outputs of `notebooks/neo4j_history_edit_wars_wanru.ipynb` and `notebooks/lsh_minhash_wanru.ipynb`, and `notebooks/privacy_zhenni/outputs/`.
+
+### Wanru: Neo4j graph of the history cohort (20-day follow-up, as in EC HW2)
+
+| What | Value | Same number recomputed from the lake's Silver tables |
+| --- | --- | --- |
+| Editor nodes | 37,546 | 37,546 |
+| Page nodes | 165,415 | 165,415 |
+| EDITED relationships | 295,013 | 295,013 |
+| REVERTED relationships | 13,269 | 13,269 |
+| Mutual-revert pairs | 462 | 462 |
+| Pages with a mutual-revert pair | 397 | 397 |
+| Editors in mutual-revert pairs | 631 | 631 |
+
+| What | Value |
+| --- | --- |
+| Contested pages | 126 |
+| Mutual-revert pairs with a bot | 25 |
+| Louvain communities | 28,615 |
+| Louvain modularity | 0.9142 |
+| Communities with two or more editors | 1,191 |
+| Communities of one editor | 27,424 |
+| Largest community: editors | 564 |
+| Largest community: revert actions | 661 |
+| Largest community: bots | 1 |
+| Largest community: share of REVERTED relationships that touch its top reverter, % | 69.1 |
+| Page with the most warring editors: warring editors | 10 |
+| Same page: mutual pairs | 9 |
+| Same page: revert actions | 34 |
+| Same page: edits | 39 |
+
+### Wanru: MinHash LSH on edit comments
+
+| What | Value |
+| --- | --- |
+| Edits in the export | 261,166 |
+| Edits kept | 91,092 |
+| Distinct cleaned texts | 49,140 |
+| Texts in the exact-join sample | 4,000 |
+| Pairs compared in the exact join | 7,998,000 |
+| True near-duplicate pairs in the sample | 2,162 |
+| Exact join, seconds | 190.8 |
+| Near-duplicate pairs on all texts | 420,629 |
+| Texts with a near-duplicate | 9,988 |
+| Groups | 1,419 |
+| Largest group, texts | 1,186 |
+| Reverted edits that reuse a summary, % | 24.63 |
+| Not-reverted edits that reuse a summary, % | 72.56 |
+| Labeled pairs | 80 |
+| Labeled pairs with the same edit pattern | 77 |
+| Precision, % | 96.2 |
+| Precision, Wilson 95% low | 89.5 |
+| Precision, Wilson 95% high | 98.7 |
+| By similarity band: same pattern | 40 |
+| By group: same pattern | 37 |
+
+| Hash tables | Pairs returned | True pairs found | Recall, % | Seconds |
+| --- | --- | --- | --- | --- |
+| 1 | 1,937 | 1,931 | 89.32 | 1.0 |
+| 3 | 2,077 | 2,069 | 95.7 | 0.7 |
+| 5 | 2,086 | 2,078 | 96.11 | 0.8 |
+| 10 | 2,087 | 2,079 | 96.16 | 1.3 |
+| 20 | 2,087 | 2,079 | 96.16 | 3.6 |
+
+### Zhenni: k-anonymity, l-diversity, suppression
+
+| Table | Rows | k | Rows below k | Rows below k, % | Edits in those rows, % | Edits kept if those rows are dropped, % (100 minus the column before) |
+| --- | --- | --- | --- | --- | --- | --- |
+| kind x date x hour | 1,875 | 2 | 7 | 0.37 | 0.01 | 99.99 |
+| kind x date x hour | 1,875 | 5 | 74 | 3.95 | 0.83 | 99.17 |
+| kind x date x hour | 1,875 | 10 | 209 | 11.15 | 3.04 | 96.96 |
+| kind x date x hour | 1,875 | 20 | 627 | 33.44 | 25.4 | 74.6 |
+| page summary | 1,559,483 | 2 | 1,273,073 | 81.63 | 52.56 | 47.44 |
+| page summary | 1,559,483 | 5 | 1,534,855 | 98.42 | 85.33 | 14.67 |
+| page summary | 1,559,483 | 10 | 1,555,567 | 99.75 | 94.02 | 5.98 |
+| page summary | 1,559,483 | 20 | 1,558,722 | 99.95 | 97.18 | 2.82 |
+
+| Table | Rows with both labels, % | Rows with only reverted edits | Those, % | Rows with no reverted edit, % | Only-reverted rows from a single editor |
+| --- | --- | --- | --- | --- | --- |
+| kind x date x hour | 92.69 | 3 | 0.16 | 7.15 | 3 |
+| page summary | 4.8 | 2,526 | 0.162 | 95.04 | 2,170 |
+
+| Cohort | Rule | Rows kept, % | Edits kept, % | Reverts kept, % | True revert rate, % | Released revert rate, % | Bias, points |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| history | A | 0.74 | 7.17 | 14.99 | 5.98 | 12.5 | 6.52 |
+| history | B | 0.74 | 7.17 | 14.86 | 5.98 | 12.41 | 6.43 |
+| history | C | 0.4 | 4.05 | 14.86 | 5.98 | 21.97 | 15.98 |
+| live | A | 0.73 | 7.38 | 18.03 | 6.38 | 15.57 | 9.19 |
+| live | B | 0.73 | 7.35 | 17.44 | 6.38 | 15.14 | 8.76 |
+| live | C | 0.44 | 4.7 | 17.44 | 6.38 | 23.64 | 17.26 |
+| live_ext | A | 1.8 | 16.44 | 42.08 | 4.71 | 12.05 | 7.34 |
+| live_ext | B | 1.8 | 16.44 | 42.05 | 4.71 | 12.05 | 7.34 |
+| live_ext | C | 1.04 | 10.47 | 42.05 | 4.71 | 18.92 | 14.21 |
+
+### Zhenni: Laplace noise on the E(L) counts (1,000 trials, seed 226)
+
+Mean absolute error of E(L) over seven waits, shown to six decimals.
+
+| Cohort | Label source | Editor kind | Eventual reverts | MAE at epsilon 0.1 | MAE at epsilon 0.5 | MAE at epsilon 1.0 |
+| --- | --- | --- | --- | --- | --- | --- |
+| live_ext | stream | all | 112,937 | 0.000145 | 0.000029 | 0.000015 |
+| live_ext | stream | temporary | 59,675 | 0.000282 | 0.000057 | 0.000027 |
+| live_ext | stream | registered | 51,302 | 0.000318 | 0.000061 | 0.000032 |
+| live | dump | all | 18,077 | 0.000896 | 0.000184 | 0.000090 |
+| live | stream | all | 17,818 | 0.000927 | 0.000182 | 0.000093 |
+| history | dump | all | 17,646 | 0.000942 | 0.000186 | 0.000092 |
+| live | dump | temporary | 9,881 | 0.001693 | 0.000334 | 0.000167 |
+| history | dump | temporary | 9,863 | 0.001694 | 0.000335 | 0.000169 |
+| live | stream | temporary | 9,772 | 0.001676 | 0.000354 | 0.000171 |
+| live | dump | registered | 8,056 | 0.001996 | 0.000419 | 0.000203 |
+| live | stream | registered | 7,905 | 0.002004 | 0.000411 | 0.000203 |
+| history | dump | registered | 7,623 | 0.002061 | 0.000418 | 0.000204 |
+| live_ext | stream | bot | 1,960 | 0.008404 | 0.001712 | 0.000866 |
+| history | dump | bot | 157 | 0.171987 | 0.021101 | 0.010557 |
+| live | stream | bot | 141 | 0.154684 | 0.023457 | 0.012041 |
+| live | dump | bot | 140 | 0.204427 | 0.024604 | 0.011546 |
+| history | dump | unknown | 3 | 11.494742 | 2.243155 | 0.997243 |
+
+### Teammate numbers against the lake and the fallback notebooks
+
+163 teammate numbers have a lake or fallback number that measures the same thing (`lsh.*`, `privacy.*`, `el.*.n_eventual`, `lakecheck.graph.*`). Compared at the precision of the less precise of the two: 159 agree, 4 disagree.
+
+| Teammate fact | Value | Lake or fallback fact | Value |
+| --- | --- | --- | --- |
+| `zhenni.privacy.laplace.history.dump.all.mae.eps1_0` | 9.20599809702619e-05 | `privacy.laplace.history.dump.all.mae.eps_high` | 9e-05 |
+| `zhenni.privacy.laplace.live.stream.all.mae.eps1_0` | 9.320430484493767e-05 | `privacy.laplace.live.stream.all.mae.eps_high` | 9e-05 |
+| `zhenni.privacy.laplace.live_ext.stream.all.mae.eps0_5` | 2.946601208092208e-05 | `privacy.laplace.live_ext.stream.all.mae.eps_mid` | 3e-05 |
+| `zhenni.privacy.laplace.live_ext.stream.all.mae.eps1_0` | 1.455512280759135e-05 | `privacy.laplace.live_ext.stream.all.mae.eps_high` | 1e-05 |
+
+Automated tests at this collection: 51 passed.
+
+<!-- teammates:end -->

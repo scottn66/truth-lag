@@ -1,6 +1,6 @@
 # Truth Lag: slide outline
 
-**Outline for the team (source for Tingyu, not the final deck).** Filled from `docs/final/results.json` at commit `84624f4` by `scripts/render_report.py`; edit `docs/final/slides_outline.template.md`, never this file. One block per slide: a title, the facts to show, the figure to use. The rubric asks for a flow diagram and a CRediT slide: both are here. Do not quote edit comments on a slide.
+**Outline for the team (source for Tingyu, not the final deck).** Filled from `docs/final/results.json` at commit `ddde933` by `scripts/render_report.py`; edit `docs/final/slides_outline.template.md`, never this file. One block per slide: a title, the facts to show, the figure to use. The rubric asks for a flow diagram and a CRediT slide: both are here. Do not quote edit comments on a slide.
 
 ## Slide 1: Title
 
@@ -25,7 +25,7 @@
 ## Slide 5: Is the lake right?
 
 - Equal to the published EC HW2 tables value for value: 6 of 6 cohort tables, 3 of 3 stream tables.
-- 33 of 33 Gold checks and 49 tests pass.
+- 33 of 33 Gold checks and 51 tests pass.
 
 ## Slide 6: The truth-lag curve
 
