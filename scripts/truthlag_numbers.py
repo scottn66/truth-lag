@@ -77,6 +77,7 @@ def render(template_text: str, results: dict) -> tuple[str, list[str]]:
 MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?"
 STRIP = [
     (re.compile(r"`[^`\n]*`"), " "),                                             # code spans: file names, commands, table names
+    (re.compile(r"<data:[^>\n]*>?"), " "),                                       # embedded image data (base64), not text
     (re.compile(r"!\[[^\]]*\]\([^)]*\)|\]\([^)]*\)"), " "),                      # image and link targets
     (re.compile(r"\[\d+(?:\s*[,–-]\s*\d+)*\]"), " "),                            # citations [3], [4, 5]
     (re.compile(r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?Z?)?"), " "),   # ISO dates and timestamps

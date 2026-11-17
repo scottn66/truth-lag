@@ -2,7 +2,8 @@
 
 Sources: the run records that the etl commands wrote (data/lake/_runs/*.json), the Gold and Silver Delta tables at
 their current versions, the export manifest, the timing lines of the build logs, the constants of ec-hw2/config.py
-and etl/lake_config.py, and a pytest run. Nothing is typed in by hand: a number that is not produced by a command
+and etl/lake_config.py, a pytest run, and the committed result files of the teammates' analyses (facts named
+wanru.* and zhenni.*; see teammates()). Nothing is typed in by hand: a number that is not produced by a command
 is not in the file.
 
 Run (lake environment, from the repository root)
@@ -80,6 +81,273 @@ def constants() -> dict:
         "text.parity_as_of": lake_config.PARITY_AS_OF, "text.ext_as_of": lake_config.EXT_AS_OF,
     }
     return c
+
+
+def _notebook_text(path: Path) -> str:
+    """All stored text outputs of a committed notebook (the notebook is read, not run)."""
+    out = []
+    for c in json.loads(path.read_text())["cells"]:
+        for o in c.get("outputs", []):
+            out.append("".join(o.get("text", [])) or "".join(o.get("data", {}).get("text/plain", [])))
+    return "\n".join(out)
+
+
+def _csv(path: Path) -> list[dict]:
+    import csv
+    with path.open(newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
+def _num(x: str):
+    v = float(x)
+    return int(v) if v == int(v) and "." not in x and "e" not in x.lower() else v
+
+
+def teammates() -> dict:
+    """Numbers of the teammates' own analyses, read from files they committed. Nothing is recomputed here, and no
+    lake number is replaced: the keys are separate (wanru.*, zhenni.*).
+
+    Wanru  Neo4j     ec-hw2/results/cypher_*.csv and the stored output of notebooks/neo4j_history_edit_wars_wanru.ipynb
+           MinHash   the stored output of notebooks/lsh_minhash_wanru.ipynb
+    Zhenni privacy   notebooks/privacy_zhenni/outputs/k_anonymity/*.csv and outputs/laplace/*
+    """
+    f: dict = {}
+    res = REPO / "ec-hw2" / "results"
+
+    def need(m, what):
+        if not m:
+            raise SystemExit(f"teammate source changed: cannot find {what}")
+        return m
+
+    # ---- Wanru, Neo4j
+    t = _notebook_text(REPO / "notebooks" / "neo4j_history_edit_wars_wanru.ipynb")
+    for label, key in (("Editor", "editors"), ("Page", "pages"), ("EDITED", "edited_rels"), ("REVERTED", "reverted_rels"),
+                       ("contested Page", "contested_pages")):
+        f[f"wanru.neo4j.graph.{key}"] = int(need(re.search(rf"\|\s*{label}\s*\|\s*(\d+)\s*\|", t), label).group(1))
+    r = _csv(res / "cypher_q1_mutual_reverts_total.csv")[0]
+    f["wanru.neo4j.mutual_pairs"], f["wanru.neo4j.mutual_pages"] = int(r["mutual_pairs"]), int(r["pages"])
+    f["wanru.neo4j.mutual_editors"], f["wanru.neo4j.mutual_pairs_with_bot"] = int(r["editors"]), int(r["pairs_with_bot"])
+    r = _csv(res / "cypher_q3_conflict_communities_louvain_stats.csv")[0]
+    f["wanru.neo4j.louvain.communities"], f["wanru.neo4j.louvain.modularity"] = int(r["communities"]), float(r["modularity"])
+    f["wanru.neo4j.louvain.editors"] = int(r["editors_written"])
+    r = _csv(res / "cypher_q3_conflict_communities_community_sizes.csv")[0]
+    f["wanru.neo4j.louvain.communities_2plus"], f["wanru.neo4j.louvain.communities_single"] = int(r["communities_2plus"]), int(r["communities_1"])
+    f["wanru.neo4j.louvain.editors_without_revert"] = int(r["editors_without_revert"])
+    r = _csv(res / "cypher_q3_conflict_communities.csv")[0]
+    f["wanru.neo4j.largest_community.editors"], f["wanru.neo4j.largest_community.reverts"] = int(r["editors"]), int(r["reverts"])
+    f["wanru.neo4j.largest_community.bots"] = int(r["bots"])
+    f["wanru.neo4j.largest_community.top_reverter_share_pct"] = round(100 * float(r["star_share"]), 1)
+    r = _csv(res / "cypher_q4_pages_most_warring_editors.csv")[0]
+    for k in ("warring_editors", "mutual_pairs", "editors_in_any_revert", "revert_actions", "edits"):
+        f[f"wanru.neo4j.top_page.{k}"] = int(r[k])
+
+    # ---- Wanru, MinHash LSH (numbers printed by her notebook)
+    t = _notebook_text(REPO / "notebooks" / "lsh_minhash_wanru.ipynb")
+    m = need(re.search(r"edits in the export: (\d+) \| edits kept: (\d+) \| by label: \{0: (\d+), 1: (\d+)\}", t), "lsh edits line")
+    f["wanru.lsh.edits_in_export"], f["wanru.lsh.edits_kept"] = int(m.group(1)), int(m.group(2))
+    f["wanru.lsh.not_reverted.edits"], f["wanru.lsh.reverted.edits"] = int(m.group(3)), int(m.group(4))
+    m = need(re.search(r"distinct texts: (\d+) .*?share their exact text with another edit: (\d+)", t), "lsh texts line")
+    f["wanru.lsh.distinct_texts"], f["wanru.lsh.edits_sharing_exact_text"] = int(m.group(1)), int(m.group(2))
+    m = need(re.search(r"pairs compared: (\d+) \| exact near-duplicate pairs: (\d+) \| seconds: ([\d.]+)", t), "lsh exact join line")
+    f["wanru.lsh.sample_pairs_compared"], f["wanru.lsh.sample_exact_pairs"], f["wanru.lsh.exact_join_seconds"] = int(m.group(1)), int(m.group(2)), float(m.group(3))
+    rows = re.findall(r"(?m)^\s*\d+\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*$", t)
+    need(len(rows) >= 5, "lsh recall table")
+    for tables, returned, found, recall, agree, secs in rows:
+        b = f"wanru.lsh.tables{tables}"
+        f[b + ".pairs_returned"], f[b + ".true_pairs_found"] = int(returned), int(found)
+        f[b + ".recall_pct"], f[b + ".seconds"] = float(recall), float(secs)
+    f["wanru.lsh.sample_texts"] = round((1 + (1 + 8 * f["wanru.lsh.sample_pairs_compared"]) ** 0.5) / 2)
+    m = need(re.search(r"near-duplicate pairs among \d+ distinct texts: (\d+) \| seconds: ([\d.]+)", t), "lsh full join line")
+    f["wanru.lsh.near_dup_pairs"], f["wanru.lsh.full_join_seconds"] = int(m.group(1)), float(m.group(2))
+    m = need(re.search(r"texts with a near-duplicate: (\d+) \| groups: (\d+) \| largest group: (\d+) texts", t), "lsh groups line")
+    f["wanru.lsh.texts_with_near_dup"], f["wanru.lsh.groups"], f["wanru.lsh.largest_group_texts"] = (int(x) for x in m.groups())
+    for name, key in (("not reverted (label 0)", "not_reverted"), ("reverted (label 1)", "reverted")):
+        m = need(re.search(rf"(?m)^{re.escape(name)}\s+(\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*$", t), f"lsh {key} row")
+        f[f"wanru.lsh.{key}.exact_dup_pct"], f[f"wanru.lsh.{key}.near_dup_pct"], f[f"wanru.lsh.{key}.reuses_pct"] = (float(x) for x in m.groups()[1:])
+    for name in ("by_band", "by_group", "all"):
+        m = need(re.search(rf"{name}: human-labeled pairs (\d+) \| same edit pattern (\d+) \| precision ([\d.]+)% "
+                           r"\(Wilson 95% interval ([\d.]+) to ([\d.]+)\)", t), f"lsh labels {name}")
+        b = f"wanru.lsh.labels.{name}"
+        f[b + ".pairs"], f[b + ".same_pattern"] = int(m.group(1)), int(m.group(2))
+        f[b + ".precision_pct"], f[b + ".precision_lo"], f[b + ".precision_hi"] = float(m.group(3)), float(m.group(4)), float(m.group(5))
+
+    # ---- Zhenni, privacy
+    out = REPO / "notebooks" / "privacy_zhenni" / "outputs"
+    tkey = {"kind x date x hour": "grid", "page summary": "page"}
+    for r in _csv(out / "k_anonymity" / "k_summary.csv"):
+        b = f"zhenni.privacy.{tkey[r['table']]}.k{r['k']}"
+        f[f"zhenni.privacy.{tkey[r['table']]}.rows"] = int(r["rows"])
+        f[b + ".rows_below"], f[b + ".rows_below_pct"] = int(r["rows_below_k"]), float(r["rows_below_k_pct"])
+        f[b + ".edits_below_pct"] = float(r["edits_in_those_rows_pct"])
+        f[b + ".edits_kept_pct"] = round(100 - float(r["edits_in_those_rows_pct"]), 2)      # derived: 100 minus the column above
+    for r in _csv(out / "k_anonymity" / "l_diversity_summary.csv"):
+        b = f"zhenni.privacy.{tkey[r['table']]}.l2"
+        f[b + ".two_diverse_pct"], f[b + ".all_reverted_rows"] = float(r["two_diverse_pct"]), int(r["all_reverted_rows"])
+        f[b + ".all_reverted_pct"], f[b + ".none_reverted_pct"] = float(r["all_reverted_pct"]), float(r["none_reverted_pct"])
+        f[b + ".all_reverted_single_editor"] = int(r["all_reverted_and_single_editor"])
+    for r in _csv(out / "k_anonymity" / "suppression_summary.csv"):
+        b = f"zhenni.privacy.suppress.{r['cohort']}.rule{r['rule']}"
+        for k in ("rows_kept_pct", "edits_kept_pct", "reverts_kept_pct", "true_revert_rate_pct", "released_revert_rate_pct", "bias_points"):
+            f[f"{b}.{k}"] = float(r[k])
+    for r in _csv(out / "laplace" / "laplace_summary.csv"):
+        b = f"zhenni.privacy.laplace.{r['cohort_id']}.{r['label_source']}.{r['user_kind']}"
+        f[b + ".n"] = int(r["eventual_reverts"])
+        for eps in ("0.1", "0.5", "1.0"):
+            f[f"{b}.mae.eps{eps.replace('.', '_')}"] = float(r[f"mae_eps_{eps}"])
+            f[f"{b}.p95.eps{eps.replace('.', '_')}"] = float(r[f"p95_eps_{eps}"])
+    md = json.loads((out / "laplace" / "laplace_metadata.json").read_text())
+    f["zhenni.privacy.laplace.trials"], f["zhenni.privacy.laplace.seed"] = md["trials"], md["seed"]
+    f["zhenni.privacy.laplace.epsilons"], f["zhenni.privacy.laplace.series"] = len(md["epsilons"]), len(md["analyzed_series"])
+    return f
+
+
+def lake_check_of_graph() -> dict:
+    """The sizes of Wanru's Neo4j graph, recomputed from the lake's Silver tables for the history cohort (same rule as
+    the graph: a revert by another editor inside the 20-day follow-up). New keys only; used to compare, not to replace."""
+    import pandas as pd
+    rev = DeltaTable(str(LAKE / "silver/history_revisions")).to_pandas(columns=["page_id", "user_key"])
+    ln = DeltaTable(str(LAKE / "silver/history_revert_links")).to_pandas(columns=["page_id", "author_key", "reverter_key", "by_other", "within_followup"])
+    d = ln[(ln.by_other == True) & (ln.within_followup == True)]          # noqa: E712  (nullable booleans)
+    g = d.groupby(["page_id", "reverter_key", "author_key"]).size().reset_index(name="n")
+    back = g.rename(columns={"reverter_key": "author_key", "author_key": "reverter_key"})
+    m = g.merge(back, on=["page_id", "reverter_key", "author_key"])
+    m = m[m.reverter_key < m.author_key]
+    return {
+        "lakecheck.graph.editors": len(set(rev.user_key.dropna()) | set(d.reverter_key.dropna()) | set(d.author_key.dropna())),
+        "lakecheck.graph.pages": int(rev.page_id.nunique()),
+        "lakecheck.graph.edited_rels": int(rev.user_key.notna().sum()),
+        "lakecheck.graph.reverted_rels": int(len(g)),
+        "lakecheck.graph.mutual_pairs": int(len(m)), "lakecheck.graph.mutual_pages": int(m.page_id.nunique()),
+        "lakecheck.graph.mutual_editors": int(pd.concat([m.reverter_key, m.author_key]).nunique()),
+    }
+
+
+# teammate fact -> the lake or fallback fact that measures the same thing (for the comparison table in RESULTS.md)
+def teammate_pairs(facts: dict) -> list[tuple[str, str]]:
+    pairs = []
+    swap = {"tables1.recall_pct": "recall_pct.tables1", "tables5.recall_pct": "recall_pct.tables5", "tables20.recall_pct": "recall_pct.tables20",
+            "tables1.seconds": "seconds.tables1", "tables5.seconds": "seconds.tables5", "tables20.seconds": "seconds.tables20"}
+    for k in facts:
+        other = None
+        if k.startswith("wanru.lsh."):
+            tail = k[len("wanru.lsh."):]
+            other = "lsh." + swap.get(tail, tail)
+        elif k.startswith("wanru.neo4j.graph.") or k.startswith("wanru.neo4j.mutual_"):
+            other = "lakecheck.graph." + k.split(".")[-1]
+        elif k.startswith("zhenni.privacy.laplace.") and k.endswith(".n"):
+            c, src, kind = k.split(".")[3:6]
+            other = f"el.{c}.{src}.{kind}.w1h.n_eventual"
+        elif k.startswith("zhenni.privacy.laplace.") and ".mae.eps" in k:
+            other = k.replace("zhenni.", "").replace("eps0_1", "eps_low").replace("eps0_5", "eps_mid").replace("eps1_0", "eps_high")
+        elif k.startswith("zhenni.privacy."):
+            other = k.replace("zhenni.", "").replace(".l2.", ".").replace("all_reverted_single_editor", "all_reverted_single_editor")
+        if other and other in facts and other != k:
+            pairs.append((k, other))
+    return pairs
+
+
+def agree(a, b) -> bool:
+    """Equal, or equal once the more precise value is rounded to the decimals of the less precise one."""
+    if isinstance(a, int) and isinstance(b, int):
+        return a == b
+    da, db = (len(repr(float(x)).split(".")[1]) if "e" not in repr(float(x)) else 12 for x in (a, b))
+    d = min(da, db)
+    return abs(round(float(a), d) - round(float(b), d)) < 10 ** -(d + 3) or abs(float(a) - float(b)) <= 0.5000001 * 10 ** -d
+
+
+BEGIN, END = "<!-- teammates:begin (written by scripts/make_results.py; do not edit by hand) -->", "<!-- teammates:end -->"
+
+
+def teammates_md(doc: dict) -> str:
+    """The "Teammates' analyses" section of docs/final/RESULTS.md, written from the collected facts."""
+    f = doc["facts"]
+    n = lambda k: f"{f[k]:,}" if isinstance(f[k], int) else repr(f[k])          # noqa: E731
+    L = [BEGIN, "", f"## Teammates' analyses, collected into results.json ({doc['meta']['generated_at_utc']})", "",
+         "`python scripts/make_results.py` reads these numbers from files the teammates committed. Nothing is recomputed and no lake "
+         "number is replaced: the keys are `wanru.*` and `zhenni.*`. Sources: `ec-hw2/results/cypher_*.csv`, the stored outputs of "
+         "`notebooks/neo4j_history_edit_wars_wanru.ipynb` and `notebooks/lsh_minhash_wanru.ipynb`, and "
+         "`notebooks/privacy_zhenni/outputs/`.", "",
+         "### Wanru: Neo4j graph of the history cohort (20-day follow-up, as in EC HW2)", "",
+         "| What | Value | Same number recomputed from the lake's Silver tables |", "| --- | --- | --- |"]
+    for label, k in (("Editor nodes", "graph.editors"), ("Page nodes", "graph.pages"), ("EDITED relationships", "graph.edited_rels"),
+                     ("REVERTED relationships", "graph.reverted_rels"), ("Mutual-revert pairs", "mutual_pairs"),
+                     ("Pages with a mutual-revert pair", "mutual_pages"), ("Editors in mutual-revert pairs", "mutual_editors")):
+        L.append(f"| {label} | {n('wanru.neo4j.' + k)} | {n('lakecheck.graph.' + k.split('.')[-1])} |")
+    L += ["", "| What | Value |", "| --- | --- |"]
+    for label, k in (("Contested pages", "graph.contested_pages"), ("Mutual-revert pairs with a bot", "mutual_pairs_with_bot"),
+                     ("Louvain communities", "louvain.communities"), ("Louvain modularity", "louvain.modularity"),
+                     ("Communities with two or more editors", "louvain.communities_2plus"), ("Communities of one editor", "louvain.communities_single"),
+                     ("Largest community: editors", "largest_community.editors"), ("Largest community: revert actions", "largest_community.reverts"),
+                     ("Largest community: bots", "largest_community.bots"),
+                     ("Largest community: share of REVERTED relationships that touch its top reverter, %", "largest_community.top_reverter_share_pct"),
+                     ("Page with the most warring editors: warring editors", "top_page.warring_editors"),
+                     ("Same page: mutual pairs", "top_page.mutual_pairs"), ("Same page: revert actions", "top_page.revert_actions"),
+                     ("Same page: edits", "top_page.edits")):
+        L.append(f"| {label} | {n('wanru.neo4j.' + k)} |")
+    L += ["", "### Wanru: MinHash LSH on edit comments", "", "| What | Value |", "| --- | --- |"]
+    for label, k in (("Edits in the export", "edits_in_export"), ("Edits kept", "edits_kept"), ("Distinct cleaned texts", "distinct_texts"),
+                     ("Texts in the exact-join sample", "sample_texts"), ("Pairs compared in the exact join", "sample_pairs_compared"),
+                     ("True near-duplicate pairs in the sample", "sample_exact_pairs"), ("Exact join, seconds", "exact_join_seconds"),
+                     ("Near-duplicate pairs on all texts", "near_dup_pairs"), ("Texts with a near-duplicate", "texts_with_near_dup"),
+                     ("Groups", "groups"), ("Largest group, texts", "largest_group_texts"),
+                     ("Reverted edits that reuse a summary, %", "reverted.reuses_pct"), ("Not-reverted edits that reuse a summary, %", "not_reverted.reuses_pct"),
+                     ("Labeled pairs", "labels.all.pairs"), ("Labeled pairs with the same edit pattern", "labels.all.same_pattern"),
+                     ("Precision, %", "labels.all.precision_pct"), ("Precision, Wilson 95% low", "labels.all.precision_lo"),
+                     ("Precision, Wilson 95% high", "labels.all.precision_hi"),
+                     ("By similarity band: same pattern", "labels.by_band.same_pattern"), ("By group: same pattern", "labels.by_group.same_pattern")):
+        L.append(f"| {label} | {n('wanru.lsh.' + k)} |")
+    L += ["", "| Hash tables | Pairs returned | True pairs found | Recall, % | Seconds |", "| --- | --- | --- | --- | --- |"]
+    for t in sorted({int(k.split(".")[2][6:]) for k in f if k.startswith("wanru.lsh.tables")}):
+        b = f"wanru.lsh.tables{t}"
+        L.append(f"| {t} | {n(b + '.pairs_returned')} | {n(b + '.true_pairs_found')} | {n(b + '.recall_pct')} | {n(b + '.seconds')} |")
+    L += ["", "### Zhenni: k-anonymity, l-diversity, suppression", "",
+          "| Table | Rows | k | Rows below k | Rows below k, % | Edits in those rows, % | Edits kept if those rows are dropped, % (100 minus the column before) |",
+          "| --- | --- | --- | --- | --- | --- | --- |"]
+    for t, name in (("grid", "kind x date x hour"), ("page", "page summary")):
+        for k in (2, 5, 10, 20):
+            b = f"zhenni.privacy.{t}.k{k}"
+            L.append(f"| {name} | {n(f'zhenni.privacy.{t}.rows')} | {k} | {n(b + '.rows_below')} | {n(b + '.rows_below_pct')} | {n(b + '.edits_below_pct')} | {n(b + '.edits_kept_pct')} |")
+    L += ["", "| Table | Rows with both labels, % | Rows with only reverted edits | Those, % | Rows with no reverted edit, % | Only-reverted rows from a single editor |",
+          "| --- | --- | --- | --- | --- | --- |"]
+    for t, name in (("grid", "kind x date x hour"), ("page", "page summary")):
+        b = f"zhenni.privacy.{t}.l2"
+        L.append(f"| {name} | {n(b + '.two_diverse_pct')} | {n(b + '.all_reverted_rows')} | {n(b + '.all_reverted_pct')} | {n(b + '.none_reverted_pct')} | {n(b + '.all_reverted_single_editor')} |")
+    L += ["", "| Cohort | Rule | Rows kept, % | Edits kept, % | Reverts kept, % | True revert rate, % | Released revert rate, % | Bias, points |",
+          "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+    for c in ("history", "live", "live_ext"):
+        for r in "ABC":
+            b = f"zhenni.privacy.suppress.{c}.rule{r}"
+            L.append(f"| {c} | {r} | " + " | ".join(n(f"{b}.{k}") for k in ("rows_kept_pct", "edits_kept_pct", "reverts_kept_pct", "true_revert_rate_pct",
+                                                                         "released_revert_rate_pct", "bias_points")) + " |")
+    L += ["", f"### Zhenni: Laplace noise on the E(L) counts ({n('zhenni.privacy.laplace.trials')} trials, seed {n('zhenni.privacy.laplace.seed')})", "",
+          "Mean absolute error of E(L) over seven waits, shown to six decimals.", "",
+          "| Cohort | Label source | Editor kind | Eventual reverts | MAE at epsilon 0.1 | MAE at epsilon 0.5 | MAE at epsilon 1.0 |", "| --- | --- | --- | --- | --- | --- | --- |"]
+    series = sorted({tuple(k.split(".")[3:6]) for k in f if k.startswith("zhenni.privacy.laplace.") and k.endswith(".n")},
+                    key=lambda x: -f["zhenni.privacy.laplace." + ".".join(x) + ".n"])
+    for c, src, kind in series:
+        b = f"zhenni.privacy.laplace.{c}.{src}.{kind}"
+        L.append(f"| {c} | {src} | {kind} | {n(b + '.n')} | " + " | ".join(f"{f[f'{b}.mae.eps{e}']:.6f}" for e in ("0_1", "0_5", "1_0")) + " |")
+    pairs = teammate_pairs(f)
+    bad = [(a, b) for a, b in pairs if not agree(f[a], f[b])]
+    L += ["", "### Teammate numbers against the lake and the fallback notebooks", "",
+          f"{len(pairs)} teammate numbers have a lake or fallback number that measures the same thing "
+          f"(`lsh.*`, `privacy.*`, `el.*.n_eventual`, `lakecheck.graph.*`). Compared at the precision of the less precise of the two: "
+          f"{len(pairs) - len(bad)} agree, {len(bad)} disagree."]
+    if bad:
+        L += ["", "| Teammate fact | Value | Lake or fallback fact | Value |", "| --- | --- | --- | --- |"]
+        L += [f"| `{a}` | {n(a)} | `{b}` | {n(b)} |" for a, b in bad]
+    L += ["", END]
+    return "\n".join(L)
+
+
+def write_results_md(doc: dict) -> None:
+    path = REPO / "docs" / "final" / "RESULTS.md"
+    text, block = path.read_text(), teammates_md(doc)
+    if BEGIN in text and END in text:
+        text = text[:text.index(BEGIN)] + block + text[text.index(END) + len(END):]
+    else:
+        text = text.rstrip("\n") + "\n\n" + block + "\n"
+    path.write_text(text)
 
 
 def collect() -> dict:
@@ -290,6 +558,10 @@ def collect() -> dict:
             for k, v in d.get("facts", {}).items():
                 f[k] = v
 
+    # ---------------- Teammates' analyses (their committed result files; separate keys)
+    f.update(teammates())
+    f.update(lake_check_of_graph())
+
     # ---------------- Exports, timings, tests
     man = REPO / "data" / "exports" / "manifest.json"
     if man.exists():
@@ -347,6 +619,7 @@ def main() -> None:
         print(f"results.json check: {len(doc['facts'])} facts, {len(diff)} differ from a fresh collection")
         raise SystemExit(1 if diff else 0)
     OUT.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
+    write_results_md(doc)
     print(f"wrote {OUT.relative_to(REPO)}: {len(doc['facts'])} facts, {len(doc['constants'])} constants, commit {doc['meta']['commit_short']}"
           f"{' (working tree dirty)' if doc['meta']['working_tree_dirty'] else ''}")
 
