@@ -10,8 +10,8 @@
 
 | **Granularity Level (Aggregation)** | **Rows Below k** | **Edits Kept** | **Edits Affected** | **Risk Assessment**       |
 | ----------------------------------- | ---------------- | -------------- | ------------------ | ------------------------- |
-| Hourly Aggregate Grid               | 3.95%            | 16.44%         | 0.83%              | Naturally Safe (Low Risk) |
-| Page-Level Summary                  | 98.42%           | 10.47%         | 85.33%             | Extremely Vulnerable      |
+| Hourly Aggregate Grid               | 3.95%            | 99.17%         | 0.83%              | Naturally Safe (Low Risk) |
+| Page-Level Summary                  | 98.42%           | 14.67%         | 85.33%             | Extremely Vulnerable      |
 
 Keyfindings:
 
@@ -66,7 +66,7 @@ Key findings:
 
 Key findings:
 
-This table confirms that for large cohorts—such as live_ext (n = 112,937) and the main live/stream all editors (n = 17,818)—even under the strictest privacy protection (epsilon = 0.1), the resulting error remains negligible (MAE 0.000125 and 0.000927), highlighting that large datasets are remarkably resilient to Laplace noise.
+This table confirms that for large cohorts—such as live_ext (n = 112,937) and the main live/stream all editors (n = 17,818)—even under the strictest privacy protection (epsilon = 0.1), the resulting error remains negligible (MAE 0.000145 and 0.000927), highlighting that large datasets are remarkably resilient to Laplace noise.
 
 **Footer:** Averaging 1,000 simulation trials eliminates random noise fluctuations and ensures reliable data utility metrics.
 
