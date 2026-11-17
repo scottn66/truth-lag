@@ -8,7 +8,7 @@ Zhenni's k-anonymity, l-diversity, suppression and Laplace-noise analysis. Her f
 | `privacy_k_anonymity_I-Diversity_Suppression.ipynb` / `.py` | k-anonymity, l-diversity and suppression on the Gold exports |
 | `privacy_laplace.ipynb` / `.py` | Laplace noise on the E(L) counts |
 | `outputs/k_anonymity/*.csv`, `outputs/laplace/*` | The summary tables and figure the notebooks write |
-| `Privacy_report_zhenni.md`, `TruthLag_privacy_analysis_report_zhenni.docx` | Her report section |
+| `Privacy_report_zhenni.md`, `TruthLag_privacy_analysis_report_zhenni.md` | Her report section |
 | `TruthLag_Privacy_Slides_Content.md` | Her slide content |
 | `TruthLag_MongoDB_Charts_analysis.md` | Her notes on the MongoDB Charts dashboard |
 
