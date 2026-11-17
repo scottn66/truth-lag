@@ -1,0 +1,765 @@
+{
+ "note": "Side analysis. Not part of docs/final/results.json or any checked number.",
+ "delta_versions": {
+  "history_revert_links": 1,
+  "live_revert_links": 3,
+  "live_ext_revert_links": 1,
+  "history_revisions": 1,
+  "live_revisions": 3,
+  "live_ext_revisions": 1,
+  "history_slim": 2
+ },
+ "bootstrap_draws": 2000,
+ "seed": 226,
+ "facts": {
+  "history.base: reverter is not the author": {
+   "link_rows": 19858,
+   "usable_links": 18020,
+   "directed_pairs": 13353,
+   "mutual_pairs": 462,
+   "mutual_pages": 397,
+   "pages_with_a_revert_by_another_editor": 10465,
+   "mutual_pages_pct_of_reverted_pages": 3.79,
+   "pages_with_one_pair": 356,
+   "pages_with_2plus_pairs": 41
+  },
+  "history.no bots": {
+   "link_rows": 19858,
+   "usable_links": 17123,
+   "directed_pairs": 12516,
+   "mutual_pairs": 437,
+   "mutual_pages": 382,
+   "pages_with_a_revert_by_another_editor": 10015,
+   "mutual_pages_pct_of_reverted_pages": 3.81,
+   "pages_with_one_pair": 348,
+   "pages_with_2plus_pairs": 34
+  },
+  "history.registered editors only": {
+   "link_rows": 19858,
+   "usable_links": 7058,
+   "directed_pairs": 4851,
+   "mutual_pairs": 194,
+   "mutual_pages": 171,
+   "pages_with_a_revert_by_another_editor": 4105,
+   "mutual_pages_pct_of_reverted_pages": 4.17,
+   "pages_with_one_pair": 156,
+   "pages_with_2plus_pairs": 15
+  },
+  "history.revert inside the 4-day follow-up": {
+   "link_rows": 19858,
+   "usable_links": 17868,
+   "directed_pairs": 13269,
+   "mutual_pairs": 462,
+   "mutual_pages": 397,
+   "pages_with_a_revert_by_another_editor": 10419,
+   "mutual_pages_pct_of_reverted_pages": 3.81,
+   "pages_with_one_pair": 356,
+   "pages_with_2plus_pairs": 41
+  },
+  "live.base: reverter is not the author": {
+   "link_rows": 19513,
+   "usable_links": 17885,
+   "directed_pairs": 13613,
+   "mutual_pairs": 510,
+   "mutual_pages": 438,
+   "pages_with_a_revert_by_another_editor": 10600,
+   "mutual_pages_pct_of_reverted_pages": 4.13,
+   "pages_with_one_pair": 392,
+   "pages_with_2plus_pairs": 46
+  },
+  "live.no bots": {
+   "link_rows": 19513,
+   "usable_links": 17414,
+   "directed_pairs": 13154,
+   "mutual_pairs": 503,
+   "mutual_pages": 434,
+   "pages_with_a_revert_by_another_editor": 10300,
+   "mutual_pages_pct_of_reverted_pages": 4.21,
+   "pages_with_one_pair": 388,
+   "pages_with_2plus_pairs": 46
+  },
+  "live.registered editors only": {
+   "link_rows": 19513,
+   "usable_links": 7028,
+   "directed_pairs": 4973,
+   "mutual_pairs": 225,
+   "mutual_pages": 215,
+   "pages_with_a_revert_by_another_editor": 4098,
+   "mutual_pages_pct_of_reverted_pages": 5.25,
+   "pages_with_one_pair": 207,
+   "pages_with_2plus_pairs": 8
+  },
+  "live.revert undid exactly one revision": {
+   "link_rows": 19513,
+   "usable_links": 11310,
+   "directed_pairs": 10881,
+   "mutual_pairs": 405,
+   "mutual_pages": 354,
+   "pages_with_a_revert_by_another_editor": 9035,
+   "mutual_pages_pct_of_reverted_pages": 3.92,
+   "pages_with_one_pair": 319,
+   "pages_with_2plus_pairs": 35
+  },
+  "live.revert inside the 4-day follow-up": {
+   "link_rows": 19513,
+   "usable_links": 16265,
+   "directed_pairs": 12441,
+   "mutual_pairs": 478,
+   "mutual_pages": 406,
+   "pages_with_a_revert_by_another_editor": 9664,
+   "mutual_pages_pct_of_reverted_pages": 4.2,
+   "pages_with_one_pair": 360,
+   "pages_with_2plus_pairs": 46
+  },
+  "live_ext.base: reverter is not the author": {
+   "link_rows": 122192,
+   "usable_links": 110894,
+   "directed_pairs": 83347,
+   "mutual_pairs": 3619,
+   "mutual_pages": 2831,
+   "pages_with_a_revert_by_another_editor": 55512,
+   "mutual_pages_pct_of_reverted_pages": 5.1,
+   "pages_with_one_pair": 2377,
+   "pages_with_2plus_pairs": 454
+  },
+  "live_ext.no bots": {
+   "link_rows": 122192,
+   "usable_links": 105309,
+   "directed_pairs": 78143,
+   "mutual_pairs": 3428,
+   "mutual_pages": 2726,
+   "pages_with_a_revert_by_another_editor": 53240,
+   "mutual_pages_pct_of_reverted_pages": 5.12,
+   "pages_with_one_pair": 2302,
+   "pages_with_2plus_pairs": 424
+  },
+  "live_ext.registered editors only": {
+   "link_rows": 122192,
+   "usable_links": 44569,
+   "directed_pairs": 31447,
+   "mutual_pairs": 1608,
+   "mutual_pages": 1393,
+   "pages_with_a_revert_by_another_editor": 23890,
+   "mutual_pages_pct_of_reverted_pages": 5.83,
+   "pages_with_one_pair": 1236,
+   "pages_with_2plus_pairs": 157
+  },
+  "live_ext.revert undid exactly one revision": {
+   "link_rows": 122192,
+   "usable_links": 69749,
+   "directed_pairs": 66564,
+   "mutual_pairs": 2755,
+   "mutual_pages": 2229,
+   "pages_with_a_revert_by_another_editor": 48659,
+   "mutual_pages_pct_of_reverted_pages": 4.58,
+   "pages_with_one_pair": 1920,
+   "pages_with_2plus_pairs": 309
+  },
+  "live_ext.revert inside the 4-day follow-up": {
+   "link_rows": 122192,
+   "usable_links": 102404,
+   "directed_pairs": 77372,
+   "mutual_pairs": 3377,
+   "mutual_pages": 2614,
+   "pages_with_a_revert_by_another_editor": 51435,
+   "mutual_pages_pct_of_reverted_pages": 5.08,
+   "pages_with_one_pair": 2178,
+   "pages_with_2plus_pairs": 436
+  },
+  "history.cohort_pages": 165415,
+  "live.cohort_pages": 155938,
+  "live_ext.cohort_pages": 1238130,
+  "history.pair_kinds": {
+   "registered vs temporary": 235,
+   "registered vs registered": 194,
+   "bot vs temporary": 21,
+   "temporary vs temporary": 8,
+   "bot vs registered": 4
+  },
+  "live.pair_kinds": {
+   "registered vs temporary": 274,
+   "registered vs registered": 225,
+   "bot vs temporary": 5,
+   "temporary vs temporary": 4,
+   "bot vs registered": 2
+  },
+  "live_ext.pair_kinds": {
+   "registered vs temporary": 1764,
+   "registered vs registered": 1608,
+   "bot vs temporary": 116,
+   "bot vs registered": 70,
+   "temporary vs temporary": 56,
+   "bot vs bot": 5
+  },
+  "history.window_M": {
+   "cohort": "history",
+   "mutual pages": 397,
+   "pages with window M = 0": 356,
+   "pages with window M > 0": 41,
+   "median M where > 0": 6.0,
+   "largest M": 170.0,
+   "pairs where an editor has no counted edit (N set to 1)": 0
+  },
+  "live.window_M": {
+   "cohort": "live",
+   "mutual pages": 438,
+   "pages with window M = 0": 392,
+   "pages with window M > 0": 46,
+   "median M where > 0": 4.0,
+   "largest M": 187.0,
+   "pairs where an editor has no counted edit (N set to 1)": 0
+  },
+  "live_ext.window_M": {
+   "cohort": "live_ext",
+   "mutual pages": 2831,
+   "pages with window M = 0": 2377,
+   "pages with window M > 0": 454,
+   "median M where > 0": 6.0,
+   "largest M": 2080.0,
+   "pairs where an editor has no counted edit (N set to 1)": 0
+  },
+  "history.E_by_in_window_flag": [
+   {
+    "L": "1 h",
+    "group": "mutual pair",
+    "pages": 397,
+    "reverts": 1983,
+    "E": 0.3777,
+    "E_lo": 0.3329,
+    "E_hi": 0.424,
+    "diff_vs_ref": 0.0551,
+    "diff_lo": 0.002,
+    "diff_hi": 0.1086,
+    "diff_interval_excludes_0": true
+   },
+   {
+    "L": "1 h",
+    "group": "no mutual pair, 2+ revert events",
+    "pages": 1235,
+    "reverts": 4039,
+    "E": 0.3226,
+    "E_lo": 0.2972,
+    "E_hi": 0.3486
+   },
+   {
+    "L": "1 h",
+    "group": "all other pages",
+    "pages": 8732,
+    "reverts": 11624,
+    "E": 0.4966,
+    "E_lo": 0.4837,
+    "E_hi": 0.5095,
+    "diff_vs_ref": 0.174,
+    "diff_lo": 0.1435,
+    "diff_hi": 0.2039,
+    "diff_interval_excludes_0": true
+   },
+   {
+    "L": "1 d",
+    "group": "mutual pair",
+    "pages": 397,
+    "reverts": 1983,
+    "E": 0.0605,
+    "E_lo": 0.0462,
+    "E_hi": 0.0765,
+    "diff_vs_ref": 0.011,
+    "diff_lo": -0.0083,
+    "diff_hi": 0.0309,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 d",
+    "group": "no mutual pair, 2+ revert events",
+    "pages": 1235,
+    "reverts": 4039,
+    "E": 0.0495,
+    "E_lo": 0.0383,
+    "E_hi": 0.0623
+   },
+   {
+    "L": "1 d",
+    "group": "all other pages",
+    "pages": 8732,
+    "reverts": 11624,
+    "E": 0.1401,
+    "E_lo": 0.1288,
+    "E_hi": 0.1522,
+    "diff_vs_ref": 0.0906,
+    "diff_lo": 0.0738,
+    "diff_hi": 0.1077,
+    "diff_interval_excludes_0": true
+   }
+  ],
+  "history.composition_in_window_groups": [
+   {
+    "group": "all other pages",
+    "reverts": 11624,
+    "temporary_author_pct": 56.2,
+    "registered_author_pct": 43.0,
+    "bot_author_pct": 0.8,
+    "self_revert_pct": 12.6
+   },
+   {
+    "group": "mutual pair",
+    "reverts": 1983,
+    "temporary_author_pct": 38.0,
+    "registered_author_pct": 60.1,
+    "bot_author_pct": 1.9,
+    "self_revert_pct": 3.0
+   },
+   {
+    "group": "no mutual pair, 2+ revert events",
+    "reverts": 4039,
+    "temporary_author_pct": 63.8,
+    "registered_author_pct": 35.6,
+    "bot_author_pct": 0.5,
+    "self_revert_pct": 4.4
+   }
+  ],
+  "live.E_by_in_window_flag": [
+   {
+    "L": "1 h",
+    "group": "mutual pair",
+    "pages": 438,
+    "reverts": 2350,
+    "E": 0.374,
+    "E_lo": 0.3266,
+    "E_hi": 0.4233,
+    "diff_vs_ref": 0.0495,
+    "diff_lo": -0.0018,
+    "diff_hi": 0.1021,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 h",
+    "group": "no mutual pair, 2+ revert events",
+    "pages": 1229,
+    "reverts": 4037,
+    "E": 0.3245,
+    "E_lo": 0.299,
+    "E_hi": 0.3506
+   },
+   {
+    "L": "1 h",
+    "group": "all other pages",
+    "pages": 8804,
+    "reverts": 11431,
+    "E": 0.4639,
+    "E_lo": 0.4489,
+    "E_hi": 0.4783,
+    "diff_vs_ref": 0.1394,
+    "diff_lo": 0.1109,
+    "diff_hi": 0.1686,
+    "diff_interval_excludes_0": true
+   },
+   {
+    "L": "1 d",
+    "group": "mutual pair",
+    "pages": 438,
+    "reverts": 2350,
+    "E": 0.0545,
+    "E_lo": 0.0419,
+    "E_hi": 0.0697,
+    "diff_vs_ref": -0.004,
+    "diff_lo": -0.0235,
+    "diff_hi": 0.0161,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 d",
+    "group": "no mutual pair, 2+ revert events",
+    "pages": 1229,
+    "reverts": 4037,
+    "E": 0.0585,
+    "E_lo": 0.0459,
+    "E_hi": 0.0725
+   },
+   {
+    "L": "1 d",
+    "group": "all other pages",
+    "pages": 8804,
+    "reverts": 11431,
+    "E": 0.1328,
+    "E_lo": 0.1185,
+    "E_hi": 0.149,
+    "diff_vs_ref": 0.0743,
+    "diff_lo": 0.0553,
+    "diff_hi": 0.0951,
+    "diff_interval_excludes_0": true
+   }
+  ],
+  "live.composition_in_window_groups": [
+   {
+    "group": "all other pages",
+    "reverts": 11431,
+    "temporary_author_pct": 55.6,
+    "registered_author_pct": 43.4,
+    "bot_author_pct": 1.0,
+    "self_revert_pct": 11.1
+   },
+   {
+    "group": "mutual pair",
+    "reverts": 2350,
+    "temporary_author_pct": 42.9,
+    "registered_author_pct": 56.6,
+    "bot_author_pct": 0.5,
+    "self_revert_pct": 5.6
+   },
+   {
+    "group": "no mutual pair, 2+ revert events",
+    "reverts": 4037,
+    "temporary_author_pct": 59.5,
+    "registered_author_pct": 40.1,
+    "bot_author_pct": 0.4,
+    "self_revert_pct": 3.9
+   }
+  ],
+  "live_ext.E_by_in_window_flag": [
+   {
+    "L": "1 h",
+    "group": "mutual pair",
+    "pages": 2829,
+    "reverts": 20271,
+    "E": 0.4182,
+    "E_lo": 0.3909,
+    "E_hi": 0.445,
+    "diff_vs_ref": 0.0614,
+    "diff_lo": 0.0319,
+    "diff_hi": 0.0918,
+    "diff_interval_excludes_0": true
+   },
+   {
+    "L": "1 h",
+    "group": "no mutual pair, 2+ revert events",
+    "pages": 9563,
+    "reverts": 35459,
+    "E": 0.3568,
+    "E_lo": 0.3472,
+    "E_hi": 0.3665
+   },
+   {
+    "L": "1 h",
+    "group": "all other pages",
+    "pages": 44139,
+    "reverts": 57207,
+    "E": 0.4451,
+    "E_lo": 0.4387,
+    "E_hi": 0.4524,
+    "diff_vs_ref": 0.0884,
+    "diff_lo": 0.0767,
+    "diff_hi": 0.0995,
+    "diff_interval_excludes_0": true
+   },
+   {
+    "L": "1 d",
+    "group": "mutual pair",
+    "pages": 2829,
+    "reverts": 20271,
+    "E": 0.0804,
+    "E_lo": 0.0681,
+    "E_hi": 0.0958,
+    "diff_vs_ref": 0.0096,
+    "diff_lo": -0.004,
+    "diff_hi": 0.0265,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 d",
+    "group": "no mutual pair, 2+ revert events",
+    "pages": 9563,
+    "reverts": 35459,
+    "E": 0.0708,
+    "E_lo": 0.0657,
+    "E_hi": 0.0765
+   },
+   {
+    "L": "1 d",
+    "group": "all other pages",
+    "pages": 44139,
+    "reverts": 57207,
+    "E": 0.1152,
+    "E_lo": 0.1106,
+    "E_hi": 0.1204,
+    "diff_vs_ref": 0.0445,
+    "diff_lo": 0.0369,
+    "diff_hi": 0.052,
+    "diff_interval_excludes_0": true
+   }
+  ],
+  "live_ext.composition_in_window_groups": [
+   {
+    "group": "all other pages",
+    "reverts": 57207,
+    "temporary_author_pct": 52.9,
+    "registered_author_pct": 44.8,
+    "bot_author_pct": 2.3,
+    "self_revert_pct": 14.1
+   },
+   {
+    "group": "mutual pair",
+    "reverts": 20271,
+    "temporary_author_pct": 40.2,
+    "registered_author_pct": 58.0,
+    "bot_author_pct": 1.8,
+    "self_revert_pct": 4.8
+   },
+   {
+    "group": "no mutual pair, 2+ revert events",
+    "reverts": 35459,
+    "temporary_author_pct": 60.0,
+    "registered_author_pct": 39.2,
+    "bot_author_pct": 0.8,
+    "self_revert_pct": 4.3
+   }
+  ],
+  "pre_period": {
+   "window": "reverted edit and revert both before 2026-10-20, dump snapshot 2026-10",
+   "first_dump_edit": "2026-09-01 00:00:00+00:00",
+   "reverted_edits_before_cut": 339663,
+   "reverting_revision_not_in_table": 0,
+   "reverted_after_cut_dropped": 16246,
+   "link_rows": 323417,
+   "usable_links": 290983,
+   "directed_pairs": 210830,
+   "mutual_pairs": 9634,
+   "mutual_pages": 7615,
+   "pages_with_a_revert_by_another_editor": 122809,
+   "mutual_pages_pct_of_reverted_pages": 6.2,
+   "pages_with_one_pair": 6364,
+   "pages_with_2plus_pairs": 1251,
+   "pair_kinds": {
+    "registered vs temporary": 4562,
+    "registered vs registered": 4201,
+    "bot vs registered": 504,
+    "bot vs temporary": 273,
+    "temporary vs temporary": 93,
+    "bot vs bot": 1
+   },
+   "pages_with_window_M_gt_0": 1251,
+   "largest_window_M": 722.0
+  },
+  "live_ext.E_by_pre_period_flag": [
+   {
+    "L": "1 h",
+    "group": "mutual pair before Oct 20",
+    "pages": 1735,
+    "reverts": 7594,
+    "E": 0.4272,
+    "E_lo": 0.3862,
+    "E_hi": 0.4695,
+    "diff_vs_ref": 0.0355,
+    "diff_lo": -0.0095,
+    "diff_hi": 0.0849,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 h",
+    "group": "no mutual pair, 2+ revert events before Oct 20",
+    "pages": 6911,
+    "reverts": 19944,
+    "E": 0.3916,
+    "E_lo": 0.3707,
+    "E_hi": 0.4113
+   },
+   {
+    "L": "1 h",
+    "group": "all other pages",
+    "pages": 47885,
+    "reverts": 85399,
+    "E": 0.4161,
+    "E_lo": 0.4098,
+    "E_hi": 0.4226,
+    "diff_vs_ref": 0.0245,
+    "diff_lo": 0.003,
+    "diff_hi": 0.0467,
+    "diff_interval_excludes_0": true
+   },
+   {
+    "L": "1 d",
+    "group": "mutual pair before Oct 20",
+    "pages": 1735,
+    "reverts": 7594,
+    "E": 0.0762,
+    "E_lo": 0.065,
+    "E_hi": 0.0897,
+    "diff_vs_ref": 0.008,
+    "diff_lo": -0.0058,
+    "diff_hi": 0.0235,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 d",
+    "group": "no mutual pair, 2+ revert events before Oct 20",
+    "pages": 6911,
+    "reverts": 19944,
+    "E": 0.0683,
+    "E_lo": 0.0615,
+    "E_hi": 0.0754
+   },
+   {
+    "L": "1 d",
+    "group": "all other pages",
+    "pages": 47885,
+    "reverts": 85399,
+    "E": 0.1029,
+    "E_lo": 0.0984,
+    "E_hi": 0.1078,
+    "diff_vs_ref": 0.0346,
+    "diff_lo": 0.0264,
+    "diff_hi": 0.043,
+    "diff_interval_excludes_0": true
+   }
+  ],
+  "live_ext.composition_pre_period_groups": [
+   {
+    "group": "all other pages",
+    "reverts": 85399,
+    "temporary_author_pct": 51.9,
+    "registered_author_pct": 46.1,
+    "bot_author_pct": 2.0,
+    "self_revert_pct": 10.4
+   },
+   {
+    "group": "mutual pair before Oct 20",
+    "reverts": 7594,
+    "temporary_author_pct": 48.2,
+    "registered_author_pct": 50.5,
+    "bot_author_pct": 1.2,
+    "self_revert_pct": 7.6
+   },
+   {
+    "group": "no mutual pair, 2+ revert events before Oct 20",
+    "reverts": 19944,
+    "temporary_author_pct": 58.7,
+    "registered_author_pct": 40.4,
+    "bot_author_pct": 0.9,
+    "self_revert_pct": 5.5
+   }
+  ],
+  "live_ext.frame_pages_with_no_dump_edit_before_cut": 16933,
+  "live.E_by_pre_period_flag": [
+   {
+    "L": "1 h",
+    "group": "mutual pair before Oct 20",
+    "pages": 550,
+    "reverts": 1430,
+    "E": 0.451,
+    "E_lo": 0.391,
+    "E_hi": 0.5131,
+    "diff_vs_ref": 0.0477,
+    "diff_lo": -0.0163,
+    "diff_hi": 0.1092,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 h",
+    "group": "no mutual pair, 2+ revert events before Oct 20",
+    "pages": 1813,
+    "reverts": 3265,
+    "E": 0.4034,
+    "E_lo": 0.3753,
+    "E_hi": 0.4322
+   },
+   {
+    "L": "1 h",
+    "group": "all other pages",
+    "pages": 8108,
+    "reverts": 13123,
+    "E": 0.4214,
+    "E_lo": 0.4065,
+    "E_hi": 0.4377,
+    "diff_vs_ref": 0.018,
+    "diff_lo": -0.0144,
+    "diff_hi": 0.0515,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 d",
+    "group": "mutual pair before Oct 20",
+    "pages": 550,
+    "reverts": 1430,
+    "E": 0.1217,
+    "E_lo": 0.0866,
+    "E_hi": 0.1598,
+    "diff_vs_ref": 0.0295,
+    "diff_lo": -0.0102,
+    "diff_hi": 0.073,
+    "diff_interval_excludes_0": false
+   },
+   {
+    "L": "1 d",
+    "group": "no mutual pair, 2+ revert events before Oct 20",
+    "pages": 1813,
+    "reverts": 3265,
+    "E": 0.0922,
+    "E_lo": 0.0753,
+    "E_hi": 0.1096
+   },
+   {
+    "L": "1 d",
+    "group": "all other pages",
+    "pages": 8108,
+    "reverts": 13123,
+    "E": 0.1072,
+    "E_lo": 0.0954,
+    "E_hi": 0.1217,
+    "diff_vs_ref": 0.015,
+    "diff_lo": -0.0069,
+    "diff_hi": 0.0362,
+    "diff_interval_excludes_0": false
+   }
+  ],
+  "live.composition_pre_period_groups": [
+   {
+    "group": "all other pages",
+    "reverts": 13123,
+    "temporary_author_pct": 53.6,
+    "registered_author_pct": 45.5,
+    "bot_author_pct": 0.9,
+    "self_revert_pct": 9.4
+   },
+   {
+    "group": "mutual pair before Oct 20",
+    "reverts": 1430,
+    "temporary_author_pct": 48.5,
+    "registered_author_pct": 50.7,
+    "bot_author_pct": 0.8,
+    "self_revert_pct": 7.9
+   },
+   {
+    "group": "no mutual pair, 2+ revert events before Oct 20",
+    "reverts": 3265,
+    "temporary_author_pct": 62.6,
+    "registered_author_pct": 37.1,
+    "bot_author_pct": 0.3,
+    "self_revert_pct": 6.4
+   }
+  ],
+  "live.frame_pages_with_no_dump_edit_before_cut": 2446,
+  "history.overlap": {
+   "cohort": "history",
+   "pages in the frame": 10364,
+   "burst pages": 83,
+   "mutual-pair pages": 397,
+   "both": 19
+  },
+  "live.overlap": {
+   "cohort": "live",
+   "pages in the frame": 10471,
+   "burst pages": 70,
+   "mutual-pair pages": 438,
+   "both": 24,
+   "pages with a mutual pair before Oct 20": 550,
+   "of those, also a mutual pair in the window": 55
+  },
+  "live_ext.overlap": {
+   "cohort": "live_ext",
+   "pages in the frame": 56531,
+   "burst pages": 506,
+   "mutual-pair pages": 2829,
+   "both": 183,
+   "pages with a mutual pair before Oct 20": 1735,
+   "of those, also a mutual pair in the window": 283
+  }
+ }
+}

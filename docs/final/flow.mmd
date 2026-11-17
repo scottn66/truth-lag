@@ -1,0 +1,42 @@
+%% TruthLag final build: data flow (render with mermaid; PNG copy in docs/final/figures/flow.png)
+flowchart LR
+  subgraph SRC[Sources]
+    ES[Wikimedia EventStreams<br/>page_change, revert_risk, tags<br/>captured on the VPS]
+    HD[MediaWiki History dumps<br/>snapshots 2026-09 and 2026-10, slim]
+  end
+  subgraph BR[Bronze: delta-rs, append-only]
+    B1[bronze/page_change_events<br/>4.87 M lines]
+    B2[bronze/revert_risk_events<br/>3.11 M]
+    B3[bronze/tags_events<br/>4.34 M]
+    B4[bronze/history_slim 15.9 M, 2 snapshots<br/>bronze/history_full 0.30 M]
+  end
+  subgraph SI[Silver: delta-rs, old EC HW2 rules]
+    S1[page_change, revert_risk,<br/>tag_events, capture_gaps]
+    S2[history_slim, history_revisions,<br/>history_revert_links]
+    S3[live_revisions, live_revert_links,<br/>late_reverts, live_ext_*<br/>rebuilt per as_of]
+  end
+  subgraph GO[Gold: Spark SQL star schema]
+    D[dim_cohort, dim_snapshot,<br/>dim_time, dim_user,<br/>dim_page SCD2]
+    F[fact_edit CDF<br/>fact_revert_label CDF,<br/>one commit per snapshot]
+    M[mart_el_curve, mart_el_by_burst<br/>mart_label_change, mart_reconciliation]
+  end
+  subgraph AN[Analyses and outputs]
+    H[H1, H3, H4<br/>bootstrap intervals]
+    T[time travel then vs now<br/>snapshot and as_of axes]
+    SA[streaming algorithms<br/>HLL, FM, Bloom, DGIM]
+    SS[Structured Streaming<br/>Bronze to Silver replay]
+    X[data/exports<br/>LSH, privacy, charts]
+  end
+  ES -->|rsync, read-only| B1 & B2 & B3
+  HD --> B4
+  B1 & B2 & B3 --> S1
+  B4 --> S2
+  S1 --> S3
+  S2 --> S3
+  S1 & S2 & S3 --> D & F
+  D & F --> M
+  M --> H
+  F --> T
+  S1 --> SA
+  B1 --> SS
+  M & F --> X

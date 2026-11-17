@@ -1,0 +1,38 @@
+{
+  "input": "truthlag_exports_2026-11-15\\data\\exports\\mart_el_curve.csv",
+  "analyzed_series": [
+    [
+      "history",
+      "dump"
+    ],
+    [
+      "live",
+      "dump"
+    ],
+    [
+      "live",
+      "stream"
+    ],
+    [
+      "live_ext",
+      "stream"
+    ]
+  ],
+  "epsilons": [
+    0.1,
+    0.5,
+    1.0
+  ],
+  "trials": 1000,
+  "seed": 226,
+  "method": "Laplace noise on first-known wait-time histogram bins",
+  "evaluated_waits": [
+    "1 min",
+    "5 min",
+    "15 min",
+    "1 h",
+    "6 h",
+    "1 d",
+    "2 d"
+  ]
+}
