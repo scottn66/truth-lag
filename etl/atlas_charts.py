@@ -52,6 +52,25 @@ def safe(err: Exception) -> str:
     return text[:300]
 
 
+def collection_lines(db, names) -> list[str]:
+    """One line per collection with its document count. A name the driver refuses (for example one that ends with a
+    dot, which a collection made by hand in the Atlas UI can have) is skipped with a warning; it is not ours and it
+    is not touched."""
+    try:
+        from pymongo.errors import InvalidName
+    except ImportError:          # tests run without the driver
+        InvalidName = ()
+    lines = []
+    for name in names:
+        try:
+            lines.append(f"  {name}: {db[name].estimated_document_count():,} documents")
+        except Exception as err:   # noqa: BLE001
+            if not (isinstance(err, InvalidName) or type(err).__name__ == "InvalidName"):
+                raise
+            lines.append(f"  WARNING: skipped {name!r}: not a valid collection name ({safe(err)})")
+    return lines
+
+
 def main() -> int:
     check_only = "--check" in sys.argv
     if not config.ATLAS_URI or "<" in config.ATLAS_URI:
@@ -68,8 +87,8 @@ def main() -> int:
     used_mb = (stats.get("dataSize", 0) + stats.get("indexSize", 0)) / 1e6
     existing = sorted(db.list_collection_names())
     print(f"database {config.ATLAS_DB}: {used_mb:.1f} MB used (data + indexes), {len(existing)} collections")
-    for name in existing:
-        print(f"  {name}: {db[name].estimated_document_count():,} documents")
+    for line in collection_lines(db, existing):
+        print(line)
 
     files = {name: EXPORTS_DIR / f for name, f in COLLECTIONS.items()}
     missing = [str(p) for p in files.values() if not p.exists()]
